@@ -20,25 +20,48 @@ module.exports = {
         use: ['babel-loader', 'eslint-loader'],
       },
       {
+        test: /\.less$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+              sourceMap: true,
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              javascriptEnabled: true,
+            },
+          },
+        ],
+      },
+      {
         test: /\.(css|scss)$/,
         exclude: /node_modules/,
         use: [
           {
+            loader: 'style-loader',
+          },
+          {
             loader: 'css-loader',
             options: {
-              discardDuplicates: true,
-              importLoaders: 1,
-              // This enables local scoped CSS based in CSS Modules spec
-              modules: true,
-              // generates a unique name for each class (e.g. app__app___2x3cr)
-              localIdentName: '[name]__[local]___[hash:base64:5]',
-              sourceMap: process.env.NODE_ENV !== 'production',
+              modules: {
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+              sourceMap: true,
             },
           },
           {
             loader: 'sass-loader',
             options: {
-              sourceMap: process.env.NODE_ENV !== 'production',
+              sourceMap: true,
             },
           },
         ],
@@ -51,7 +74,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebPackPlugin({
-      template: './index.html',
+      template: './app/index.html',
       filename: './index.html',
     }),
   ],

@@ -1,6 +1,22 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import { ConnectedRouter } from 'react-router-redux';
 
-const App = () => <h1>ConnectUs</h1>;
+import store, { history } from './store';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import App from './containers/App';
+
+const renderApp = () =>
+  render(
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
+        <App />
+      </ConnectedRouter>
+    </Provider>,
+    document.getElementById('root')
+  );
+
+if (process.env.NODE_ENV !== 'production' && module.hot) {
+  module.hot.accept('containers/App', renderApp);
+}
