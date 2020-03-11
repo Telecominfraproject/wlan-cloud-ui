@@ -5,6 +5,8 @@ import { Layout, Icon, Popover, Row } from 'antd';
 
 import logoMobile from 'images/logoxmobile.jpg';
 
+import styles from './GlobalHeader.module.scss';
+
 const { Header } = Layout;
 
 const GlobalHeader = ({ collapsed, onMenuButtonClick, isMobile }) => {
@@ -44,13 +46,23 @@ const GlobalHeader = ({ collapsed, onMenuButtonClick, isMobile }) => {
   );
 
   return (
-    <Header collapsed={collapsed} isMobile={isMobile}>
+    <Header
+      className={`${styles.GlobalHeader} ${collapsed ? styles.collapsed : ''} ${
+        isMobile ? styles.mobile : ''
+      }`}
+      collapsed={collapsed}
+      isMobile={isMobile}
+    >
       {isMobile && [
-        <Link to="/" key="mobileLogo">
+        <Link className={styles.LogoContainer} to="/" key="mobileLogo">
           <img src={logoMobile} alt="logo" width="32" />
         </Link>,
       ]}
-      <Icon type={collapsed ? 'menu-unfold' : 'menu-fold'} onClick={onMenuButtonClick} />
+      <Icon
+        className={styles.MenuIcon}
+        type={collapsed ? 'menu-unfold' : 'menu-fold'}
+        onClick={onMenuButtonClick}
+      />
       <Popover
         content={userOptions}
         trigger="click"
@@ -58,7 +70,7 @@ const GlobalHeader = ({ collapsed, onMenuButtonClick, isMobile }) => {
         visible={popoverVisible}
         onVisibleChange={handleVisibleChange}
       >
-        <Icon type="setting" />
+        <Icon className={styles.MenuIcon} type="setting" />
       </Popover>
     </Header>
   );

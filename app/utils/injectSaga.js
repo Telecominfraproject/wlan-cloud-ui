@@ -18,14 +18,6 @@ import getInjectors from './sagaInjectors';
  */
 export default ({ key, saga, mode }) => WrappedComponent => {
   class InjectSaga extends React.Component {
-    static WrappedComponent = WrappedComponent;
-
-    static contextType = ReactReduxContext;
-
-    static displayName = `withSaga(${WrappedComponent.displayName ||
-      WrappedComponent.name ||
-      'Component'})`;
-
     constructor(props, context) {
       super(props, context);
 
@@ -38,10 +30,18 @@ export default ({ key, saga, mode }) => WrappedComponent => {
       this.injectors.ejectSaga(key);
     }
 
+    static WrappedComponent = WrappedComponent;
+
     render() {
       return <WrappedComponent {...this.props} />;
     }
   }
+
+  InjectSaga.contextType = ReactReduxContext;
+
+  InjectSaga.displayName = `withSaga(${WrappedComponent.displayName ||
+    WrappedComponent.name ||
+    'Component'})`;
 
   return hoistNonReactStatics(InjectSaga, WrappedComponent);
 };

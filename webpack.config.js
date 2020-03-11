@@ -4,7 +4,7 @@ const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: process.env.NODE_ENV,
-  entry: './app/index.js',
+  entry: ['babel-polyfill', './app/index.js'],
   output: {
     path: path.join(__dirname, 'dist'),
     publicPath: '/',
@@ -16,12 +16,27 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
+      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: ['babel-loader', 'eslint-loader'],
       },
       {
+        // Preprocess 3rd party .css files located in node_modules
+        test: /\.css$/,
+        include: /node_modules/,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
         test: /\.less$/,
+        exclude: /node_modules/,
         use: [
           {
             loader: 'style-loader',
@@ -61,9 +76,6 @@ module.exports = {
           },
           {
             loader: 'sass-loader',
-            options: {
-              sourceMap: true,
-            },
           },
         ],
       },
@@ -80,6 +92,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebPackPlugin({
+      inject: true,
       template: './app/index.html',
       filename: './index.html',
     }),

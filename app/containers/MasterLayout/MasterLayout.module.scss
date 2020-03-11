@@ -1,13 +1,20 @@
+@import 'styles/variables';
+
 .MainLayout {
   height: 100vh;
-  margin-left: 234px;
+  margin-left: $sidebar-width;
+  overflow: auto;
 
   &.mobile {
     margin-left: 0;
   }
   &.collapsed {
-    margin-left: 80px;
+    margin-left: $sidebar-collapsed-width;
   }
+}
+
+.Content {
+    margin-top: $header-height;
 }
 
 .Footer {

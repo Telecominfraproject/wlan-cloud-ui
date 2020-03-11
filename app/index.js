@@ -1,24 +1,30 @@
 import React from 'react';
-import { render } from 'react-dom';
+import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { ConnectedRouter } from 'react-router-redux';
+import { ConnectedRouter } from 'connected-react-router';
 
 import App from 'containers/App';
-import store from 'store';
+import configureStore from 'store';
 import history from 'utils/history';
 
-const renderApp = () =>
-  render(
+// Create redux store with history
+const initialState = {};
+const store = configureStore(initialState, history);
+const MOUNT_NODE = document.getElementById('root');
+
+const render = () => {
+  ReactDOM.render(
     <Provider store={store}>
       <ConnectedRouter history={history}>
         <App />
       </ConnectedRouter>
     </Provider>,
-    document.getElementById('root')
+    MOUNT_NODE
   );
+};
 
 if (process.env.NODE_ENV !== 'production' && module.hot) {
-  module.hot.accept('containers/App', renderApp);
+  module.hot.accept('containers/App', () => ReactDOM.unmountComponentAtNode(MOUNT_NODE));
 }
 
-renderApp();
+render();

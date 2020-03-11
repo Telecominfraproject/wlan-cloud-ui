@@ -1,17 +1,28 @@
-import { fromJS } from 'immutable';
+/*
+ * AppReducer
+ *
+ * The reducer takes care of our data. Using actions, we can
+ * update our application state. To add a new action,
+ * add it to the switch statement in the reducer function
+ *
+ */
+
+import produce from 'immer';
 
 // The initial state of the App
-const initialState = fromJS({});
+export const initialState = {
+  loading: false,
+  error: false,
+  currentUser: false,
+};
 
-// const mergedState = initialState.merge(getItem(FILTERS_LS_KEY));
-
-function appReducer(currentState = initialState, action) {
-  const state = currentState.setIn(['error'], false);
-
-  switch (action.type) {
-    default:
-      return state;
-  }
-}
+/* eslint-disable default-case, no-param-reassign */
+const appReducer = (state = initialState, action) =>
+  produce(state, () => {
+    switch (action.type) {
+      default:
+        break;
+    }
+  });
 
 export default appReducer;
