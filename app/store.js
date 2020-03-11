@@ -3,14 +3,12 @@
  */
 
 import { createStore, applyMiddleware, compose } from 'redux';
-import { createBrowserHistory } from 'history';
 import { fromJS } from 'immutable';
 import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 
-import createReducer from './reducers';
-
-export const history = createBrowserHistory();
+import history from 'utils/history';
+import createReducer from 'reducers';
 
 const initialState = {};
 
@@ -29,7 +27,6 @@ if (process.env.NODE_ENV === 'development' && isReduxLogger) {
 
   middlewares.push(
     createLogger({
-      collapsed: true,
       predicate: (getState, action) => getState && action,
     })
   );

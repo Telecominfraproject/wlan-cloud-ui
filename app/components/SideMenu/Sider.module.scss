@@ -1,0 +1,109 @@
+.Sider {
+  height: 100vh;
+  left: 0;
+  position: fixed;
+
+  &.Mobile {
+    position: relative;
+
+    .Logo {
+      height: 32px;
+    }
+  }
+
+  .TopArea {
+    height: 64px;
+  }
+
+  .LogoContainer {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .Logo {
+    height: 44px;
+  }
+
+  .MenuIcon {
+    margin-right: 10px;
+  }
+
+  :global(.sidemenu) {
+    border: none;
+    margin-top: 14px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 78px);
+    width: auto;
+
+    .ant-menu-item {
+      display: flex;
+      min-height: 40px;
+      width: 100%;
+      align-items: center;
+    }
+
+    .ant-menu-submenu {
+      &.ant-menu-submenu-selected {
+        &.ant-menu-submenu-open {
+          .ant-menu-submenu-title {
+            color: rgba(0, 0, 0, 0.65);
+            background: transparent;
+          }
+        }
+
+        .ant-menu-submenu-title {
+          background: #e6f7ff;
+          color: #1890ff;
+
+          &::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border-right: 4px solid #1890ff;
+            transform: scaleY(0.0001);
+            opacity: 0;
+            transition: transform 0.15s cubic-bezier(0.215, 0.61, 0.355, 1),
+              opacity 0.15s cubic-bezier(0.215, 0.61, 0.355, 1);
+          }
+        }
+      }
+
+      .ant-menu-item {
+        padding-left: 24px !important;
+      }
+    }
+
+    &.ant-menu-inline {
+      .ant-menu-submenu {
+        &.ant-menu-submenu-selected {
+          &.ant-menu-submenu-open {
+            .ant-menu-submenu-title {
+              &::after {
+                transition: transform 0.15s cubic-bezier(0.645, 0.045, 0.355, 1),
+                  opacity 0.15s cubic-bezier(0.645, 0.045, 0.355, 1);
+                opacity: 0;
+                transform: scaleY(0.0001);
+              }
+            }
+          }
+
+          .ant-menu-submenu-title {
+            &::after {
+              transition: transform 0.15s cubic-bezier(0.645, 0.045, 0.355, 1),
+                opacity 0.15s cubic-bezier(0.645, 0.045, 0.355, 1);
+              opacity: 1;
+              transform: scaleY(1);
+            }
+          }
+        }
+      }
+    }
+  }
+}

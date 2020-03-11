@@ -13,6 +13,7 @@
     "import/imports-first": ["error", "absolute-first"],
     "import/newline-after-import": "error",
     "import/prefer-default-export": 0,
+    "react/jsx-props-no-spreading": 0,
     "semi": "error"
   },
   "globals": {
@@ -27,5 +28,13 @@
     "Request": true,
     "fetch": true
   },
-  "parser": "babel-eslint"
+  "parser": "babel-eslint",
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "moduleDirectory": ["node_modules", "app"]
+      }
+    }
+  }
 }

@@ -3,9 +3,9 @@ import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
 
-import store, { history } from './store';
-
-import App from './containers/App';
+import App from 'containers/App';
+import store from 'store';
+import history from 'utils/history';
 
 const renderApp = () =>
   render(
@@ -20,3 +20,5 @@ const renderApp = () =>
 if (process.env.NODE_ENV !== 'production' && module.hot) {
   module.hot.accept('containers/App', renderApp);
 }
+
+renderApp();

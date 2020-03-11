@@ -3,6 +3,7 @@ const path = require('path');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  mode: process.env.NODE_ENV,
   entry: './app/index.js',
   output: {
     path: path.join(__dirname, 'dist'),
@@ -71,7 +72,12 @@ module.exports = {
   optimization: {
     minimizer: [new UglifyJsPlugin()],
   },
-
+  resolve: {
+    modules: ['node_modules', path.resolve(`${__dirname}/app`)],
+    alias: {
+      app: path.resolve(`${__dirname}/app`),
+    },
+  },
   plugins: [
     new HtmlWebPackPlugin({
       template: './app/index.html',
