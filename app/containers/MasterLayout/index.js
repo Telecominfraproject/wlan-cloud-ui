@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, memo } from 'react';
 import PropTypes from 'prop-types';
-import { Layout as AntdLayout } from 'antd';
+import { Layout } from 'antd';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
@@ -14,16 +14,15 @@ import { makeSelectLocation, makeSelectError } from 'containers/App/selectors';
 
 import { setMenu } from './actions';
 import { STATE_KEY } from './constants';
-import { makeSelectMenu } from './selectors';
+import { makeSelectCollapsed, makeSelectIsMobile, makeSelectScreen } from './selectors';
 import reducer from './reducer';
 import styles from './MasterLayout.module.scss';
 
-const { Content, Footer } = AntdLayout;
+const { Content, Footer } = Layout;
 
-const MasterLayout = ({ children, locationState, menu, onSetMenu }) => {
+const MasterLayout = ({ children, locationState, collapsed, isMobile, screen, onSetMenu }) => {
   useInjectReducer({ key: STATE_KEY, reducer });
 
-  const { collapsed, isMobile, screen } = menu;
   const currentYear = new Date().getFullYear();
 
   const handleResize = () => {
@@ -52,7 +51,8 @@ const MasterLayout = ({ children, locationState, menu, onSetMenu }) => {
 
   const handleMenuToggle = () => {
     onSetMenu({
-      ...menu,
+      isMobile,
+      screen,
       collapsed: !collapsed,
     });
 
@@ -65,7 +65,8 @@ const MasterLayout = ({ children, locationState, menu, onSetMenu }) => {
   const handleMenuItemClick = () => {
     if (isMobile === true) {
       onSetMenu({
-        ...menu,
+        isMobile,
+        screen,
         collapsed: true,
       });
     }
@@ -82,8 +83,13 @@ const MasterLayout = ({ children, locationState, menu, onSetMenu }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [screen]);
+
   return (
-    <AntdLayout>
+    <Layout>
       <SideMenu
         locationState={locationState}
         collapsed={collapsed}
@@ -92,38 +98,40 @@ const MasterLayout = ({ children, locationState, menu, onSetMenu }) => {
         onMenuItemClick={handleMenuItemClick}
         onLogout={handleLogout}
       />
-      <AntdLayout
+      <Layout
         className={`${styles.MainLayout} ${collapsed ? styles.collapsed : ''} ${
           isMobile ? styles.mobile : ''
         }`}
-        collapsed={collapsed}
-        isMobile={isMobile}
       >
         <GlobalHeader
           collapsed={collapsed}
-          onMenuButtonClick={handleMenuToggle}
           isMobile={isMobile}
+          onMenuButtonClick={handleMenuToggle}
         />
-        <Content>{children}</Content>
+        <Content className={styles.Content}>{children}</Content>
         <Footer className={styles.Footer}>
           Copyright © {currentYear} ConnectUs Inc. All Rights Reserved.
         </Footer>
-      </AntdLayout>
-    </AntdLayout>
+      </Layout>
+    </Layout>
   );
 };
 
 MasterLayout.propTypes = {
   children: PropTypes.node.isRequired,
   locationState: PropTypes.instanceOf(Object).isRequired,
-  menu: PropTypes.instanceOf(Object).isRequired,
+  collapsed: PropTypes.bool.isRequired,
+  isMobile: PropTypes.bool.isRequired,
+  screen: PropTypes.string.isRequired,
   onSetMenu: PropTypes.func.isRequired,
 };
 
 export const mapStateToProps = createStructuredSelector({
   locationState: makeSelectLocation(),
   globalError: makeSelectError(),
-  menu: makeSelectMenu(),
+  collapsed: makeSelectCollapsed(),
+  isMobile: makeSelectIsMobile(),
+  screen: makeSelectScreen(),
 });
 
 export function mapDispatchToProps(dispatch) {
@@ -134,4 +142,4 @@ export function mapDispatchToProps(dispatch) {
 
 const withConnect = connect(mapStateToProps, mapDispatchToProps);
 
-export default compose(withConnect)(MasterLayout);
+export default compose(withConnect, memo)(MasterLayout);

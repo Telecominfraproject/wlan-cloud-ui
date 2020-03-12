@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Layout, Icon, Popover, Row } from 'antd';
+import { Layout, Popover, Row } from 'antd';
+import { MenuUnfoldOutlined, MenuFoldOutlined, SettingOutlined } from '@ant-design/icons';
 
 import logoMobile from 'images/logoxmobile.jpg';
 
@@ -50,28 +51,30 @@ const GlobalHeader = ({ collapsed, onMenuButtonClick, isMobile }) => {
       className={`${styles.GlobalHeader} ${collapsed ? styles.collapsed : ''} ${
         isMobile ? styles.mobile : ''
       }`}
-      collapsed={collapsed}
-      isMobile={isMobile}
     >
       {isMobile && [
         <Link className={styles.LogoContainer} to="/" key="mobileLogo">
           <img src={logoMobile} alt="logo" width="32" />
         </Link>,
       ]}
-      <Icon
-        className={styles.MenuIcon}
-        type={collapsed ? 'menu-unfold' : 'menu-fold'}
-        onClick={onMenuButtonClick}
-      />
-      <Popover
-        content={userOptions}
-        trigger="click"
-        getPopupContainer={e => e.parentElement}
-        visible={popoverVisible}
-        onVisibleChange={handleVisibleChange}
-      >
-        <Icon className={styles.MenuIcon} type="setting" />
-      </Popover>
+      {collapsed ? (
+        <MenuUnfoldOutlined className={styles.MenuIcon} onClick={onMenuButtonClick} />
+      ) : (
+        <MenuFoldOutlined className={styles.MenuIcon} onClick={onMenuButtonClick} />
+      )}
+      <div className={styles.RightMenu}>
+        <Popover
+          content={userOptions}
+          trigger="click"
+          getPopupContainer={e => e.parentElement}
+          visible={popoverVisible}
+          onVisibleChange={handleVisibleChange}
+          placement="bottomRight"
+          arrowPointAtCenter
+        >
+          <SettingOutlined className={styles.MenuIcon} />
+        </Popover>
+      </div>
     </Header>
   );
 };

@@ -1,6 +1,7 @@
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   mode: process.env.NODE_ENV,
@@ -10,6 +11,7 @@ module.exports = {
     publicPath: '/',
     filename: 'bundle.js',
   },
+  devtool: 'inline-source-map',
   devServer: {
     port: 3000,
   },
@@ -36,19 +38,12 @@ module.exports = {
       },
       {
         test: /\.less$/,
-        exclude: /node_modules/,
         use: [
           {
             loader: 'style-loader',
           },
           {
             loader: 'css-loader',
-            options: {
-              modules: {
-                localIdentName: '[name]__[local]___[hash:base64:5]',
-              },
-              sourceMap: true,
-            },
           },
           {
             loader: 'less-loader',
@@ -91,6 +86,7 @@ module.exports = {
     },
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
       inject: true,
       template: './app/index.html',

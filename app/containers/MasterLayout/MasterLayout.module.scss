@@ -5,16 +5,16 @@
   margin-left: $sidebar-width;
   overflow: auto;
 
-  &.mobile {
-    margin-left: 0;
-  }
   &.collapsed {
     margin-left: $sidebar-collapsed-width;
+  }
+  &.mobile {
+    margin-left: 0;
   }
 }
 
 .Content {
-    margin-top: $header-height;
+  margin-top: $header-height;
 }
 
 .Footer {

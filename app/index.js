@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
 
+import 'styles/antd.less';
+import 'styles/index.scss';
+
 import App from 'containers/App';
 import configureStore from 'store';
 import history from 'utils/history';

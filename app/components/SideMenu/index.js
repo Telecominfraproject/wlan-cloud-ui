@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Layout, Menu, Icon, Drawer } from 'antd';
+import { Layout, Menu, Drawer } from 'antd';
+import {
+  DashboardOutlined,
+  ProfileOutlined,
+  AreaChartOutlined,
+  MobileOutlined,
+  ApiOutlined,
+  NotificationOutlined,
+  CheckCircleOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  LogoutOutlined,
+} from '@ant-design/icons';
 
 import logo from 'images/logo-light.png';
 import logoMobile from 'images/logoxmobile.jpg';
@@ -36,63 +48,63 @@ const SideMenu = ({
   const enocMenuItems = [
     {
       key: 'dashboard',
-      icon: 'dashboard',
-      path: '/dashboard',
+      icon: <DashboardOutlined className={styles.MenuIcon} />,
+      path: '/',
       text: 'Dashboard',
       onClick: onMenuItemClick,
     },
     {
       key: 'profiles',
-      icon: 'profile',
+      icon: <ProfileOutlined className={styles.MenuIcon} />,
       path: '/profiles',
       text: 'Profiles',
       onClick: onMenuItemClick,
     },
     {
       key: 'reports',
-      icon: 'area-chart',
+      icon: <AreaChartOutlined className={styles.MenuIcon} />,
       path: '/analytics/qoe',
       text: 'Insights',
       onClick: onMenuItemClick,
     },
     {
       key: 'client-devices',
-      icon: 'mobile',
+      icon: <MobileOutlined className={styles.MenuIcon} />,
       path: '/network/client-devices',
       text: 'Client Devices',
       onClick: onMenuItemClick,
     },
     {
       key: 'network-elements',
-      icon: 'api',
+      icon: <ApiOutlined className={styles.MenuIcon} />,
       path: '/network/elements',
       text: 'Network Elements',
       onClick: onMenuItemClick,
     },
     {
       key: 'alarms',
-      icon: 'notification',
+      icon: <NotificationOutlined className={styles.MenuIcon} />,
       path: '/network/alarms',
       text: 'Alarms',
       onClick: onMenuItemClick,
     },
     {
       key: 'recommendations',
-      icon: 'check',
+      icon: <CheckCircleOutlined className={styles.MenuIcon} />,
       path: '/recommendations',
       text: 'Recommendations',
       onClick: onMenuItemClick,
     },
     {
       key: 'settings',
-      icon: 'setting',
+      icon: <SettingOutlined className={styles.MenuIcon} />,
       path: '/settings',
       text: 'Settings',
       onClick: onMenuItemClick,
     },
     {
       key: ACCOUNTS,
-      icon: 'team',
+      icon: <TeamOutlined className={styles.MenuIcon} />,
       text: 'Customers',
       path: '/accounts/customers',
       onClick: onMenuItemClick,
@@ -102,7 +114,8 @@ const SideMenu = ({
   const commonMenuItems = [
     {
       key: 'logout',
-      icon: 'logout',
+      icon: <LogoutOutlined className={styles.MenuIcon} />,
+      path: '/signout',
       text: 'Sign Out',
       onClick: onLogout,
     },
@@ -141,7 +154,7 @@ const SideMenu = ({
               key={item.key}
               title={
                 <span>
-                  <Icon type={item.icon} className={styles.MenuIcon} />
+                  {item.icon}
                   <span>{item.text}</span>
                 </span>
               }
@@ -176,7 +189,7 @@ const SideMenu = ({
           items.push(
             <ItemComponent key={item.key} className="ant-menu-item">
               <LinkComponent onClick={item.onClick} to={item.path}>
-                <Icon type={item.icon} className={styles.MenuIcon} />
+                {item.icon}
                 <span>{item.text}</span>
               </LinkComponent>
             </ItemComponent>
@@ -204,8 +217,9 @@ const SideMenu = ({
       width="234px"
       collapsedWidth="80px"
       breakpoint="lg"
-      isMobile={isMobile}
-      className={`${styles.Sider} ${isMobile || collapsed ? styles.Mobile : ''}`}
+      className={`${styles.Sider} ${collapsed ? styles.collapsed : ''}  ${
+        isMobile ? styles.Mobile : ''
+      }`}
     >
       <div className={styles.TopArea}>
         <Link
@@ -213,13 +227,7 @@ const SideMenu = ({
           to="/"
           // preserveParams={this.getPreservedParams('/', locationState)}
         >
-          <img
-            className={styles.Logo}
-            alt="ConnectUs"
-            collapsed={collapsed}
-            isMobile={isMobile}
-            src={collapsed ? logoMobile : logo}
-          />
+          <img className={styles.Logo} alt="ConnectUs" src={collapsed ? logoMobile : logo} />
         </Link>
       </div>
       <Menu
@@ -228,7 +236,7 @@ const SideMenu = ({
         defaultOpenKeys={menu.openKeys}
         onOpenChange={onOpenChange}
         mode="inline"
-        inlineCollapsed={collapsed}
+        theme="dark"
       >
         {menu.items}
       </Menu>
@@ -238,11 +246,13 @@ const SideMenu = ({
   if (isMobile) {
     return (
       <Drawer
-        getContainer={null}
-        level={null}
-        open={!collapsed}
-        handleChild={false}
-        onMaskClick={onMenuButtonClick}
+        zIndex={9999}
+        placement="left"
+        closable={false}
+        visible={!collapsed}
+        onClose={onMenuButtonClick}
+        bodyStyle={{ padding: 0 }}
+        width={256}
       >
         {sider}
       </Drawer>

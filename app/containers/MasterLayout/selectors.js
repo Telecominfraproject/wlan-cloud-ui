@@ -5,6 +5,8 @@ import { initialState } from './reducer';
 
 const selectLayout = state => state[STATE_KEY] || initialState;
 
-const makeSelectMenu = () => createSelector(selectLayout, state => state.menu);
+const makeSelectCollapsed = () => createSelector(selectLayout, state => state.collapsed);
+const makeSelectIsMobile = () => createSelector(selectLayout, state => state.isMobile);
+const makeSelectScreen = () => createSelector(selectLayout, state => state.screen);
 
-export { selectLayout, makeSelectMenu };
+export { selectLayout, makeSelectCollapsed, makeSelectIsMobile, makeSelectScreen };
