@@ -21,6 +21,7 @@
     "axios": "^0.19.2",
     "clean-webpack-plugin": "^3.0.0",
     "connected-react-router": "^6.7.0",
+    "cu-ui": "git+https://sean_macfarlane@bitbucket.org/connectustechnologies/connectus-wlan-ui-workspace.git",
     "history": "^4.10.1",
     "hoist-non-react-statics": "^3.3.2",
     "immer": "^6.0.1",
@@ -82,7 +83,7 @@
   "lint-staged": {
     "*.{js,jsx}": [
       "pretty-quick --staged",
-      "eslint app/ --fix",
+      "eslint . --fix --max-warnings=0",
       "git add"
     ]
   },
