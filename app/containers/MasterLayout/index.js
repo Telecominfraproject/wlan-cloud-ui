@@ -4,11 +4,10 @@ import { Layout } from 'antd';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
+import GlobalHeader from 'cu-ui/app/components/GlobalHeader';
+import SideMenu from 'cu-ui/app/components/SideMenu';
 
 import { useInjectReducer } from 'utils/injectReducer';
-
-import GlobalHeader from 'components/GlobalHeader';
-import SideMenu from 'components/SideMenu';
 
 import { makeSelectLocation, makeSelectError } from 'containers/App/selectors';
 
@@ -18,6 +17,7 @@ import { makeSelectCollapsed, makeSelectIsMobile, makeSelectScreen } from './sel
 import reducer from './reducer';
 import styles from './MasterLayout.module.scss';
 
+npm;
 const { Content, Footer } = Layout;
 
 const MasterLayout = ({ children, locationState, collapsed, isMobile, screen, onSetMenu }) => {
