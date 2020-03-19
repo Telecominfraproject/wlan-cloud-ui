@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Switch } from 'react-router-dom';
 
-import Dashboard from 'containers/Dashboard';
+import { Dashboard } from 'cu-ui';
 
 import RouteWithLayout from './components/RouteWithLayout';
 
