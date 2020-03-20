@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 
-import { MasterLayout as Layout } from 'cu-ui';
+import { AppLayout as Layout } from 'cu-ui';
 
 import { makeSelectLocation } from 'containers/App/selectors';
 
