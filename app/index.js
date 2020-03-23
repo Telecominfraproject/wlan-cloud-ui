@@ -1,27 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { ConnectedRouter } from 'connected-react-router';
+import { BrowserRouter as Router } from 'react-router-dom';
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from '@apollo/react-hooks';
 
 import 'styles/antd.less';
 import 'styles/index.scss';
 
 import App from 'containers/App';
-import configureStore from 'store';
-import history from 'utils/history';
 
-// Create redux store with history
-const initialState = {};
-const store = configureStore(initialState, history);
 const MOUNT_NODE = document.getElementById('root');
+
+const client = new ApolloClient({
+  // uri: "https://48p1r2roz4.sse.codesandbox.io"
+});
 
 const render = () => {
   ReactDOM.render(
-    <Provider store={store}>
-      <ConnectedRouter history={history}>
+    <ApolloProvider client={client}>
+      <Router>
         <App />
-      </ConnectedRouter>
-    </Provider>,
+      </Router>
+    </ApolloProvider>,
     MOUNT_NODE
   );
 };

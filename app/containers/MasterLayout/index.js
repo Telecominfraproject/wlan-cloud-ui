@@ -1,31 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { createStructuredSelector } from 'reselect';
+import { useLocation } from 'react-router-dom';
 
 import { AppLayout as Layout } from 'cu-ui';
-
-import { makeSelectLocation } from 'containers/App/selectors';
 
 import logo from 'images/logo-light.png';
 import logoMobile from 'images/logoxmobile.jpg';
 
-const MasterLayout = ({ children, locationState }) => (
-  <Layout logo={logo} logoMobile={logoMobile} onLogout={() => {}} locationState={locationState}>
-    {children}
-  </Layout>
-);
+const MasterLayout = ({ children }) => {
+  const location = useLocation();
+  return (
+    <Layout company="ConnectUs" logo={logo} logoMobile={logoMobile} onLogout={() => {}} locationState={location}>
+      {children}
+    </Layout>
+  );
+};
 
 MasterLayout.propTypes = {
   children: PropTypes.node.isRequired,
-  locationState: PropTypes.instanceOf(Object).isRequired,
 };
 
-export const mapStateToProps = createStructuredSelector({
-  locationState: makeSelectLocation(),
-});
-
-const withConnect = connect(mapStateToProps);
-
-export default compose(withConnect)(MasterLayout);
+export default MasterLayout;
