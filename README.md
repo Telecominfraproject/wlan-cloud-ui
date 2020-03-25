@@ -1,4 +1,4 @@
-# ConnectUs TIP Portal
+# TIP WLAN Cloud Portal
 
 ## Set up environment:
 		
