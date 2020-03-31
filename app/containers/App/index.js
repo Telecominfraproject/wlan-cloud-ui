@@ -1,10 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import { Switch } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 
-import { Dashboard } from 'cu-ui';
+import { Login, Dashboard } from 'cu-ui';
 
-import RouteWithLayout from './components/RouteWithLayout';
+import ProtectedRouteWithLayout from './components/ProtectedRouteWithLayout';
 
 const App = () => (
   <>
@@ -13,7 +13,8 @@ const App = () => (
     </Helmet>
 
     <Switch>
-      <RouteWithLayout exact path="/" component={Dashboard} />
+      <Route exact path="/login" component={Login} />
+      <ProtectedRouteWithLayout exact path="/" component={Dashboard} />
     </Switch>
   </>
 );

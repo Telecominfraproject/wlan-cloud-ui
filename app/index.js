@@ -8,11 +8,20 @@ import 'styles/antd.less';
 import 'styles/index.scss';
 
 import App from 'containers/App';
+import { AUTH_TOKEN } from 'constants/index';
 
 const MOUNT_NODE = document.getElementById('root');
 
 const client = new ApolloClient({
-  // uri: "https://48p1r2roz4.sse.codesandbox.io"
+  // uri: ""
+  request: operation => {
+    const token = localStorage.getItem(AUTH_TOKEN);
+    operation.setContext({
+      headers: {
+        authorization: token ? `Bearer ${token}` : '',
+      },
+    });
+  },
 });
 
 const render = () => {
