@@ -9,10 +9,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --mode development",
+    "start": "cross-env NODE_ENV=development webpack-dev-server",
+    "build": "cross-env NODE_ENV=production webpack",
     "format": "prettier --write \"app/**/*.js\"",
-    "eslint-fix": "eslint --fix \"app/**/*.js\"",
-    "build": "webpack --mode production"
+    "eslint-fix": "eslint --fix \"app/**/*.js\""
   },
   "license": "MIT",
   "dependencies": {
@@ -23,11 +23,15 @@
     "clean-webpack-plugin": "^3.0.0",
     "cu-ui": "git+https://sean_macfarlane@bitbucket.org/connectustechnologies/connectus-wlan-ui-workspace.git",
     "graphql": "^14.6.0",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.9.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-helmet": "^5.2.1",
-    "react-router-dom": "^5.1.2"
+    "react-router-dom": "^5.1.2",
+    "terser-webpack-plugin": "^2.3.5"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",
@@ -39,6 +43,7 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-root-import": "^6.4.1",
     "babel-polyfill": "^6.26.0",
+    "cross-env": "^7.0.2",
     "css-loader": "^3.4.2",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.0.1",
@@ -51,7 +56,6 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.0",
     "file-loader": "^5.1.0",
-    "html-webpack-plugin": "^3.2.0",
     "husky": "^4.2.3",
     "less": "^3.11.1",
     "less-loader": "^5.0.0",
@@ -61,10 +65,10 @@
     "pretty-quick": "^2.0.1",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.1.3",
-    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.42.0",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^3.10.3",
+    "webpack-merge": "^4.2.2"
   },
   "precommit": "NODE_ENV=production lint-staged",
   "browserslist": [
