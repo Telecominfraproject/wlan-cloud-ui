@@ -43,12 +43,19 @@ module.exports = {
     modules: [
       'node_modules',
       'app',
-      path.resolve(__dirname, '../', 'node_modules', 'cu-ui', 'src'),
+      path.resolve(__dirname, '../', 'node_modules', 'wlan-cloud-ui-library', 'src'),
     ],
     alias: {
       app: path.resolve(__dirname, '../', 'app'),
       react: path.resolve(__dirname, '../', 'node_modules', 'react'),
-      'cu-ui': path.resolve(__dirname, '../', 'node_modules', 'cu-ui', 'src'),
+      'react-router-dom': path.resolve('./node_modules/react-router-dom'),
+      'wlan-cloud-ui-library': path.resolve(
+        __dirname,
+        '../',
+        'node_modules',
+        'wlan-cloud-ui-library',
+        'src'
+      ),
     },
   },
 };

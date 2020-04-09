@@ -22,17 +22,15 @@ export const removeItem = key => {
 };
 
 export const getItem = key => {
-  let value;
+  let value = null;
   try {
-    value = JSON.parse(window.localStorage.getItem(key) || '{}');
+    value = JSON.parse(window.localStorage.getItem(key));
   } catch (err) {
-    removeItem();
-
-    return {};
+    return null;
   }
 
   if (isItemExpired(value)) {
-    return removeItem();
+    return removeItem(key);
   }
 
   return value;

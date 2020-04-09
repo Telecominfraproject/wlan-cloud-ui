@@ -2,10 +2,12 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Switch, Route } from 'react-router-dom';
 
-import { ThemeProvider, Login, Dashboard } from 'cu-ui';
+import { ThemeProvider, Dashboard } from 'wlan-cloud-ui-library';
 
 import logo from 'images/logo-light.png';
 import logoMobile from 'images/logoxmobile.jpg';
+
+import Login from 'containers/Login';
 
 import ProtectedRouteWithLayout from './components/ProtectedRouteWithLayout';
 
