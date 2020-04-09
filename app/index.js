@@ -13,6 +13,7 @@ import { AUTH_TOKEN } from 'constants/index';
 
 import { getItem } from 'utils/localStorage';
 
+const API_URI = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000/' : '';
 const MOUNT_NODE = document.getElementById('root');
 
 const REFRESH_TOKEN = gql`
@@ -24,7 +25,7 @@ const REFRESH_TOKEN = gql`
 `;
 
 const client = new ApolloClient({
-  uri: 'http://localhost:4000/',
+  uri: API_URI,
   request: operation => {
     const token = getItem(AUTH_TOKEN);
     operation.setContext({

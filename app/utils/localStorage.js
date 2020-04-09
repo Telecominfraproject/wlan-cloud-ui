@@ -29,7 +29,7 @@ export const getItem = key => {
     return null;
   }
 
-  if (isItemExpired(value)) {
+  if (value && isItemExpired(value)) {
     return removeItem(key);
   }
 
