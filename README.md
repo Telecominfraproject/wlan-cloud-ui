@@ -1,19 +1,23 @@
 # TIP WLAN Cloud Portal
 
 ## Set up environment:
-		
-	Install Dependencies 
-		`npm install`
 
-   To link cu-ui package locally for development:
-      `npm link ../cu-ui` 
+    Install Dependencies
+    	`npm install`
+
+To link wlan-cloud-ui-library package locally for development:
+`npm link ../wlan-cloud-ui-library`
 
 ## Run:
-  ### Development
+
+### Development
+
      `npm start`
 
-  ### Tests
+### Tests
+
      `npm run test`
 
-  ### Production
+### Production
+
      `npm run build`

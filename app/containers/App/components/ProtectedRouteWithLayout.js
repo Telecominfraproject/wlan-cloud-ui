@@ -3,8 +3,9 @@ import T from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
 
 import MasterLayout from 'containers/MasterLayout';
-import { getItem } from 'utils/localStorage';
 import { AUTH_TOKEN } from 'constants/index';
+
+import { getItem } from 'utils/localStorage';
 
 const ProtectedRouteWithLayout = ({ component: Component, ...rest }) => (
   <Route

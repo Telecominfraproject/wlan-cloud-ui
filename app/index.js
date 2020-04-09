@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
+import gql from 'graphql-tag';
 
 import 'styles/antd.less';
 import 'styles/index.scss';
@@ -10,27 +11,66 @@ import 'styles/index.scss';
 import App from 'containers/App';
 import { AUTH_TOKEN } from 'constants/index';
 
+import { getItem } from 'utils/localStorage';
+
+const API_URI = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000/' : '';
 const MOUNT_NODE = document.getElementById('root');
 
+const REFRESH_TOKEN = gql`
+  mutation UpdateToken($refreshToken: String!) {
+    updateToken(refreshToken: $refreshToken) {
+      token
+    }
+  }
+`;
+
 const client = new ApolloClient({
-  // uri: ""
+  uri: API_URI,
   request: operation => {
-    const token = localStorage.getItem(AUTH_TOKEN);
+    const token = getItem(AUTH_TOKEN);
     operation.setContext({
       headers: {
-        authorization: token ? `Bearer ${token}` : '',
+        authorization: token ? `Bearer ${token.access_token}` : '',
       },
     });
+  },
+  onError: ({ graphQLErrors, operation, forward }) => {
+    if (graphQLErrors) {
+      graphQLErrors.forEach(err => {
+        // handle errors differently based on its error code
+        switch (err.extensions.code) {
+          case 'UNAUTHENTICATED':
+            operation.setContext({
+              headers: {
+                ...operation.getContext().headers,
+                authorization: client
+                  .mutate({
+                    mutation: REFRESH_TOKEN,
+                    variables: {
+                      refreshToken: getItem(AUTH_TOKEN).refresh_token,
+                    },
+                  })
+                  .then(data => {
+                    return data.updateToken.token;
+                  }),
+              },
+            });
+            return forward(operation);
+          default:
+            return forward(operation);
+        }
+      });
+    }
   },
 });
 
 const render = () => {
   ReactDOM.render(
-    <ApolloProvider client={client}>
-      <Router>
+    <Router>
+      <ApolloProvider client={client}>
         <App />
-      </Router>
-    </ApolloProvider>,
+      </ApolloProvider>
+    </Router>,
     MOUNT_NODE
   );
 };
