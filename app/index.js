@@ -11,7 +11,7 @@ import 'styles/index.scss';
 import App from 'containers/App';
 import { AUTH_TOKEN } from 'constants/index';
 
-import { getItem } from 'utils/localStorage';
+import { getItem, setItem } from 'utils/localStorage';
 
 const API_URI = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000/' : '';
 const MOUNT_NODE = document.getElementById('root');
@@ -19,7 +19,9 @@ const MOUNT_NODE = document.getElementById('root');
 const REFRESH_TOKEN = gql`
   mutation UpdateToken($refreshToken: String!) {
     updateToken(refreshToken: $refreshToken) {
-      token
+      access_token
+      refreshToken
+      expires_in
     }
   }
 `;
@@ -51,7 +53,8 @@ const client = new ApolloClient({
                     },
                   })
                   .then(data => {
-                    return data.updateToken.token;
+                    setItem(AUTH_TOKEN, data.updateToken, data.updateToken.expires_in);
+                    return data.updateToken;
                   }),
               },
             });

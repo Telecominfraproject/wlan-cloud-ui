@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import { Switch, Route } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 
 import { ThemeProvider, Dashboard } from 'wlan-cloud-ui-library';
 
@@ -9,6 +9,7 @@ import logoMobile from 'images/logoxmobile.jpg';
 
 import Login from 'containers/Login';
 
+import UnauthenticatedRoute from './components/UnauthenticatedRoute';
 import ProtectedRouteWithLayout from './components/ProtectedRouteWithLayout';
 
 const App = () => (
@@ -18,7 +19,7 @@ const App = () => (
     </Helmet>
 
     <Switch>
-      <Route exact path="/login" component={Login} />
+      <UnauthenticatedRoute exact path="/login" component={Login} />
       <ProtectedRouteWithLayout exact path="/" component={Dashboard} />
     </Switch>
   </ThemeProvider>
