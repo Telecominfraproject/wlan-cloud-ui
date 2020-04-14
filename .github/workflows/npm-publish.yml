@@ -3,6 +3,7 @@ name: NPM CI - TIP WLAN Cloud UI
 on:
   push:
     branches: [ master ]
+    
 jobs:
   build:
     runs-on: ubuntu-latest
