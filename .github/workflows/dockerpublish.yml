@@ -17,7 +17,22 @@ env:
   IMAGE_NAME: wlan-cloud-ui
 
 jobs:
+  # Run tests.
+  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
+  test:
+    runs-on: ubuntu-latest
+
+      - name: Run tests
+        run: |
+          if [ -f docker-compose.test.yml ]; then
+            docker-compose --file docker-compose.test.yml build
+            docker-compose --file docker-compose.test.yml run sut
+          else
+            docker build --build-arg SSH_KEY=${{ secrets.GH_AUTOMATION_KEY }} . --file Dockerfile
+          fi
   push:
+    # Ensure test job passes before pushing image.
+    needs: test
 
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -35,7 +50,7 @@ jobs:
           password: ${{ secrets.REPO_PASSWORD }}
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag image
+        run: docker build --build-arg SSH_KEY=${{ secrets.GH_AUTOMATION_KEY }} . --file Dockerfile --tag image
           
       - name: Push image
         run: |
