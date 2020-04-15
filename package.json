@@ -22,7 +22,6 @@
     "antd": "^4.0.2",
     "apollo-boost": "^0.4.7",
     "clean-webpack-plugin": "^3.0.0",
-    "wlan-cloud-ui-library": "git+ssh://git@github.com/Telecominfraproject/wlan-cloud-ui-library.git",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.3",
     "html-webpack-plugin": "^3.2.0",
@@ -33,7 +32,8 @@
     "react-dom": "^16.13.0",
     "react-helmet": "^5.2.1",
     "react-router-dom": "^5.1.2",
-    "terser-webpack-plugin": "^2.3.5"
+    "terser-webpack-plugin": "^2.3.5",
+    "wlan-cloud-ui-library": "git+ssh://git@github.com/Telecominfraproject/wlan-cloud-ui-library.git"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",

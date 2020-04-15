@@ -1,7 +1,11 @@
-FROM node:12
+# build environment
+FROM node:13.12.0-alpine as build
 
 # Create app directory
 WORKDIR /app
+
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -15,5 +19,11 @@ RUN npm ci --only=production
 # Bundle app source
 COPY . .
 
-EXPOSE 3000
-CMD [ "npm", "start" ]
+CMD [ "npm", "run", "build" ]
+
+# production environment
+FROM nginx:stable-alpine
+COPY --from=dist /app/dist /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
