@@ -24,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.NPM_REPO_AUTH_TOKEN }}
 
       - name: Run tests
         run: |
