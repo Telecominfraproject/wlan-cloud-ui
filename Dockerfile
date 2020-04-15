@@ -1,6 +1,16 @@
 # build environment
 FROM node:13.12.0-alpine as build
 
+RUN apk add --update \
+  python \
+  python-dev \
+  py-pip \
+  build-base \
+  git \
+  openssh-client \
+&& pip install virtualenv \
+&& rm -rf /var/cache/apk/*
+
 # Create app directory
 WORKDIR /app
 
