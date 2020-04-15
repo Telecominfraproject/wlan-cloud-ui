@@ -22,6 +22,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    steps:
+      - uses: actions/checkout@v2
+
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
@@ -50,7 +53,7 @@ jobs:
           password: ${{ secrets.REPO_PASSWORD }}
 
       - name: Build image
-        run: docker build --build-arg SSH_KEY=${{ secrets.GH_AUTOMATION_KEY }} . --file Dockerfile --tag image
+        run: docker build --build-arg SSH_KEY=${{ secrets.GH_AUTOMATION_KEY }}up . --file Dockerfile --tag image
           
       - name: Push image
         run: |
