@@ -34,7 +34,7 @@ jobs:
             docker-compose --file docker-compose.test.yml run sut
           else
             key=$(cat ${{ secrets.SSH_BUILD_KEY }} | base64)
-            docker build --build-arg SSH_KEY=$key . --file Dockerfile
+            docker build --build-arg SSH_KEY=$key .
           fi
   push:
     # Ensure test job passes before pushing image.
@@ -58,7 +58,7 @@ jobs:
       - name: Build image
         run: |
           key=$(cat ${{ secrets.SSH_BUILD_KEY }} | base64)
-          docker build --build-arg SSH_KEY=$key . --file Dockerfile --tag image
+          docker build --build-arg SSH_KEY=$key . --tag image
           
       - name: Push image
         run: |
