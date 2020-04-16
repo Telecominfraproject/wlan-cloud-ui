@@ -33,7 +33,8 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            docker build --build-arg SSH_KEY=${{ secrets.GH_AUTOMATION_KEY }} . --file Dockerfile
+            key=$(echo ${{ secrets.GH_AUTOMATION_KEY }} | base64)
+            docker build --build-arg SSH_KEY=$key . --file Dockerfile
           fi
   push:
     # Ensure test job passes before pushing image.
@@ -55,7 +56,9 @@ jobs:
           password: ${{ secrets.REPO_PASSWORD }}
 
       - name: Build image
-        run: docker build --build-arg SSH_KEY=${{ secrets.GH_AUTOMATION_KEY }}up . --file Dockerfile --tag image
+        run: |
+          key=$(echo ${{ secrets.GH_AUTOMATION_KEY }} | base64)
+          docker build --build-arg SSH_KEY=$key . --file Dockerfile --tag image
           
       - name: Push image
         run: |
