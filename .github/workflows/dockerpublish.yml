@@ -24,15 +24,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          ssh-key: ${{ secrets.GH_AUTOMATION_KEY }}
 
-      - name: Login to TIP Docker registry 
-        uses: azure/docker-login@v1
+      - uses: webfactory/ssh-agent@v0.2.0
         with:
-          login-server: tip-tip-wlan-cloud-docker-repo.jfrog.io
-          username: build-pipeline
-          password: ${{ secrets.REPO_PASSWORD }}
+            ssh-private-key: ${{ secrets.GH_AUTOMATION_KEY }}
 
       - name: Run tests
         run: |
@@ -40,8 +35,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            key=$(echo ${{ secrets.SSH_PUBLIC_KEY }} | base64)
-            docker build --build-arg SSH_KEY=$key . --file Dockerfile
+            DOCKER_BUILDKIT=1 docker build --ssh --squash . --file Dockerfile
           fi
   push:
     # Ensure test job passes before pushing image.
