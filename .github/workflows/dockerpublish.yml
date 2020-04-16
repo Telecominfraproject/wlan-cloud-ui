@@ -31,7 +31,6 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            key=$(echo "${{ secrets.SSH_BUILD_KEY }}" | base64)
             docker build --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}} .
           fi
   push:
