@@ -27,13 +27,21 @@ jobs:
         with:
           ssh-key: ${{ secrets.GH_AUTOMATION_KEY }}
 
+      - name: Login to TIP Docker registry 
+        uses: azure/docker-login@v1
+        with:
+          login-server: tip-tip-wlan-cloud-docker-repo.jfrog.io
+          username: build-pipeline
+          password: ${{ secrets.REPO_PASSWORD }}
+
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            docker build --build-arg SSH_KEY=${{ secrets.SSH_BASE64_KEY }} . --file Dockerfile
+            key=$(echo ${{ secrets.SSH_PUBLIC_KEY }} | base64)
+            docker build --build-arg SSH_KEY=$key . --file Dockerfile
           fi
   push:
     # Ensure test job passes before pushing image.
@@ -56,7 +64,8 @@ jobs:
 
       - name: Build image
         run: |
-          docker build --build-arg SSH_KEY=${{ secrets.SSH_BASE64_KEY }} . --file Dockerfile --tag image
+          key=$(echo ${{ secrets.SSH_PUBLIC_KEY }} | base64)
+          docker build --build-arg SSH_KEY=$key . --file Dockerfile --tag image
           
       - name: Push image
         run: |
