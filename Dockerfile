@@ -16,7 +16,7 @@ COPY package*.json ./
 
 #RUN npm install
 # If you are building your code for production
-RUN (echo "@tip-wlan:registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/" && echo "//tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/:_authToken=$NPM_TOKEN") > .npmrc
+RUN (echo "@tip-wlan:registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/" && echo "//tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/:_authToken=$NPM_TOKEN" && echo "//tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/:always-auth=true") > .npmrc
 RUN npm ci --only=production
 RUN rm -f .npmrc
 
