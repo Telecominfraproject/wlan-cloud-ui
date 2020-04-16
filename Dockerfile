@@ -1,8 +1,9 @@
 # build environment
 FROM node:13.12.0-alpine as build
-RUN apk add --update --no-cache openssh-client git \
- && mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+ARG SSH_KEY
+
+RUN apk add git openssh-client
 
 # Create app directory
 WORKDIR /app
@@ -17,10 +18,9 @@ COPY package*.json ./
 
 #RUN npm install
 # If you are building your code for production
+RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
 
-RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-RUN ssh-agent sh -c "echo $SSH_KEY | base64 -d | ssh-add - ; npm ci --only=production"
+RUN ssh-agent sh -c 'echo $SSH_KEY | base64 -d | ssh-add - ; npm ci --only=production'
 
 # Bundle app source
 COPY . .
