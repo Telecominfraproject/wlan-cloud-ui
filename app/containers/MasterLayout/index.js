@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { useApolloClient } from '@apollo/react-hooks';
 
-import { AppLayout as Layout } from 'wlan-cloud-ui-library';
+import { AppLayout as Layout } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { AUTH_TOKEN } from 'constants/index';
 

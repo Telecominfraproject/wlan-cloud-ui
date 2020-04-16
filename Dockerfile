@@ -1,9 +1,7 @@
 # build environment
 FROM node:13.12.0-alpine as build
 
-ARG SSH_KEY
-
-RUN apk add git openssh-client
+ARG NPM_TOKEN
 
 # Create app directory
 WORKDIR /app
@@ -18,12 +16,17 @@ COPY package*.json ./
 
 #RUN npm install
 # If you are building your code for production
-RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
+RUN (echo "@tip-wlan:registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/" && echo "//tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/:_authToken=$NPM_TOKEN") > .npmrc
+RUN more .npmrc
+RUN npm ci --only=production
+RUN rm -f .npmrc
 
-RUN ssh-agent sh -c 'echo $SSH_KEY | base64 -d | ssh-add - ; npm ci --only=production'
+#copy build to hide NPM TOKEN
+FROM node:13.12.0-alpine
 
-# Bundle app source
-COPY . .
+WORKDIR /app
+
+COPY --from=build /app /app
 
 CMD [ "npm", "run", "build" ]
 

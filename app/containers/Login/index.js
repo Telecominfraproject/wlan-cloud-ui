@@ -4,7 +4,7 @@ import { useMutation, useApolloClient } from '@apollo/react-hooks';
 import { useHistory } from 'react-router-dom';
 import { notification } from 'antd';
 
-import { Login as LoginPage } from 'wlan-cloud-ui-library';
+import { Login as LoginPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { AUTH_TOKEN } from 'constants/index';
 

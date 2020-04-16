@@ -24,8 +24,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          ssh-key: ${{ secrets.SSH_BUILD_KEY }}
 
       - name: Run tests
         run: |
@@ -34,7 +32,7 @@ jobs:
             docker-compose --file docker-compose.test.yml run sut
           else
             key=$(echo "${{ secrets.SSH_BUILD_KEY }}" | base64)
-            docker build --build-arg SSH_KEY=$key .
+            docker build --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}} .
           fi
   push:
     # Ensure test job passes before pushing image.
@@ -45,10 +43,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          ssh-key: ${{ secrets.SSH_BUILD_KEY }}
-        
-      - name: Login to TIP Docker registry 
+
+      - name: Login to TIP Docker registry
         uses: azure/docker-login@v1
         with:
           login-server: tip-tip-wlan-cloud-docker-repo.jfrog.io
@@ -56,14 +52,12 @@ jobs:
           password: ${{ secrets.REPO_PASSWORD }}
 
       - name: Build image
-        run: |
-          key=$(echo ${{ secrets.SSH_BUILD_KEY }} | base64)
-          docker build --build-arg SSH_KEY=$key . --tag image
-          
+        run: docker build --build-arg  NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}} . --tag image
+
       - name: Push image
         run: |
           IMAGE_ID=${{ github.repository }}/$IMAGE_NAME
-          
+
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 

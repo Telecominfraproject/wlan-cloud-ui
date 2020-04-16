@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Switch } from 'react-router-dom';
 
-import { ThemeProvider, Dashboard } from 'wlan-cloud-ui-library';
+import { ThemeProvider, Dashboard } from '@tip-wlan/wlan-cloud-ui-library';
 
 import logo from 'images/logo-light.png';
 import logoMobile from 'images/logoxmobile.jpg';
