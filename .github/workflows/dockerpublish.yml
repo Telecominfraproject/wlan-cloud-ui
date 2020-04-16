@@ -25,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ssh-key: ${{ secrets.SSH_KEY }}
+          ssh-key: ${{ secrets.SSH_BUILD_KEY }}
 
       - name: Run tests
         run: |
@@ -33,7 +33,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            key=$(cat ${{ secrets.SSH_KEY }} | base64)
+            key=$(cat ${{ secrets.SSH_BUILD_KEY }} | base64)
             docker build --build-arg SSH_KEY=$key . --file Dockerfile
           fi
   push:
@@ -46,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ssh-key: ${{ secrets.SSH_KEY }}
+          ssh-key: ${{ secrets.SSH_BUILD_KEY }}
         
       - name: Login to TIP Docker registry 
         uses: azure/docker-login@v1
@@ -57,7 +57,7 @@ jobs:
 
       - name: Build image
         run: |
-          key=$(cat ${{ secrets.SSH_KEY }} | base64)
+          key=$(cat ${{ secrets.SSH_BUILD_KEY }} | base64)
           docker build --build-arg SSH_KEY=$key . --file Dockerfile --tag image
           
       - name: Push image
