@@ -16,8 +16,6 @@ ENV PATH /app/node_modules/.bin:$PATH
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN echo $SSH_KEY
-
 #RUN npm install
 # If you are building your code for production
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts

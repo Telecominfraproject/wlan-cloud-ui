@@ -33,7 +33,7 @@ jobs:
             docker-compose --file docker-compose.test.yml build
             docker-compose --file docker-compose.test.yml run sut
           else
-            key=$(cat ${{ secrets.SSH_BUILD_KEY }} | base64)
+            key=$(cat "${{ secrets.SSH_BUILD_KEY }}" | base64)
             docker build --build-arg SSH_KEY=$key .
           fi
   push:
