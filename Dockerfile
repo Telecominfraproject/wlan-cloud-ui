@@ -20,7 +20,7 @@ COPY package*.json ./
 
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-RUN ssh-agent sh -c 'echo $SSH_KEY | base64 -d | ssh-add - ; npm ci --only=production'
+RUN ssh-agent sh -c "echo $SSH_KEY | base64 -d | ssh-add - ; npm ci --only=production"
 
 # Bundle app source
 COPY . .
