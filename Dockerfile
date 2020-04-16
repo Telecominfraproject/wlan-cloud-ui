@@ -20,7 +20,7 @@ COPY package*.json ./
 # If you are building your code for production
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts
 
-RUN echo ${SSH_KEY}
+RUN echo $SSH_KEY
 RUN ssh-agent sh -c 'echo $SSH_KEY | base64 -d | ssh-add - ; npm ci --only=production'
 
 # Bundle app source
