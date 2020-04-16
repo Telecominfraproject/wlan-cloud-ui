@@ -1,3 +1,6 @@
 sut:
-    build: .
+    build:
+        context: .
+        args:
+            NPM_TOKEN: ${{secrets.NPM_REPO_AUTH_TOKEN}}
     command: npm test
