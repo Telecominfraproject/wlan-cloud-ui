@@ -18,8 +18,6 @@ COPY package*.json ./
 
 #RUN npm install
 # If you are building your code for production
-RUN echo $SSH_KEY
-
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 RUN ssh-agent sh -c 'echo $SSH_KEY | base64 -d | ssh-add - ; npm ci --only=production'
