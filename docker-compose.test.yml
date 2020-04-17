@@ -1,4 +1,6 @@
 version: '2'
-sut:
-    build: .
-    command: npm test
+
+services: 
+    sut:
+        build: .
+        command: npm test
