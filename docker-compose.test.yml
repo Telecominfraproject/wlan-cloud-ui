@@ -2,5 +2,6 @@ version: '2.2'
 
 services: 
     sut:
-        build: .
-        command: npm test
+        build:
+            context: .
+            dockerfile: Dockerfile.test
