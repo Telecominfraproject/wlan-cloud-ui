@@ -25,15 +25,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Build image
+        run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
+
       - name: Login to TIP Docker registry
         uses: azure/docker-login@v1
         with:
           login-server: tip-tip-wlan-cloud-docker-repo.jfrog.io
           username: build-pipeline
           password: ${{ secrets.REPO_PASSWORD }}
-
-      - name: Build image
-        run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
 
       - name: Push image
         run: |
