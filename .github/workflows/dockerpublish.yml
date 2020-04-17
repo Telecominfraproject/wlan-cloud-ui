@@ -33,7 +33,7 @@ jobs:
           password: ${{ secrets.REPO_PASSWORD }}
 
       - name: Build image
-        run: docker build -f Dockerfile --build-arg NPM_TOKEN=$npmtoken -t image .
+        run: docker build -f Dockerfile --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}} -t image .
 
       - name: Push image
         run: |
