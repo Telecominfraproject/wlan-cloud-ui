@@ -4,9 +4,10 @@ import { Switch, Redirect } from 'react-router-dom';
 
 import { ThemeProvider, Dashboard, ClientDevices } from '@tip-wlan/wlan-cloud-ui-library';
 
-import logo from 'images/logo-light.png';
-import logoMobile from 'images/logoxmobile.jpg';
+import logo from 'images/tip-logo.png';
+import logoMobile from 'images/tip-logo-mobile.png';
 
+import { COMPANY } from 'constants/index';
 import Login from 'containers/Login';
 
 import UnauthenticatedRoute from './components/UnauthenticatedRoute';
@@ -21,9 +22,9 @@ const RedirectToDashboard = () => (
 );
 
 const App = () => (
-  <ThemeProvider company="ConnectUs" logo={logo} logoMobile={logoMobile}>
-    <Helmet titleTemplate="%s - ConnectUs" defaultTitle="ConnectUs">
-      <meta name="description" content="ConnectUs" />
+  <ThemeProvider company={COMPANY} logo={logo} logoMobile={logoMobile}>
+    <Helmet titleTemplate={`%s - ${COMPANY}`} defaultTitle={COMPANY}>
+      <meta name="description" content={COMPANY} />
     </Helmet>
 
     <Switch>
