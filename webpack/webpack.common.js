@@ -41,6 +41,7 @@ module.exports = {
   plugins: [
     new HtmlWebPackPlugin({
       template: commonPaths.templatePath,
+      favicon: './app/images/favicon.ico',
     }),
   ],
 };
