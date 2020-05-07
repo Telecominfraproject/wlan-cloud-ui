@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Switch, Redirect } from 'react-router-dom';
 
 import { ThemeProvider, Dashboard, ClientDevices } from '@tip-wlan/wlan-cloud-ui-library';
+import EditAccount from 'containers/EditAccount';
 
 import logo from 'images/tip-logo.png';
 import logoMobile from 'images/tip-logo-mobile.png';
@@ -32,6 +33,7 @@ const App = () => (
       <ProtectedRouteWithLayout exact path="/" component={RedirectToDashboard} />
       <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
       <ProtectedRouteWithLayout exact path="/network/client-devices" component={ClientDevices} />
+      <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
     </Switch>
   </ThemeProvider>
 );
