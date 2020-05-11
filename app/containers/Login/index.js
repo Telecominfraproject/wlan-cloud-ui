@@ -5,9 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { notification } from 'antd';
 
 import { Login as LoginPage } from '@tip-wlan/wlan-cloud-ui-library';
-
 import { AUTH_TOKEN } from 'constants/index';
-
 import { setItem } from 'utils/localStorage';
 
 const AUTHENTICATE_USER = gql`
