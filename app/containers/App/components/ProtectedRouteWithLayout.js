@@ -10,8 +10,8 @@ import { getItem } from 'utils/localStorage';
 const ProtectedRouteWithLayout = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
-    render={props =>
-      getItem(AUTH_TOKEN) ? (
+    render={props => {
+      return getItem(AUTH_TOKEN) ? (
         <MasterLayout>
           <Component {...props} />
         </MasterLayout>
@@ -21,8 +21,8 @@ const ProtectedRouteWithLayout = ({ component: Component, ...rest }) => (
             pathname: '/login',
           }}
         />
-      )
-    }
+      );
+    }}
   />
 );
 
