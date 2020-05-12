@@ -11,6 +11,7 @@ import { COMPANY } from 'constants/index';
 import Login from 'containers/Login';
 import ClientDevices from 'containers/ClientDevices';
 import EditAccount from 'containers/EditAccount';
+import Accounts from 'containers/Accounts';
 
 import UnauthenticatedRoute from './components/UnauthenticatedRoute';
 import ProtectedRouteWithLayout from './components/ProtectedRouteWithLayout';
@@ -35,6 +36,7 @@ const App = () => (
       <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
       <ProtectedRouteWithLayout exact path="/network/client-devices" component={ClientDevices} />
       <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
+      <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
     </Switch>
   </ThemeProvider>
 );
