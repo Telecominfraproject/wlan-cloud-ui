@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { EditAccount as EditAccountPage } from '@tip-wlan/wlan-cloud-ui-library';
-import UserContext from 'contexts/UserContext';
 import gql from 'graphql-tag';
 import { useMutation } from '@apollo/react-hooks';
 import { notification } from 'antd';
+import UserContext from 'contexts/UserContext';
 
 const UPDATE_USER = gql`
   mutation UpdateUser(
@@ -12,7 +12,7 @@ const UPDATE_USER = gql`
     $password: String!
     $role: String!
     $customerId: Int!
-    $lastModifiedTimestamp: String!
+    $lastModifiedTimestamp: String
   ) {
     updateUser(
       id: $id
@@ -22,21 +22,30 @@ const UPDATE_USER = gql`
       customerId: $customerId
       lastModifiedTimestamp: $lastModifiedTimestamp
     ) {
-      User
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
     }
   }
 `;
 
 const EditAccount = () => {
-  const { id, email, role, customerID } = useContext(UserContext);
+  const { id, email, role, customerId, lastModifiedTimestamp } = useContext(UserContext);
   const [updateUser] = useMutation(UPDATE_USER);
 
   const handleSubmit = newPassword => {
-    const username = email;
-    const password = newPassword;
-    const lastModifiedTimestamp = new Date().getTime.toString;
-
-    updateUser({ variables: { id, username, password, role, customerID, lastModifiedTimestamp } })
+    updateUser({
+      variables: {
+        id,
+        username: email,
+        password: newPassword,
+        role,
+        customerId,
+        lastModifiedTimestamp,
+      },
+    })
       .then(() => {
         notification.success({
           message: 'Success',
