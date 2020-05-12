@@ -2,22 +2,42 @@
 
 ## Set up environment:
 
-    Install Dependencies
-    	`npm install`
+Delete from package.json (undo this delete after all steps)
+`"@tip-wlan/wlan-cloud-ui-library": X.X.X,`
 
-To link wlan-cloud-ui-library package locally for development:
-`npm link ../wlan-cloud-ui-library`
+Install Dependencies
+`npm install`
+
+Clone [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) in parent folder
+
+```
+cd ..
+git clone https://github.com/Telecominfraproject/wlan-cloud-ui-library.git
+```
+
+Link wlan-cloud-ui-library package locally for development:
+
+```
+cd wlan-cloud-ui
+npm link ../wlan-cloud-ui-library
+```
+
+If `npm link` fails due to Permissions run with `sudo`
+
+```
+sudo npm link ../wlan-cloud-ui-library
+```
 
 ## Run:
 
 ### Development
 
-     `npm start`
+`npm start`
 
 ### Tests
 
-     `npm run test`
+`npm run test`
 
 ### Production
 
-     `npm run build`
+`npm run build`

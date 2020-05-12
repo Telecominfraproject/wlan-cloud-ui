@@ -1,6 +1,3 @@
-import React from 'react';
-import { WifiOutlined } from '@ant-design/icons';
-
 export const AUTH_TOKEN = 'tip-auth-token';
 export const COMPANY = 'Telecom Infra Project';
 
@@ -16,7 +13,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-0-0',
+    locationId: 3,
   },
   {
     name: 'Laptop',
@@ -29,7 +26,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-0-0',
+    locationId: 7,
   },
   {
     name: 'Laptop',
@@ -42,7 +39,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-0-0',
+    locationId: 2,
   },
   {
     name: 'Laptop',
@@ -55,7 +52,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-0-0',
+    locationId: 2,
   },
   {
     name: 'Laptop',
@@ -68,7 +65,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-0-0',
+    locationId: 2,
   },
   {
     name: 'Laptop',
@@ -81,7 +78,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-1-0',
+    locationId: 2,
   },
   {
     name: 'Laptop',
@@ -94,7 +91,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-1-0',
+    locationId: 8,
   },
   {
     name: 'Laptop',
@@ -107,7 +104,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-1-0',
+    locationId: 8,
   },
   {
     name: 'Laptop',
@@ -120,7 +117,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-1-0',
+    locationId: 8,
   },
   {
     name: 'Laptop',
@@ -133,7 +130,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-2-0',
+    locationId: 8,
   },
   {
     name: 'Laptop',
@@ -146,7 +143,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-2-0',
+    locationId: 8,
   },
   {
     name: 'Laptop',
@@ -159,7 +156,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-2-0',
+    locationId: 8,
   },
   {
     name: 'Laptop',
@@ -172,7 +169,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-2-0',
+    locationId: 8,
   },
   {
     name: 'Laptop',
@@ -185,108 +182,6 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     band: '5Ghz',
     signal: '-43 dBm',
     status: '39h 41m 25s Connected',
-    locationId: '0-2-0',
-  },
-];
-
-export const LOCATIONS_TREE_DATA = [
-  {
-    title: 'Las Vegas',
-    key: '0-0-0',
-    children: [
-      {
-        title: 'Mobilitie',
-        key: '0-0-0',
-        children: [
-          {
-            title: 'Lab',
-            key: '0-0-0-0',
-            children: [
-              {
-                title: 'App100',
-                key: '0-0-0-0-0',
-                icon: <WifiOutlined />,
-              },
-              {
-                title: 'App101',
-                key: '0-0-0-0-1',
-                icon: <WifiOutlined />,
-              },
-              {
-                title: 'App102',
-                key: '0-0-0-0-2',
-                icon: <WifiOutlined />,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Washington, D.C.',
-    key: '0-1-0',
-    children: [
-      {
-        title: 'Mobilitie',
-        key: '0-1-0',
-        children: [
-          {
-            title: 'Lab',
-            key: '0-1-0-0',
-            children: [
-              {
-                title: 'App100',
-                key: '0-1-0-0-0',
-                icon: <WifiOutlined />,
-              },
-              {
-                title: 'App101',
-                key: '0-1-0-0-1',
-                icon: <WifiOutlined />,
-              },
-              {
-                title: 'App102',
-                key: '0-1-0-0-2',
-                icon: <WifiOutlined />,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Los Angeles',
-    key: '0-2-0',
-    children: [
-      {
-        title: 'Mobilitie',
-        key: '0-2-0',
-        children: [
-          {
-            title: 'Lab',
-            key: '0-2-0-0',
-            children: [
-              {
-                title: 'App100',
-                key: '0-2-0-0-0',
-                icon: <WifiOutlined />,
-              },
-              {
-                title: 'App101',
-                key: '0-2-0-0-1',
-                icon: <WifiOutlined />,
-              },
-              {
-                title: 'App102',
-                key: '0-2-0-0-2',
-                icon: <WifiOutlined />,
-              },
-            ],
-          },
-        ],
-      },
-    ],
+    locationId: 8,
   },
 ];

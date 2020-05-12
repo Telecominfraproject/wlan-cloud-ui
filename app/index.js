@@ -20,7 +20,7 @@ const REFRESH_TOKEN = gql`
   mutation UpdateToken($refreshToken: String!) {
     updateToken(refreshToken: $refreshToken) {
       access_token
-      refreshToken
+      refresh_token
       expires_in
     }
   }
@@ -52,7 +52,7 @@ const client = new ApolloClient({
                       refreshToken: getItem(AUTH_TOKEN).refresh_token,
                     },
                   })
-                  .then(data => {
+                  .then(({ data }) => {
                     setItem(AUTH_TOKEN, data.updateToken, data.updateToken.expires_in);
                     return data.updateToken;
                   }),
