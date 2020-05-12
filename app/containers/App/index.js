@@ -12,7 +12,7 @@ import Login from 'containers/Login';
 import ClientDevices from 'containers/ClientDevices';
 import UserProvider from 'contexts/UserProvider';
 
-import { getItem } from 'utils/localStorage';
+import { getItem, setItem } from 'utils/localStorage';
 import { parseJwt } from 'utils/jwt';
 
 import UnauthenticatedRoute from './components/UnauthenticatedRoute';
@@ -27,26 +27,34 @@ const RedirectToDashboard = () => (
 );
 
 const App = () => {
+  const token = getItem(AUTH_TOKEN);
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    const token = getItem(AUTH_TOKEN);
     if (token) {
       const { userId, userName, userRole, customerId } = parseJwt(token.access_token);
-
       setUser({ id: userId, email: userName, role: userRole, customerId });
     }
   }, []);
+
+  const updateToken = newToken => {
+    setItem(AUTH_TOKEN, newToken);
+    if (newToken) {
+      const { userId, userName, userRole, customerId } = parseJwt(newToken.access_token);
+      setUser({ id: userId, email: userName, role: userRole, customerId });
+    }
+  };
 
   const updateUser = newUser => setUser({ ...user, ...newUser });
 
   return (
     <UserProvider
-      id={user.id}
-      email={user.email}
-      role={user.role}
+      id={user.userId}
+      email={user.userName}
+      role={user.userRole}
       customerId={user.customerId}
       updateUser={updateUser}
+      updateToken={updateToken}
     >
       <ThemeProvider company={COMPANY} logo={logo} logoMobile={logoMobile}>
         <Helmet titleTemplate={`%s - ${COMPANY}`} defaultTitle={COMPANY}>

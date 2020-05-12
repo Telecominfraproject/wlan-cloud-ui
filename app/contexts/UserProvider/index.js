@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import UserContext from 'contexts/UserContext';
 
-const UserProvider = ({ children, id, email, role, customerId, updateUser }) => (
-  <UserContext.Provider value={{ id, email, role, customerId, updateUser }}>
+const UserProvider = ({ children, id, email, role, customerId, updateUser, updateToken }) => (
+  <UserContext.Provider value={{ id, email, role, customerId, updateUser, updateToken }}>
     {children}
   </UserContext.Provider>
 );
@@ -12,6 +12,7 @@ const UserProvider = ({ children, id, email, role, customerId, updateUser }) => 
 UserProvider.propTypes = {
   children: PropTypes.node.isRequired,
   updateUser: PropTypes.func.isRequired,
+  updateToken: PropTypes.func.isRequired,
   id: PropTypes.number,
   email: PropTypes.string,
   role: PropTypes.string,
