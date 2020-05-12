@@ -5,4 +5,4 @@ services:
         build:
             context: .
             dockerfile: Dockerfile.test
-        command: npm run test
+        command: npm test
