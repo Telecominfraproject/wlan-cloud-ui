@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-import UserContext from 'contexts/UserContext';
 import { notification, Spin } from 'antd';
 
 import { Accounts as AccountsPage } from '@tip-wlan/wlan-cloud-ui-library';
+
+import UserContext from 'contexts/UserContext';
 
 const GET_ALL_USERS = gql`
   query GetAllUsers($customerId: Int!) {
@@ -17,7 +18,8 @@ const GET_ALL_USERS = gql`
     }
   }
 `;
-export default function Accounts() {
+
+const Accounts = () => {
   const { customerId } = useContext(UserContext);
   const { loading, error, data } = useQuery(GET_ALL_USERS, { variables: { customerId } });
 
@@ -32,9 +34,6 @@ export default function Accounts() {
     });
   }
 
-  return (
-    <div>
-      <AccountsPage data={data} />
-    </div>
-  );
-}
+  return <AccountsPage data={data.getAllUsers.items} />;
+};
+export default Accounts;
