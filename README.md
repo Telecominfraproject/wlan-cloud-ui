@@ -9,17 +9,21 @@ Install Dependencies
 `npm install`
 
 Clone [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) in parent folder
+
 ```
 cd ..
 git clone https://github.com/Telecominfraproject/wlan-cloud-ui-library.git
 ```
 
 Link wlan-cloud-ui-library package locally for development:
+
 ```
 cd wlan-cloud-ui
 npm link ../wlan-cloud-ui-library
 ```
+
 If `npm link` fails due to Permissions run with `sudo`
+
 ```
 sudo npm link ../wlan-cloud-ui-library
 ```
