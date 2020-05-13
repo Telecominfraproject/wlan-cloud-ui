@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Switch, Redirect } from 'react-router-dom';
 
@@ -28,14 +28,12 @@ const RedirectToDashboard = () => (
 
 const App = () => {
   const token = getItem(AUTH_TOKEN);
-  const [user, setUser] = useState({});
-
-  useEffect(() => {
-    if (token) {
-      const { userId, userName, userRole, customerId } = parseJwt(token.access_token);
-      setUser({ id: userId, email: userName, role: userRole, customerId });
-    }
-  }, []);
+  let initialUser = {};
+  if (token) {
+    const { userId, userName, userRole, customerId } = parseJwt(token.access_token);
+    initialUser = { id: userId, email: userName, role: userRole, customerId };
+  }
+  const [user, setUser] = useState(initialUser);
 
   const updateToken = newToken => {
     setItem(AUTH_TOKEN, newToken);
