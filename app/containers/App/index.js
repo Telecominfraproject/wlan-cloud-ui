@@ -49,9 +49,9 @@ const App = () => {
 
   return (
     <UserProvider
-      id={user.userId}
-      email={user.userName}
-      role={user.userRole}
+      id={user.id}
+      email={user.email}
+      role={user.role}
       customerId={user.customerId}
       updateUser={updateUser}
       updateToken={updateToken}
