@@ -6,7 +6,8 @@ import { notification, Spin } from 'antd';
 import _ from 'lodash';
 import UserContext from 'contexts/UserContext';
 import {
-  CLIENT_DEVICES_TABLE_CLOUMNS as tableColumns,
+  ACCESS_POINTS_TABLE_CLOUMNS as accessPointsTableColumns,
+  CLIENT_DEVICES_TABLE_CLOUMNS as clientDevicesTableColumns,
   CLIENT_DEVICES_TABLE_DATA,
 } from 'constants/index';
 import styles from './index.module.scss';
@@ -24,6 +25,7 @@ const GET_ALL_LOCATIONS = gql`
 const ClientDevices = () => {
   const { customerId } = useContext(UserContext);
   const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, { variables: { customerId } });
+  const [activeTab, setActiveTab] = useState('cd');
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [selected, setSelected] = useState(false);
@@ -89,6 +91,9 @@ const ClientDevices = () => {
     return filteredData;
   }, [checkedLocations]);
 
+  const onToggle = e => {
+    setActiveTab(e.target.id);
+  };
   if (loading) {
     return <Spin size="large" className={styles.spinner} />;
   }
@@ -103,10 +108,12 @@ const ClientDevices = () => {
     <ClientDevicesPage
       onSelect={onSelect}
       onCheck={onCheck}
-      tableColumns={tableColumns}
+      tableColumns={activeTab === 'cd' ? clientDevicesTableColumns : accessPointsTableColumns}
       tableData={devicesData}
       checkedLocations={checkedLocations}
       locations={locationsTree}
+      onToggle={onToggle}
+      activeTab={activeTab}
     />
   );
 };

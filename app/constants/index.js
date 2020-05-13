@@ -1,6 +1,29 @@
 export const AUTH_TOKEN = 'tip-auth-token';
 export const COMPANY = 'Telecom Infra Project';
 
+export const ACCESS_POINTS_TABLE_CLOUMNS = [
+  {
+    title: 'NAME',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: 'ALARMS',
+    dataIndex: 'alarms',
+    key: 'alarms',
+  },
+  { title: 'MODEL', dataIndex: 'model', key: 'model' },
+  { title: 'IP', dataIndex: 'ip', key: 'ip' },
+  { title: 'MAC', dataIndex: 'mac', key: 'mac' },
+  { title: 'ASSET ID', dataIndex: 'assetId', key: 'assetId' },
+  { title: 'UP TIME', dataIndex: 'upTime', key: 'upTime' },
+  { title: 'PROFILE', dataIndex: 'profile', key: 'profile' },
+  { title: 'CHANNEL', dataIndex: 'channel', key: 'channel' },
+  { title: 'CAPACITY', dataIndex: 'capacity', key: 'capacity' },
+  { title: 'NOISE FLOOR', dataIndex: 'noiseFloor', key: 'noiseFloor' },
+  { title: 'DEVICES', dataIndex: 'devices', key: 'devices' },
+];
+
 export const CLIENT_DEVICES_TABLE_CLOUMNS = [
   {
     title: '',
