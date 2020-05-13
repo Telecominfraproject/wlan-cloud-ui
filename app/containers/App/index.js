@@ -10,6 +10,7 @@ import logoMobile from 'images/tip-logo-mobile.png';
 import { AUTH_TOKEN, COMPANY } from 'constants/index';
 import Login from 'containers/Login';
 import ClientDevices from 'containers/ClientDevices';
+import EditAccount from 'containers/EditAccount';
 import UserProvider from 'contexts/UserProvider';
 
 import { getItem, setItem } from 'utils/localStorage';
@@ -47,9 +48,9 @@ const App = () => {
 
   return (
     <UserProvider
-      id={user.userId}
-      email={user.userName}
-      role={user.userRole}
+      id={user.id}
+      email={user.email}
+      role={user.role}
       customerId={user.customerId}
       updateUser={updateUser}
       updateToken={updateToken}
@@ -69,6 +70,7 @@ const App = () => {
             component={ClientDevices}
           />
         </Switch>
+        <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
       </ThemeProvider>
     </UserProvider>
   );
