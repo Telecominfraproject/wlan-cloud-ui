@@ -1,9 +1,22 @@
 import React, { useContext } from 'react';
 import { EditAccount as EditAccountPage } from '@tip-wlan/wlan-cloud-ui-library';
 import gql from 'graphql-tag';
-import { useMutation } from '@apollo/react-hooks';
-import { notification } from 'antd';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import { notification, Spin, Alert } from 'antd';
+
 import UserContext from 'contexts/UserContext';
+
+const GET_USER = gql`
+  query GetUser($id: Int!) {
+    getUser(id: $id) {
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
+    }
+  }
+`;
 
 const UPDATE_USER = gql`
   mutation UpdateUser(
@@ -32,10 +45,13 @@ const UPDATE_USER = gql`
 `;
 
 const EditAccount = () => {
-  const { id, email, role, customerId, lastModifiedTimestamp } = useContext(UserContext);
+  const { id, email } = useContext(UserContext);
+  const { loading, error, data } = useQuery(GET_USER, { variables: { id } });
   const [updateUser] = useMutation(UPDATE_USER);
 
   const handleSubmit = newPassword => {
+    const { role, customerId, lastModifiedTimestamp } = data.getUser;
+
     updateUser({
       variables: {
         id,
@@ -59,6 +75,14 @@ const EditAccount = () => {
         })
       );
   };
+
+  if (loading) {
+    return <Spin size="large" />;
+  }
+
+  if (error) {
+    return <Alert message="Error" description="Failed to load User." type="error" showIcon />;
+  }
 
   return <EditAccountPage onSubmit={handleSubmit} email={email} />;
 };
