@@ -11,7 +11,7 @@ import 'styles/index.scss';
 import App from 'containers/App';
 import { AUTH_TOKEN } from 'constants/index';
 
-import { getItem, setItem } from 'utils/localStorage';
+import { getItem, setItem, removeItem } from 'utils/localStorage';
 
 const API_URI = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000/' : '';
 const MOUNT_NODE = document.getElementById('root');
@@ -41,6 +41,7 @@ const client = new ApolloClient({
       graphQLErrors.forEach(err => {
         // handle errors differently based on its error code
         switch (err.extensions.code) {
+          case 'FORBIDDEN':
           case 'UNAUTHENTICATED':
             operation.setContext({
               headers: {
@@ -58,6 +59,11 @@ const client = new ApolloClient({
                   }),
               },
             });
+            return forward(operation);
+          case 'INTERNAL_SERVER_ERROR':
+            if (err.path && err.path[0] === 'updateToken') {
+              removeItem(AUTH_TOKEN);
+            }
             return forward(operation);
           default:
             return forward(operation);

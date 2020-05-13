@@ -29,4 +29,5 @@ EXPOSE 3000
 
 COPY --from=build /app /app
 
+RUN npm run eslint
 CMD ["npm", "start"]

@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import gql from 'graphql-tag';
 import { useMutation, useApolloClient } from '@apollo/react-hooks';
 import { useHistory } from 'react-router-dom';
 import { notification } from 'antd';
 
 import { Login as LoginPage } from '@tip-wlan/wlan-cloud-ui-library';
-import { AUTH_TOKEN } from 'constants/index';
-import { setItem } from 'utils/localStorage';
+
+import UserContext from 'contexts/UserContext';
 
 const AUTHENTICATE_USER = gql`
   mutation AuthenticateUser($email: String!, $password: String!) {
@@ -20,6 +20,7 @@ const AUTHENTICATE_USER = gql`
 
 const Login = () => {
   const history = useHistory();
+  const { updateToken } = useContext(UserContext);
   const client = useApolloClient();
   const [authenticateUser] = useMutation(AUTHENTICATE_USER);
 
@@ -27,7 +28,7 @@ const Login = () => {
     authenticateUser({ variables: { email, password } })
       .then(({ data }) => {
         client.resetStore();
-        setItem(AUTH_TOKEN, data.authenticateUser, data.authenticateUser.expires_in);
+        updateToken(data.authenticateUser);
         history.push('/');
       })
       .catch(() =>
