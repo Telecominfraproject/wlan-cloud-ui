@@ -26,7 +26,6 @@ const ClientDevices = () => {
   const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, { variables: { customerId } });
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
-  const [checkboxTouched, setCheckboxTouched] = useState(false);
   const [selected, setSelected] = useState(false);
 
   const formatLocationListForTree = list => {
@@ -77,12 +76,10 @@ const ClientDevices = () => {
   };
 
   const onCheck = checkedKeys => {
-    setCheckboxTouched(true);
     setCheckedLocations(checkedKeys);
   };
 
   const devicesData = useMemo(() => {
-    if (!checkboxTouched) return CLIENT_DEVICES_TABLE_DATA;
     const filteredData = [];
     checkedLocations.forEach(locationId => {
       CLIENT_DEVICES_TABLE_DATA.filter(d => {
@@ -108,7 +105,6 @@ const ClientDevices = () => {
       onCheck={onCheck}
       tableColumns={tableColumns}
       tableData={devicesData}
-      treeData={locationsTree}
       checkedLocations={checkedLocations}
       locations={locationsTree}
     />
