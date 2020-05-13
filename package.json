@@ -12,7 +12,8 @@
     "start": "cross-env NODE_ENV=development webpack-dev-server",
     "build": "webpack --mode=production",
     "format": "prettier --write \"app/**/*.js\"",
-    "eslint-fix": "eslint --fix \"app/**/*.js\""
+    "eslint-fix": "eslint --fix \"app/**/*.js\"",
+    "eslint": "eslint \"app/**/*.js\" --max-warnings=0"
   },
   "license": "MIT",
   "dependencies": {
