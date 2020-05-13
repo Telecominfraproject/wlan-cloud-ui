@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-import { notification, Spin } from 'antd';
+import { Alert, Spin } from 'antd';
 
 import { Accounts as AccountsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -28,10 +28,7 @@ const Accounts = () => {
   }
 
   if (error) {
-    notification.error({
-      message: 'Error',
-      description: 'Failed to load users',
-    });
+    return <Alert message="Error" description="Failed to load Users." type="error" showIcon />;
   }
 
   return <AccountsPage data={data.getAllUsers.items} />;
