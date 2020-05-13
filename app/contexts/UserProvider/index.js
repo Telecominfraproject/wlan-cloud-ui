@@ -3,16 +3,27 @@ import PropTypes from 'prop-types';
 
 import UserContext from 'contexts/UserContext';
 
-const UserProvider = ({ children, id, email, role, customerId }) => (
-  <UserContext.Provider value={{ id, email, role, customerId }}>{children}</UserContext.Provider>
+const UserProvider = ({ children, id, email, role, customerId, updateUser, updateToken }) => (
+  <UserContext.Provider value={{ id, email, role, customerId, updateUser, updateToken }}>
+    {children}
+  </UserContext.Provider>
 );
 
 UserProvider.propTypes = {
   children: PropTypes.node.isRequired,
-  id: PropTypes.number.isRequired,
-  email: PropTypes.string.isRequired,
-  role: PropTypes.string.isRequired,
-  customerId: PropTypes.number.isRequired,
+  updateUser: PropTypes.func.isRequired,
+  updateToken: PropTypes.func.isRequired,
+  id: PropTypes.number,
+  email: PropTypes.string,
+  role: PropTypes.string,
+  customerId: PropTypes.number,
+};
+
+UserProvider.defaultProps = {
+  id: null,
+  email: null,
+  role: null,
+  customerId: null,
 };
 
 export default UserProvider;

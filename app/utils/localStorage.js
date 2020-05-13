@@ -13,7 +13,9 @@ export const getItemExpiration = () => {
 
 export const setItem = (key, data, expiration) => {
   const localStorageState = data;
-  localStorageState.expiration = expiration || getItemExpiration();
+  if (localStorageState) {
+    localStorageState.expiration = expiration || getItemExpiration();
+  }
   window.localStorage.setItem(key, JSON.stringify(localStorageState));
 };
 
