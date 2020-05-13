@@ -5,7 +5,10 @@ import { useQuery } from '@apollo/react-hooks';
 import { notification, Spin } from 'antd';
 import _ from 'lodash';
 import UserContext from 'contexts/UserContext';
-import { CLIENT_DEVICES_TABLE_DATA } from 'constants/index';
+import {
+  CLIENT_DEVICES_TABLE_CLOUMNS as tableColumns,
+  CLIENT_DEVICES_TABLE_DATA,
+} from 'constants/index';
 import styles from './index.module.scss';
 
 const GET_ALL_LOCATIONS = gql`
@@ -103,6 +106,7 @@ const ClientDevices = () => {
     <ClientDevicesPage
       onSelect={onSelect}
       onCheck={onCheck}
+      tableColumns={tableColumns}
       tableData={devicesData}
       treeData={locationsTree}
       checkedLocations={checkedLocations}
