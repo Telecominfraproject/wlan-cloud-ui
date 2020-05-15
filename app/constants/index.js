@@ -1,3 +1,5 @@
+import React from 'react';
+
 export const AUTH_TOKEN = 'tip-auth-token';
 export const COMPANY = 'Telecom Infra Project';
 
@@ -18,12 +20,97 @@ export const ACCESS_POINTS_TABLE_CLOUMNS = [
   { title: 'ASSET ID', dataIndex: 'assetId', key: 'assetId' },
   { title: 'UP TIME', dataIndex: 'upTime', key: 'upTime' },
   { title: 'PROFILE', dataIndex: 'profile', key: 'profile' },
-  { title: 'CHANNEL', dataIndex: 'channel', key: 'channel' },
+  {
+    title: 'CHANNEL',
+    dataIndex: 'channel',
+    key: 'channel',
+    render: channel => {
+      return (
+        <div
+          className="channelRow"
+          style={{ display: 'flex', flexDirection: 'column', padding: '0 30px' }}
+        >
+          <span>{channel && channel.is2dot4GHz ? channel.is2dot4GHz : 'null'}</span>
+          <span style={{ color: 'darkgray' }}>
+            {channel && channel.is5GHz ? channel.is5GHz : 'null'}
+          </span>
+        </div>
+      );
+    },
+  },
   { title: 'CAPACITY', dataIndex: 'capacity', key: 'capacity' },
-  { title: 'NOISE FLOOR', dataIndex: 'noiseFloor', key: 'noiseFloor' },
-  { title: 'DEVICES', dataIndex: 'devices', key: 'devices' },
+  {
+    title: 'NOISE FLOOR',
+    dataIndex: 'noiseFloor',
+    key: 'noiseFloor',
+    render: noiseFloor => {
+      return (
+        <div
+          className="noiseFloorRow"
+          style={{ display: 'flex', flexDirection: 'column', padding: '0 30px' }}
+        >
+          <span>{noiseFloor && noiseFloor.is2dot4GHz ? noiseFloor.is2dot4GHz : 'null'}</span>
+          <span>{noiseFloor && noiseFloor.is5GHz ? noiseFloor.is5GHz : 'null'}</span>
+        </div>
+      );
+    },
+  },
+  {
+    title: 'DEVICES',
+    dataIndex: 'devices',
+    key: 'devices',
+  },
 ];
-
+export const ACCESS_POINTS_TABLE_DATA = [
+  {
+    key: 0,
+    name: 'AP100',
+    alarms: 0,
+    model: 'AP20-US',
+    ip: '192.168.0.1',
+    mac: '74:9C:E3:02:91:6F',
+    assetId: 'A1B2C3D4',
+    upTime: '39h 41m 25s',
+    profile: 'Default',
+    channel: '0 0 0',
+    capacity: '1 44 44',
+    noiseFloor: '-80 -93 -93',
+    devices: [0, 0, 0],
+    locationId: 4,
+  },
+  {
+    key: 1,
+    name: 'AP100',
+    alarms: 1,
+    model: 'AP20-US',
+    ip: '192.168.0.1',
+    mac: '74:9C:E3:02:91:6F',
+    assetId: 'A1B2C3D4',
+    upTime: '39h 41m 25s',
+    profile: 'Default',
+    channel: '0 0 0',
+    capacity: '1 44 44',
+    noiseFloor: '-80 -93 -93',
+    devices: '0 0 0',
+    locationId: 5,
+  },
+  {
+    key: 2,
+    name: 'AP100',
+    alarms: 2,
+    model: 'AP20-US',
+    ip: '192.168.0.1',
+    mac: '74:9C:E3:02:91:6F',
+    assetId: 'A1B2C3D4',
+    upTime: '39h 41m 25s',
+    profile: 'Default',
+    channel: '0 0 0',
+    capacity: '1 44 44',
+    noiseFloor: '-80 -93 -93',
+    devices: '0 0 0',
+    locationId: 6,
+  },
+];
 export const CLIENT_DEVICES_TABLE_CLOUMNS = [
   {
     title: '',
@@ -47,6 +134,7 @@ export const CLIENT_DEVICES_TABLE_CLOUMNS = [
 
 export const CLIENT_DEVICES_TABLE_DATA = [
   {
+    key: 0,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -60,6 +148,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 3,
   },
   {
+    key: 1,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -73,6 +162,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 7,
   },
   {
+    key: 2,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -86,6 +176,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 3,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -99,6 +190,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 4,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -112,6 +204,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 5,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -125,6 +218,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 6,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -138,6 +232,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 7,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -151,6 +246,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 8,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -164,6 +260,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 9,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -177,6 +274,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 10,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -190,6 +288,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 11,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -203,6 +302,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 12,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -216,6 +316,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 13,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
