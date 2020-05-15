@@ -18,8 +18,75 @@ const MasterLayout = ({ children }) => {
     client.resetStore();
   };
 
+  const menuItems = [
+    {
+      key: 'dashboard',
+      path: '/dashboard',
+      text: 'Dashboard',
+    },
+    {
+      key: 'network',
+      path: '/network',
+      text: 'Network',
+    },
+    {
+      key: 'profiles',
+      path: '/profiles',
+      text: 'Profiles',
+    },
+    {
+      key: 'alarms',
+      path: '/alarms',
+      text: 'Alarms',
+    },
+  ];
+
+  const mobileMenuItems = [
+    {
+      key: 'dashboard',
+      path: '/dashboard',
+      text: 'Dashboard',
+    },
+    {
+      key: 'network',
+      path: '/network',
+      text: 'Network',
+    },
+    {
+      key: 'profiles',
+      path: '/profiles',
+      text: 'Profiles',
+    },
+    {
+      key: 'alarms',
+      path: '/alarms',
+      text: 'Alarms',
+    },
+    {
+      key: 'settings',
+      text: 'Settings',
+      children: [
+        {
+          key: 'editAccount',
+          path: '/account/edit',
+          text: 'Edit Account',
+        },
+        {
+          key: 'logout',
+          path: '/',
+          text: 'Log Out',
+        },
+      ],
+    },
+  ];
+
   return (
-    <Layout onLogout={handleLogout} locationState={location}>
+    <Layout
+      onLogout={handleLogout}
+      locationState={location}
+      menuItems={menuItems}
+      mobileMenuItems={mobileMenuItems}
+    >
       {children}
     </Layout>
   );
