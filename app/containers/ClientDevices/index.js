@@ -22,7 +22,7 @@ const ClientDevices = () => {
   });
   const [activeTab, setActiveTab] = useState('cd');
   const [locationsTree, setLocationsTree] = useState([]);
-  const [checkedLocations, setCheckedLocations] = useState([3]);
+  const [checkedLocations, setCheckedLocations] = useState([]);
   const [tableColums, setTableColumns] = useState(clientDevicesTableColumns);
   const [devicesData, setDevicesData] = useState([]);
   const [selected, setSelected] = useState(false);
