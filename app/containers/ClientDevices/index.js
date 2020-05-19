@@ -22,11 +22,18 @@ const ClientDevices = () => {
   });
   const [activeTab, setActiveTab] = useState('cd');
   const [locationsTree, setLocationsTree] = useState([]);
-  const [checkedLocations, setCheckedLocations] = useState([]);
+  const [checkedLocations, setCheckedLocations] = useState([3]);
+  const [tableColums, setTableColumns] = useState(clientDevicesTableColumns);
   const [devicesData, setDevicesData] = useState([]);
   const [selected, setSelected] = useState(false);
 
   const formatLocationListForTree = list => {
+    const checkedTreeLocations = [];
+    list.forEach(ele => {
+      checkedTreeLocations.push(ele.id);
+    });
+    setCheckedLocations(checkedTreeLocations);
+
     function unflatten(array, p, t) {
       let tree = typeof t !== 'undefined' ? t : [];
       const parent = typeof p !== 'undefined' ? p : { id: 0 };
@@ -72,20 +79,8 @@ const ClientDevices = () => {
   };
 
   const getRadioDetails = (radioDetails, type) => {
-    let is5GHz;
-    let is2dot4GHz;
-    if (type === 'channel') {
-      is5GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_5GHZ);
-      is2dot4GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_2DOT4GHZ);
-    } else {
-      is5GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_5GHZ);
-      is2dot4GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_2DOT4GHZ);
-
-      return {
-        is5GHz,
-        is2dot4GHz,
-      };
-    }
+    const is5GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_5GHZ);
+    const is2dot4GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_2DOT4GHZ);
     return {
       is5GHz,
       is2dot4GHz,
@@ -98,6 +93,7 @@ const ClientDevices = () => {
       dataSource.items.map(ap => {
         const radioChannelDetails = getRadioDetails(ap.details, 'channel');
         const radioNoiseFloorDetails = getRadioDetails(ap.details, 'noiseFloor');
+
         return {
           key: ap.id,
           name: ap.name !== undefined ? ap.name : 'null',
@@ -117,54 +113,44 @@ const ClientDevices = () => {
     return tableData;
   };
 
-  useEffect(() => {
-    if (data && data.getAllLocations) {
-      const checkedTreeLocations = [];
-      const unflattenData = formatLocationListForTree(data && data.getAllLocations);
-      unflattenData[0].children.forEach(loc => {
-        checkedTreeLocations.push(loc.id);
-        if (loc.children && loc.children.length > 0) {
-          loc.children.forEach(cl => {
-            checkedTreeLocations.push(cl.id);
-            if (cl.children && cl.children.length > 0) {
-              cl.children.map(l => {
-                return checkedTreeLocations.push(l.id);
-              });
-            }
-          });
-        }
-      });
-      setLocationsTree(unflattenData[0].children);
-      setCheckedLocations(checkedTreeLocations);
-    }
-  }, [data, activeTab]);
-
-  const onSelect = () => {
-    setSelected(!selected);
+  const fetchFilterEquipment = async () => {
+    const ap = await client.query({
+      query: FILTER_EQUIPMENT,
+      variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
+    });
+    const accessPointsData = setAccessPointsTableData(ap.data && ap.data.filterEquipment);
+    setDevicesData(accessPointsData);
   };
 
   useEffect(() => {
+    if (data && data.getAllLocations) {
+      const unflattenData = formatLocationListForTree(data && data.getAllLocations);
+      setLocationsTree(unflattenData[0].children);
+    }
+  }, [data]);
+
+  useEffect(() => {
     const filteredData = [];
-    if (checkedLocations.length > 0) {
-      checkedLocations.forEach(async locationId => {
-        if (activeTab === 'cd') {
+    if (activeTab === 'cd') {
+      if (checkedLocations.length > 0) {
+        checkedLocations.forEach(locationId => {
           CLIENT_DEVICES_TABLE_DATA.filter(d => {
             return d.locationId === locationId ? filteredData.push(d) : '';
           });
           setDevicesData(filteredData);
-        } else {
-          const ap = await client.query({
-            query: FILTER_EQUIPMENT,
-            variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
-          });
-          const accessPointsData = setAccessPointsTableData(ap.data && ap.data.filterEquipment);
-          setDevicesData(accessPointsData);
-        }
-      });
+        });
+      } else {
+        setDevicesData(filteredData);
+      }
     } else {
-      setDevicesData(filteredData);
+      fetchFilterEquipment();
     }
-  }, [checkedLocations]);
+    setTableColumns(activeTab === 'cd' ? clientDevicesTableColumns : accessPointsTableColumns);
+  }, [checkedLocations, activeTab]);
+
+  const onSelect = () => {
+    setSelected(!selected);
+  };
 
   const onCheck = checkedKeys => {
     setCheckedLocations(checkedKeys);
@@ -172,6 +158,7 @@ const ClientDevices = () => {
 
   const onToggle = e => {
     setActiveTab(e.target.id);
+    setDevicesData([]);
   };
 
   if (loading) {
@@ -189,7 +176,7 @@ const ClientDevices = () => {
     <ClientDevicesPage
       onSelect={onSelect}
       onCheck={onCheck}
-      tableColumns={activeTab === 'cd' ? clientDevicesTableColumns : accessPointsTableColumns}
+      tableColumns={tableColums}
       tableData={devicesData}
       checkedLocations={checkedLocations}
       locations={locationsTree}
