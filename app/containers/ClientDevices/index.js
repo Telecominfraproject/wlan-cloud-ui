@@ -131,6 +131,7 @@ const ClientDevices = () => {
 
   useEffect(() => {
     const filteredData = [];
+    setDevicesData(filteredData);
     if (activeTab === 'cd') {
       if (checkedLocations.length > 0) {
         checkedLocations.forEach(locationId => {
@@ -158,7 +159,6 @@ const ClientDevices = () => {
 
   const onToggle = e => {
     setActiveTab(e.target.id);
-    setDevicesData([]);
   };
 
   if (loading) {

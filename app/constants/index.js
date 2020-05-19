@@ -118,7 +118,7 @@ export const CLIENT_DEVICES_TABLE_CLOUMNS = [
     key: 'name',
   },
   {
-    title: 'Mac',
+    title: 'MAC',
     dataIndex: 'mac',
     key: 'mac',
   },
