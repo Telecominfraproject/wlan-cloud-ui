@@ -39,6 +39,11 @@ const MasterLayout = ({ children }) => {
       path: '/alarms',
       text: 'Alarms',
     },
+    {
+      key: 'accounts',
+      path: '/accounts',
+      text: 'Accounts',
+    },
   ];
 
   const mobileMenuItems = [
@@ -62,6 +67,12 @@ const MasterLayout = ({ children }) => {
       path: '/alarms',
       text: 'Alarms',
     },
+    {
+      key: 'accounts',
+      path: '/accounts',
+      text: 'Accounts',
+    },
+
     {
       key: 'settings',
       text: 'Settings',
