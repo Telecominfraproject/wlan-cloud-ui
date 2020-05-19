@@ -21,10 +21,12 @@ const GET_ALL_USERS = gql`
   }
 `;
 
-const DELETE_USER = gql`
-  query DeleteUser($id: Int!) {
-    deleteUser(id: $id) {
-      id
+const CREATE_USER = gql`
+  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: Int!) {
+    createUser(username: $username, password: $password, role: $role, customerId: $customerId) {
+      username
+      role
+      customerId
     }
   }
 `;
@@ -55,12 +57,10 @@ const UPDATE_USER = gql`
   }
 `;
 
-const CREATE_USER = gql`
-  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: Int!) {
-    createUser(username: $username, password: $password, role: $role, customerId: $customerId) {
-      username
-      role
-      customerId
+const DELETE_USER = gql`
+  query DeleteUser($id: Int!) {
+    deleteUser(id: $id) {
+      id
     }
   }
 `;
