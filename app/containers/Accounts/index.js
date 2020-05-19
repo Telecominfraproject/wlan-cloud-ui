@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
 
 import { Accounts as AccountsPage } from '@tip-wlan/wlan-cloud-ui-library';
@@ -14,10 +14,25 @@ const GET_ALL_USERS = gql`
         id
         username
         role
+        lastModifiedTimestamp
+        customerId
       }
     }
   }
 `;
+
+const DELETE_USER = gql`
+  query DeleteUser($id: Int!) {
+    deleteUser(id: $id) {
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
+    }
+  }
+`;
+
 const UPDATE_USER = gql`
   mutation UpdateUser(
     $id: Int!
@@ -58,6 +73,21 @@ const Accounts = () => {
   const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch } = useQuery(GET_ALL_USERS, { variables: { customerId } });
 
+  const [DeleteUser] = useLazyQuery(DELETE_USER, {
+    onCompleted: () => {
+      notification.success({
+        message: 'Success',
+        description: 'Account successfully deleted.',
+      });
+    },
+    onError: () => {
+      notification.error({
+        message: 'Error',
+        description: 'Account could not be deleted.',
+      });
+    },
+  });
+
   const [createUser] = useMutation(CREATE_USER);
   const [updateUser] = useMutation(UPDATE_USER);
 
@@ -85,8 +115,12 @@ const Accounts = () => {
       );
   };
 
-  const handleEditUser = (email, password, role) => {
-    const { id, lastModifiedTimestamp } = data.getAllUsers;
+  const handleDeleteUser = id => {
+    DeleteUser({ variables: { id } });
+    refetch();
+  };
+
+  const handleEditUser = (id, email, password, role, lastModifiedTimestamp) => {
     updateUser({
       variables: {
         id,
@@ -101,7 +135,7 @@ const Accounts = () => {
         refetch();
         notification.success({
           message: 'Success',
-          description: 'Account successfully edited.',
+          description: 'Account successfully updated.',
         });
       })
       .catch(() =>
@@ -125,6 +159,7 @@ const Accounts = () => {
       data={data.getAllUsers.items}
       onCreateUser={handleCreateUser}
       onEditUser={handleEditUser}
+      onDeleteUser={handleDeleteUser}
     />
   );
 };
