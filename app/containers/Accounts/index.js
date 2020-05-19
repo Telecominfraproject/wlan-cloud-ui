@@ -25,10 +25,6 @@ const DELETE_USER = gql`
   query DeleteUser($id: Int!) {
     deleteUser(id: $id) {
       id
-      username
-      role
-      customerId
-      lastModifiedTimestamp
     }
   }
 `;
@@ -71,10 +67,13 @@ const CREATE_USER = gql`
 
 const Accounts = () => {
   const { customerId } = useContext(UserContext);
-  const { loading, error, data, refetch } = useQuery(GET_ALL_USERS, { variables: { customerId } });
 
+  const { loading, error, data, refetch } = useQuery(GET_ALL_USERS, { variables: { customerId } });
+  const [createUser] = useMutation(CREATE_USER);
+  const [updateUser] = useMutation(UPDATE_USER);
   const [DeleteUser] = useLazyQuery(DELETE_USER, {
     onCompleted: () => {
+      refetch();
       notification.success({
         message: 'Success',
         description: 'Account successfully deleted.',
@@ -87,9 +86,6 @@ const Accounts = () => {
       });
     },
   });
-
-  const [createUser] = useMutation(CREATE_USER);
-  const [updateUser] = useMutation(UPDATE_USER);
 
   const handleCreateUser = (email, password, role) => {
     createUser({
@@ -113,11 +109,6 @@ const Accounts = () => {
           description: 'Account could not be created.',
         })
       );
-  };
-
-  const handleDeleteUser = id => {
-    DeleteUser({ variables: { id } });
-    refetch();
   };
 
   const handleEditUser = (id, email, password, role, lastModifiedTimestamp) => {
@@ -144,6 +135,10 @@ const Accounts = () => {
           description: 'Account could not be updated.',
         })
       );
+  };
+
+  const handleDeleteUser = id => {
+    DeleteUser({ variables: { id } });
   };
 
   if (loading) {

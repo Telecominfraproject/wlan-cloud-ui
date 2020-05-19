@@ -71,9 +71,8 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
+          <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
         </Switch>
-        <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
-        <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
       </ThemeProvider>
     </UserProvider>
   );
