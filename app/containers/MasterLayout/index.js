@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { useApolloClient } from '@apollo/react-hooks';
@@ -9,7 +9,11 @@ import { AUTH_TOKEN } from 'constants/index';
 
 import { removeItem } from 'utils/localStorage';
 
+import UserContext from 'contexts/UserContext';
+
 const MasterLayout = ({ children }) => {
+  const { role } = useContext(UserContext);
+
   const client = useApolloClient();
   const location = useLocation();
 
@@ -39,11 +43,6 @@ const MasterLayout = ({ children }) => {
       path: '/alarms',
       text: 'Alarms',
     },
-    {
-      key: 'accounts',
-      path: '/accounts',
-      text: 'Accounts',
-    },
   ];
 
   const mobileMenuItems = [
@@ -67,11 +66,6 @@ const MasterLayout = ({ children }) => {
       path: '/alarms',
       text: 'Alarms',
     },
-    {
-      key: 'accounts',
-      path: '/accounts',
-      text: 'Accounts',
-    },
 
     {
       key: 'settings',
@@ -90,6 +84,19 @@ const MasterLayout = ({ children }) => {
       ],
     },
   ];
+
+  if (role === 'SuperUser') {
+    menuItems.push({
+      key: 'accounts',
+      path: '/accounts',
+      text: 'Accounts',
+    });
+    mobileMenuItems.push({
+      key: 'accounts',
+      path: '/accounts',
+      text: 'Accounts',
+    });
+  }
 
   return (
     <Layout

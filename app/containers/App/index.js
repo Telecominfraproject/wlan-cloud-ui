@@ -71,7 +71,9 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
-          <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
+          {user.role === 'SuperUser' && (
+            <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
+          )}
         </Switch>
       </ThemeProvider>
     </UserProvider>
