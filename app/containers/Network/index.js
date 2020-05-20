@@ -11,13 +11,33 @@ import { notification, Spin } from 'antd';
 import _ from 'lodash';
 import UserContext from 'contexts/UserContext';
 import {
-  CLIENT_DEVICES_TABLE_CLOUMNS as clientDevicesTableColumns,
   CLIENT_DEVICES_TABLE_DATA,
   IS_RADIO_TYPE_5GHZ,
   IS_RADIO_TYPE_2DOT4GHZ,
 } from 'constants/index.js';
 import { GET_ALL_LOCATIONS, FILTER_EQUIPMENT } from 'graphql/queries';
 import styles from './index.module.scss';
+
+const clientDevicesTableColumns = [
+  {
+    title: '',
+    dataIndex: 'name',
+    key: 'name',
+  },
+  {
+    title: 'MAC',
+    dataIndex: 'mac',
+    key: 'mac',
+  },
+  { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr', key: '1' },
+  { title: 'IP', dataIndex: 'ip', key: '2' },
+  { title: 'HOST NAME', dataIndex: 'hostName', key: '3' },
+  { title: 'ACCESS POINT', dataIndex: 'accessPoint', key: '4' },
+  { title: 'SSID', dataIndex: 'ssid', key: '5' },
+  { title: 'BAND', dataIndex: 'band', key: '6' },
+  { title: 'SIGNAL', dataIndex: 'signal', key: '7' },
+  { title: 'STATUS', dataIndex: 'status', key: '8' },
+];
 
 const accessPointsTableColumns = [
   {

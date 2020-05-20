@@ -3,27 +3,6 @@ export const COMPANY = 'Telecom Infra Project';
 export const IS_RADIO_TYPE_5GHZ = 'is5GHz';
 export const IS_RADIO_TYPE_2DOT4GHZ = 'is2dot4GHz';
 
-export const CLIENT_DEVICES_TABLE_CLOUMNS = [
-  {
-    title: '',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: 'MAC',
-    dataIndex: 'mac',
-    key: 'mac',
-  },
-  { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr', key: '1' },
-  { title: 'IP', dataIndex: 'ip', key: '2' },
-  { title: 'HOST NAME', dataIndex: 'hostName', key: '3' },
-  { title: 'ACCESS POINT', dataIndex: 'accessPoint', key: '4' },
-  { title: 'SSID', dataIndex: 'ssid', key: '5' },
-  { title: 'BAND', dataIndex: 'band', key: '6' },
-  { title: 'SIGNAL', dataIndex: 'signal', key: '7' },
-  { title: 'STATUS', dataIndex: 'status', key: '8' },
-];
-
 export const CLIENT_DEVICES_TABLE_DATA = [
   {
     key: 0,
