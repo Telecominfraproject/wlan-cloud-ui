@@ -212,19 +212,31 @@ const Network = () => {
       dataSource.items.map(ap => {
         const radioChannelDetails = getRadioDetails(ap.details, 'channel');
         const radioNoiseFloorDetails = getRadioDetails(ap.details, 'noiseFloor');
-
+        const {
+          id,
+          name,
+          alarms,
+          model,
+          ip,
+          mac,
+          inventoryId,
+          uptime,
+          profileId,
+          capacity,
+          devices,
+        } = ap;
         return {
-          key: ap.id,
-          name: ap.name,
-          alarms: ap.alarms,
-          model: ap.model,
-          ip: ap.ip,
-          mac: ap.mac,
-          assetId: ap.inventoryId,
-          upTime: ap.uptime,
-          profile: ap.profileId,
-          capacity: ap.capacity,
-          devices: ap.devices,
+          key: id,
+          name,
+          alarms,
+          model,
+          ip,
+          mac,
+          assetId: inventoryId,
+          upTime: uptime,
+          profile: profileId,
+          capacity,
+          devices,
           channel: radioChannelDetails,
           noiseFloor: radioNoiseFloorDetails,
         };
