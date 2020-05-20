@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Network as NetworkPage, DevicesTable } from '@tip-wlan/wlan-cloud-ui-library';
+import { Network as NetworkPage, NetworkTable } from '@tip-wlan/wlan-cloud-ui-library';
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, Spin } from 'antd';
 import _ from 'lodash';
@@ -136,7 +136,7 @@ const Network = () => {
     variables: { customerId },
   });
   const [filterEquipment, { data: equipData }] = useLazyQuery(FILTER_EQUIPMENT);
-  const [activeTab, setActiveTab] = useState('/network/client-devices');
+  const [activeTab, setActiveTab] = useState(location.pathname);
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [devicesData, setDevicesData] = useState([]);
@@ -203,7 +203,7 @@ const Network = () => {
   };
 
   const mapAccessPointsTableData = (dataSource = []) => {
-    const tableData = dataSource.map(
+    return dataSource.map(
       ({
         id,
         name,
@@ -235,7 +235,6 @@ const Network = () => {
         };
       }
     );
-    return tableData;
   };
 
   const fetchFilterEquipment = async () => {
@@ -304,9 +303,9 @@ const Network = () => {
       activeTab={activeTab}
     >
       {activeTab === '/network/client-devices' ? (
-        <DevicesTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />
+        <NetworkTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />
       ) : (
-        <DevicesTable
+        <NetworkTable
           tableColumns={accessPointsTableColumns}
           tableData={mapAccessPointsTableData(
             equipData && equipData.filterEquipment && equipData.filterEquipment.items
