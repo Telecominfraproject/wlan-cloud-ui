@@ -9,7 +9,7 @@ import logoMobile from 'images/tip-logo-mobile.png';
 
 import { AUTH_TOKEN, COMPANY } from 'constants/index';
 import Login from 'containers/Login';
-import ClientDevices from 'containers/ClientDevices';
+import Network from 'containers/Network';
 import Profiles from 'containers/Profiles';
 import Alarms from 'containers/Alarms';
 import EditAccount from 'containers/EditAccount';
@@ -66,7 +66,7 @@ const App = () => {
           <UnauthenticatedRoute exact path="/login" component={Login} />
           <ProtectedRouteWithLayout exact path="/" component={RedirectToDashboard} />
           <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
-          <ProtectedRouteWithLayout path="/network" component={ClientDevices} />
+          <ProtectedRouteWithLayout path="/network" component={Network} />
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />

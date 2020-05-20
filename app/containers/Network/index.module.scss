@@ -4,3 +4,8 @@
   align-items: center;
   height: 100vh;
 }
+.tabColumn {
+  display: flex;
+  flex-direction: column;
+  padding: 0 30px;
+}

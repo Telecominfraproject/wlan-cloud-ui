@@ -1,29 +1,148 @@
 import React, { useEffect, useContext, useState } from 'react';
-import { ClientDevices as ClientDevicesPage } from '@tip-wlan/wlan-cloud-ui-library';
-import { useQuery } from '@apollo/react-hooks';
+import { useLocation } from 'react-router-dom';
+
+import {
+  Network as NetworkPage,
+  ClientDevicesTable,
+  AccessPointsTable,
+} from '@tip-wlan/wlan-cloud-ui-library';
+import { useQuery, useLazyQuery } from '@apollo/react-hooks';
 import { notification, Spin } from 'antd';
 import _ from 'lodash';
 import UserContext from 'contexts/UserContext';
 import {
-  ACCESS_POINTS_TABLE_CLOUMNS as accessPointsTableColumns,
   CLIENT_DEVICES_TABLE_CLOUMNS as clientDevicesTableColumns,
   CLIENT_DEVICES_TABLE_DATA,
-} from 'constants/index';
+  IS_RADIO_TYPE_5GHZ,
+  IS_RADIO_TYPE_2DOT4GHZ,
+} from 'constants/index.js';
 import { GET_ALL_LOCATIONS, FILTER_EQUIPMENT } from 'graphql/queries';
 import styles from './index.module.scss';
 
-const IS_RADIO_TYPE_5GHZ = 'is5GHz';
-const IS_RADIO_TYPE_2DOT4GHZ = 'is2dot4GHz';
+const accessPointsTableColumns = [
+  {
+    title: 'NAME',
+    dataIndex: 'name',
+    key: 'name',
+    render: name => {
+      return <span>{name || 'null'}</span>;
+    },
+  },
+  {
+    title: 'ALARMS',
+    dataIndex: 'alarms',
+    key: 'alarms',
+    render: alarms => {
+      return <span>{alarms || 'null'}</span>;
+    },
+  },
+  {
+    title: 'MODEL',
+    dataIndex: 'model',
+    key: 'model',
+    render: model => {
+      return <span>{model || 'null'}</span>;
+    },
+  },
+  {
+    title: 'IP',
+    dataIndex: 'ip',
+    key: 'ip',
+    render: ip => {
+      return <span>{ip || 'null'}</span>;
+    },
+  },
+  {
+    title: 'MAC',
+    dataIndex: 'mac',
+    key: 'mac',
+    render: mac => {
+      return <span>{mac || 'null'}</span>;
+    },
+  },
+  {
+    title: 'ASSET ID',
+    dataIndex: 'assetId',
+    key: 'assetId',
+    render: assetId => {
+      return <span>{assetId || 'null'}</span>;
+    },
+  },
+  {
+    title: 'UP TIME',
+    dataIndex: 'upTime',
+    key: 'upTime',
+    render: alarms => {
+      return <span>{alarms || 'null'}</span>;
+    },
+  },
+  {
+    title: 'PROFILE',
+    dataIndex: 'profile',
+    key: 'profile',
+    render: profile => {
+      return <span>{profile || 'null'}</span>;
+    },
+  },
+  {
+    title: 'CHANNEL',
+    dataIndex: 'channel',
+    key: 'channel',
+    render: channel => {
+      return (
+        <div className={styles.tabColumn}>
+          <span>{channel && channel.is2dot4GHz ? channel.is2dot4GHz : 'null'}</span>
+          <span style={{ color: 'darkgray' }}>
+            {channel && channel.is5GHz ? channel.is5GHz : 'null'}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    title: 'CAPACITY',
+    dataIndex: 'capacity',
+    key: 'capacity',
+    render: capacity => {
+      return <span>{capacity || 'null'}</span>;
+    },
+  },
+  {
+    title: 'NOISE FLOOR',
+    dataIndex: 'noiseFloor',
+    key: 'noiseFloor',
+    render: noiseFloor => {
+      return (
+        <div className={styles.tabColumn}>
+          <span>{noiseFloor && noiseFloor.is2dot4GHz ? noiseFloor.is2dot4GHz : 'null'}</span>
+          <span>{noiseFloor && noiseFloor.is5GHz ? noiseFloor.is5GHz : 'null'}</span>
+        </div>
+      );
+    },
+  },
+  {
+    title: 'DEVICES',
+    dataIndex: 'devices',
+    key: 'devices',
+    render: devices => {
+      return <span>{devices || 'null'}</span>;
+    },
+  },
+];
 
-const ClientDevices = () => {
+const Network = () => {
   const { customerId } = useContext(UserContext);
-  const { loading, error, data, client } = useQuery(GET_ALL_LOCATIONS, {
+  const location = useLocation();
+
+  const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
+  const [filterEquipment, { loading: isEquipLoading, data: equipData }] = useLazyQuery(
+    FILTER_EQUIPMENT
+  );
   const [activeTab, setActiveTab] = useState('cd');
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
-  const [tableColums, setTableColumns] = useState(clientDevicesTableColumns);
   const [devicesData, setDevicesData] = useState([]);
   const [selected, setSelected] = useState(false);
 
@@ -96,16 +215,16 @@ const ClientDevices = () => {
 
         return {
           key: ap.id,
-          name: ap.name !== undefined ? ap.name : 'null',
-          alarms: ap.alarms !== undefined ? ap.alarms : 'null',
-          model: ap.model !== undefined ? ap.model : 'null',
-          ip: ap.ip !== undefined ? ap.ip : 'null',
-          mac: ap.mac !== undefined ? ap.mac : 'null',
+          name: ap.name,
+          alarms: ap.alarms,
+          model: ap.model,
+          ip: ap.ip,
+          mac: ap.mac,
           assetId: ap.inventoryId,
-          upTime: ap.uptime !== undefined ? ap.uptime : 'null',
+          upTime: ap.uptime,
           profile: ap.profileId,
-          capacity: ap.capacity !== undefined ? ap.capacity : 'null',
-          devices: ap.devices !== undefined ? ap.devices : 'null',
+          capacity: ap.capacity,
+          devices: ap.devices,
           channel: radioChannelDetails,
           noiseFloor: radioNoiseFloorDetails,
         };
@@ -114,13 +233,15 @@ const ClientDevices = () => {
   };
 
   const fetchFilterEquipment = async () => {
-    const ap = await client.query({
-      query: FILTER_EQUIPMENT,
+    filterEquipment({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
     });
-    const accessPointsData = setAccessPointsTableData(ap.data && ap.data.filterEquipment);
-    setDevicesData(accessPointsData);
   };
+
+  useEffect(() => {
+    const { pathname } = location;
+    return pathname === '/network/access-points' ? setActiveTab('ap') : setActiveTab('cd');
+  }, [location]);
 
   useEffect(() => {
     if (data && data.getAllLocations) {
@@ -146,7 +267,6 @@ const ClientDevices = () => {
     } else {
       fetchFilterEquipment();
     }
-    setTableColumns(activeTab === 'cd' ? clientDevicesTableColumns : accessPointsTableColumns);
   }, [checkedLocations, activeTab]);
 
   const onSelect = () => {
@@ -157,11 +277,7 @@ const ClientDevices = () => {
     setCheckedLocations(checkedKeys);
   };
 
-  const onToggle = e => {
-    setActiveTab(e.target.id);
-  };
-
-  if (loading) {
+  if (loading || isEquipLoading) {
     return <Spin size="large" className={styles.spinner} />;
   }
 
@@ -171,19 +287,28 @@ const ClientDevices = () => {
       description: 'Failed to load Locations',
     });
   }
-
   return (
-    <ClientDevicesPage
+    <NetworkPage
       onSelect={onSelect}
       onCheck={onCheck}
-      tableColumns={tableColums}
-      tableData={devicesData}
       checkedLocations={checkedLocations}
       locations={locationsTree}
-      onToggle={onToggle}
       activeTab={activeTab}
-    />
+    >
+      {activeTab === 'cd' ? (
+        <ClientDevicesTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />
+      ) : (
+        <AccessPointsTable
+          tableColumns={accessPointsTableColumns}
+          tableData={
+            equipData && equipData.filterEquipment
+              ? setAccessPointsTableData(equipData && equipData.filterEquipment)
+              : []
+          }
+        />
+      )}
+    </NetworkPage>
   );
 };
 
-export default ClientDevices;
+export default Network;
