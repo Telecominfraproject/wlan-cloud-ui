@@ -1,13 +1,8 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-
-import {
-  Network as NetworkPage,
-  ClientDevicesTable,
-  AccessPointsTable,
-} from '@tip-wlan/wlan-cloud-ui-library';
+import { Network as NetworkPage, DevicesTable } from '@tip-wlan/wlan-cloud-ui-library';
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
-import { notification, Spin } from 'antd';
+import { Alert, Spin } from 'antd';
 import _ from 'lodash';
 import UserContext from 'contexts/UserContext';
 import {
@@ -39,70 +34,58 @@ const clientDevicesTableColumns = [
   { title: 'STATUS', dataIndex: 'status', key: '8' },
 ];
 
+const renderTableCell = tabCell => {
+  return <span>{tabCell || 'null'}</span>;
+};
+
 const accessPointsTableColumns = [
   {
     title: 'NAME',
     dataIndex: 'name',
     key: 'name',
-    render: name => {
-      return <span>{name || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'ALARMS',
     dataIndex: 'alarms',
     key: 'alarms',
-    render: alarms => {
-      return <span>{alarms || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'MODEL',
     dataIndex: 'model',
     key: 'model',
-    render: model => {
-      return <span>{model || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'IP',
     dataIndex: 'ip',
     key: 'ip',
-    render: ip => {
-      return <span>{ip || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'MAC',
     dataIndex: 'mac',
     key: 'mac',
-    render: mac => {
-      return <span>{mac || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'ASSET ID',
     dataIndex: 'assetId',
     key: 'assetId',
-    render: assetId => {
-      return <span>{assetId || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'UP TIME',
     dataIndex: 'upTime',
     key: 'upTime',
-    render: alarms => {
-      return <span>{alarms || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'PROFILE',
     dataIndex: 'profile',
     key: 'profile',
-    render: profile => {
-      return <span>{profile || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'CHANNEL',
@@ -123,9 +106,7 @@ const accessPointsTableColumns = [
     title: 'CAPACITY',
     dataIndex: 'capacity',
     key: 'capacity',
-    render: capacity => {
-      return <span>{capacity || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
   {
     title: 'NOISE FLOOR',
@@ -144,23 +125,18 @@ const accessPointsTableColumns = [
     title: 'DEVICES',
     dataIndex: 'devices',
     key: 'devices',
-    render: devices => {
-      return <span>{devices || 'null'}</span>;
-    },
+    render: renderTableCell,
   },
 ];
 
 const Network = () => {
   const { customerId } = useContext(UserContext);
   const location = useLocation();
-
   const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const [filterEquipment, { loading: isEquipLoading, data: equipData }] = useLazyQuery(
-    FILTER_EQUIPMENT
-  );
-  const [activeTab, setActiveTab] = useState('cd');
+  const [filterEquipment, { data: equipData }] = useLazyQuery(FILTER_EQUIPMENT);
+  const [activeTab, setActiveTab] = useState('/network/client-devices');
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [devicesData, setDevicesData] = useState([]);
@@ -226,25 +202,22 @@ const Network = () => {
     };
   };
 
-  const setAccessPointsTableData = dataSource => {
-    const tableData =
-      dataSource &&
-      dataSource.items.map(ap => {
-        const radioChannelDetails = getRadioDetails(ap.details, 'channel');
-        const radioNoiseFloorDetails = getRadioDetails(ap.details, 'noiseFloor');
-        const {
-          id,
-          name,
-          alarms,
-          model,
-          ip,
-          mac,
-          inventoryId,
-          uptime,
-          profileId,
-          capacity,
-          devices,
-        } = ap;
+  const mapAccessPointsTableData = (dataSource = []) => {
+    const tableData = dataSource.map(
+      ({
+        id,
+        name,
+        alarms,
+        model,
+        ip,
+        mac,
+        inventoryId,
+        uptime,
+        profileId,
+        capacity,
+        devices,
+        details,
+      }) => {
         return {
           key: id,
           name,
@@ -257,10 +230,11 @@ const Network = () => {
           profile: profileId,
           capacity,
           devices,
-          channel: radioChannelDetails,
-          noiseFloor: radioNoiseFloorDetails,
+          channel: getRadioDetails(details, 'channel'),
+          noiseFloor: getRadioDetails(details, 'noiseFloor'),
         };
-      });
+      }
+    );
     return tableData;
   };
 
@@ -272,7 +246,11 @@ const Network = () => {
 
   useEffect(() => {
     const { pathname } = location;
-    return pathname === '/network/access-points' ? setActiveTab('ap') : setActiveTab('cd');
+    if (pathname === '/network/access-points') {
+      setActiveTab('/network/access-points');
+    } else {
+      setActiveTab('/network/client-devices');
+    }
   }, [location]);
 
   useEffect(() => {
@@ -285,7 +263,7 @@ const Network = () => {
   useEffect(() => {
     const filteredData = [];
     setDevicesData(filteredData);
-    if (activeTab === 'cd') {
+    if (activeTab === '/network/client-devices') {
       if (checkedLocations.length > 0) {
         checkedLocations.forEach(locationId => {
           CLIENT_DEVICES_TABLE_DATA.filter(d => {
@@ -309,16 +287,14 @@ const Network = () => {
     setCheckedLocations(checkedKeys);
   };
 
-  if (loading || isEquipLoading) {
+  if (loading) {
     return <Spin size="large" className={styles.spinner} />;
   }
 
   if (error) {
-    notification.error({
-      message: 'Error',
-      description: 'Failed to load Locations',
-    });
+    return <Alert message="Error" description="Failed to load locations." type="error" showIcon />;
   }
+
   return (
     <NetworkPage
       onSelect={onSelect}
@@ -327,16 +303,14 @@ const Network = () => {
       locations={locationsTree}
       activeTab={activeTab}
     >
-      {activeTab === 'cd' ? (
-        <ClientDevicesTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />
+      {activeTab === '/network/client-devices' ? (
+        <DevicesTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />
       ) : (
-        <AccessPointsTable
+        <DevicesTable
           tableColumns={accessPointsTableColumns}
-          tableData={
-            equipData && equipData.filterEquipment
-              ? setAccessPointsTableData(equipData && equipData.filterEquipment)
-              : []
-          }
+          tableData={mapAccessPointsTableData(
+            equipData && equipData.filterEquipment && equipData.filterEquipment.items
+          )}
         />
       )}
     </NetworkPage>
