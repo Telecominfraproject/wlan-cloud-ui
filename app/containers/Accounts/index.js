@@ -71,7 +71,7 @@ const Accounts = () => {
   const { loading, error, data, refetch } = useQuery(GET_ALL_USERS, { variables: { customerId } });
   const [createUser] = useMutation(CREATE_USER);
   const [updateUser] = useMutation(UPDATE_USER);
-  const [DeleteUser] = useLazyQuery(DELETE_USER, {
+  const [deleteUser] = useLazyQuery(DELETE_USER, {
     onCompleted: () => {
       refetch();
       notification.success({
@@ -138,7 +138,7 @@ const Accounts = () => {
   };
 
   const handleDeleteUser = id => {
-    DeleteUser({ variables: { id } });
+    deleteUser({ variables: { id } });
   };
 
   if (loading) {
