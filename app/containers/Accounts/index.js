@@ -12,7 +12,7 @@ const GET_ALL_USERS = gql`
     getAllUsers(customerId: $customerId) {
       items {
         id
-        username
+        email: username
         role
         lastModifiedTimestamp
         customerId
