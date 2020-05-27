@@ -11,6 +11,8 @@ import { AUTH_TOKEN, COMPANY } from 'constants/index';
 import Login from 'containers/Login';
 import ClientDevices from 'containers/ClientDevices';
 import Profiles from 'containers/Profiles';
+import ProfileDetails from 'containers/ProfileDetails';
+
 import Alarms from 'containers/Alarms';
 import EditAccount from 'containers/EditAccount';
 import UserProvider from 'contexts/UserProvider';
@@ -68,6 +70,7 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
           <ProtectedRouteWithLayout path="/network" component={ClientDevices} />
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
+          <ProtectedRouteWithLayout exact path="/profiledetails" component={ProfileDetails} />
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
         </Switch>
