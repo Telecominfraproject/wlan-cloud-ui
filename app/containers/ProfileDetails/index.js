@@ -15,12 +15,10 @@ const GET_PROFILE = gql`
 `;
 
 const ProfileDetails = () => {
-  let { id } = useParams();
-
-  id = parseInt(id, 10);
+  const { id } = useParams();
 
   const { loading, error, data } = useQuery(GET_PROFILE, {
-    variables: { id },
+    variables: { id: parseInt(id, 10) },
   });
 
   if (loading) {
