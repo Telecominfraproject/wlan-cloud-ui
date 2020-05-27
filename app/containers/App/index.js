@@ -70,7 +70,7 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
           <ProtectedRouteWithLayout path="/network" component={ClientDevices} />
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
-          <ProtectedRouteWithLayout exact path="/profiledetails" component={ProfileDetails} />
+          <ProtectedRouteWithLayout exact path="/profiles/:id" component={ProfileDetails} />
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
         </Switch>
