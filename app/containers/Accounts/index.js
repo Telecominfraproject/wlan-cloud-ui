@@ -8,14 +8,18 @@ import { Accounts as AccountsPage } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_USERS = gql`
-  query GetAllUsers($customerId: Int!) {
-    getAllUsers(customerId: $customerId) {
+  query GetAllUsers($customerId: Int!, $cursor: String) {
+    getAllUsers(customerId: $customerId, cursor: $cursor) {
       items {
         id
         email: username
         role
         lastModifiedTimestamp
         customerId
+      }
+      context {
+        cursor
+        lastPage
       }
     }
   }
@@ -68,7 +72,9 @@ const DELETE_USER = gql`
 const Accounts = () => {
   const { customerId } = useContext(UserContext);
 
-  const { loading, error, data, refetch } = useQuery(GET_ALL_USERS, { variables: { customerId } });
+  const { data, loading, error, refetch, fetchMore } = useQuery(GET_ALL_USERS, {
+    variables: { customerId },
+  });
   const [createUser] = useMutation(CREATE_USER);
   const [updateUser] = useMutation(UPDATE_USER);
   const [deleteUser] = useLazyQuery(DELETE_USER, {
@@ -86,6 +92,26 @@ const Accounts = () => {
       });
     },
   });
+
+  const handleLoadMore = () => {
+    if (!data.getAllUsers.context.lastPage) {
+      fetchMore({
+        variables: { cursor: data.getAllUsers.context.cursor },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.getAllUsers;
+          const newItems = fetchMoreResult.getAllUsers.items;
+
+          return {
+            getAllUsers: {
+              context: fetchMoreResult.getAllUsers.context,
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
 
   const handleCreateUser = (email, password, role) => {
     createUser({
@@ -152,9 +178,11 @@ const Accounts = () => {
   return (
     <AccountsPage
       data={data.getAllUsers.items}
+      onLoadMore={handleLoadMore}
       onCreateUser={handleCreateUser}
       onEditUser={handleEditUser}
       onDeleteUser={handleDeleteUser}
+      isLastPage={data.getAllUsers.context.lastPage}
     />
   );
 };
