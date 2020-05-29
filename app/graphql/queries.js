@@ -32,10 +32,7 @@ export const FILTER_EQUIPMENT = gql`
         inventoryId
       }
       context {
-        maxItemsPerPage
-        lastReturnedPageNumber
         lastPage
-        totalItemsReturned
         cursor
       }
     }
