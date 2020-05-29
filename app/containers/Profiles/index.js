@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useLazyQuery } from '@apollo/react-hooks';
 
 import { Alert, Spin, notification } from 'antd';
 
@@ -23,10 +23,34 @@ const GET_ALL_PROFILES = gql`
   }
 `;
 
+const DELETE_PROFILE = gql`
+  query DeleteProfile($id: Int!) {
+    deleteProfile(id: $id) {
+      id
+    }
+  }
+`;
+
 const Profiles = () => {
   const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_PROFILES, {
     variables: { customerId },
+  });
+
+  const [deleteProfile] = useLazyQuery(DELETE_PROFILE, {
+    onCompleted: () => {
+      refetch();
+      notification.success({
+        message: 'Success',
+        description: 'Account successfully deleted.',
+      });
+    },
+    onError: () => {
+      notification.error({
+        message: 'Error',
+        description: 'Account could not be deleted.',
+      });
+    },
   });
 
   const reloadTable = () => {
@@ -65,6 +89,9 @@ const Profiles = () => {
     }
   };
 
+  const handleDeleteProfile = id => {
+    deleteProfile({ variables: { id } });
+  };
   if (loading) {
     return <Spin size="large" />;
   }
@@ -78,6 +105,7 @@ const Profiles = () => {
       data={data.getAllProfiles.items}
       onReload={reloadTable}
       isLastPage={data.getAllProfiles.context.lastPage}
+      onDeleteProfile={handleDeleteProfile}
       onLoadMore={handleLoadMore}
     />
   );

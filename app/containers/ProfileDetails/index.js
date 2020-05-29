@@ -57,7 +57,7 @@ const ProfileDetails = () => {
       <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
     );
   }
-  return <ProfileDetailsPage name={data.getProfile.name} onDeleteUser={handleDeleteProfile} />;
+  return <ProfileDetailsPage name={data.getProfile.name} onDeleteProfile={handleDeleteProfile} />;
 };
 
 export default ProfileDetails;
