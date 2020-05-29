@@ -135,7 +135,7 @@ const Network = () => {
   const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const [filterEquipment, { loading: isEquipLoading, data: equipData }] = useLazyQuery(
+  const [filterEquipment, { loading: isEquipLoading, data: equipData, fetchMore }] = useLazyQuery(
     FILTER_EQUIPMENT
   );
   const [activeTab, setActiveTab] = useState(location.pathname);
@@ -239,6 +239,26 @@ const Network = () => {
     );
   };
 
+  const handleLoadMore = () => {
+    if (!equipData.filterEquipment.context.lastPage) {
+      fetchMore({
+        variables: { cursor: equipData.filterEquipment.context.cursor },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.filterEquipment;
+          const newItems = fetchMoreResult.filterEquipment.items;
+
+          return {
+            filterEquipment: {
+              context: fetchMoreResult.filterEquipment.context,
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
+
   const fetchFilterEquipment = async () => {
     filterEquipment({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
@@ -313,6 +333,10 @@ const Network = () => {
           tableData={mapAccessPointsTableData(
             equipData && equipData.filterEquipment && equipData.filterEquipment.items
           )}
+          onLoadMore={handleLoadMore}
+          isLastPage={
+            equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
+          }
         />
       )}
     </NetworkPage>

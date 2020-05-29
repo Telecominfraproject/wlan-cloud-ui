@@ -11,11 +11,17 @@ export const GET_ALL_LOCATIONS = gql`
 `;
 
 export const FILTER_EQUIPMENT = gql`
-  query FilterEquipment($locationIds: [Int], $customerId: Int!, $equipmentType: String) {
+  query FilterEquipment(
+    $locationIds: [Int]
+    $customerId: Int!
+    $equipmentType: String
+    $cursor: String
+  ) {
     filterEquipment(
       customerId: $customerId
       locationIds: $locationIds
       equipmentType: $equipmentType
+      cursor: $cursor
     ) {
       items {
         name
@@ -28,8 +34,9 @@ export const FILTER_EQUIPMENT = gql`
       context {
         maxItemsPerPage
         lastReturnedPageNumber
-        isLastPage
+        lastPage
         totalItemsReturned
+        cursor
       }
     }
   }
