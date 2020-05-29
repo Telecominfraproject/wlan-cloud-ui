@@ -15,13 +15,17 @@ const GET_ALL_PROFILES = gql`
         name
         profileType
       }
+      context {
+        cursor
+        lastPage
+      }
     }
   }
 `;
 
 const Profiles = () => {
   const { customerId } = useContext(UserContext);
-  const { loading, error, data, refetch } = useQuery(GET_ALL_PROFILES, {
+  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_PROFILES, {
     variables: { customerId },
   });
 
@@ -41,6 +45,26 @@ const Profiles = () => {
       );
   };
 
+  const handleLoadMore = () => {
+    if (!data.getAllProfiles.context.lastPage) {
+      fetchMore({
+        variables: { cursor: data.getAllProfiles.context.cursor },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.getAllProfiles;
+          const newItems = fetchMoreResult.getAllProfiles.items;
+
+          return {
+            getAllProfiles: {
+              context: fetchMoreResult.getAllProfiles.context,
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
+
   if (loading) {
     return <Spin size="large" />;
   }
@@ -48,7 +72,15 @@ const Profiles = () => {
   if (error) {
     return <Alert message="Error" description="Failed to load profiles." type="error" showIcon />;
   }
-  return <ProfilePage data={data.getAllProfiles.items} onReload={reloadTable} />;
+
+  return (
+    <ProfilePage
+      data={data.getAllProfiles.items}
+      onReload={reloadTable}
+      isLastPage={data.getAllProfiles.context.lastPage}
+      onLoadMore={handleLoadMore}
+    />
+  );
 };
 
 export default Profiles;
