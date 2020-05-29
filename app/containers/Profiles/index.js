@@ -8,8 +8,8 @@ import { Profile as ProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: Int!) {
-    getAllProfiles(customerId: $customerId) {
+  query GetAllProfiles($customerId: Int!, $cursor: String) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor) {
       items {
         id
         name
