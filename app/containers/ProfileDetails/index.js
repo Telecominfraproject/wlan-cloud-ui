@@ -2,14 +2,22 @@ import React from 'react';
 import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
-import { Alert, Spin } from 'antd';
+import { useQuery, useLazyQuery } from '@apollo/react-hooks';
+import { Alert, Spin, notification } from 'antd';
 
 const GET_PROFILE = gql`
   query GetProfile($id: Int!) {
     getProfile(id: $id) {
       id
       name
+    }
+  }
+`;
+
+const DELETE_PROFILE = gql`
+  query DeleteProfile($id: Int!) {
+    deleteProfile(id: $id) {
+      id
     }
   }
 `;
@@ -21,6 +29,25 @@ const ProfileDetails = () => {
     variables: { id: parseInt(id, 10) },
   });
 
+  const [deleteProfile] = useLazyQuery(DELETE_PROFILE, {
+    onCompleted: () => {
+      notification.success({
+        message: 'Success',
+        description: 'Account successfully deleted.',
+      });
+    },
+    onError: () => {
+      notification.error({
+        message: 'Error',
+        description: 'Account could not be deleted.',
+      });
+    },
+  });
+
+  const handleDeleteProfile = () => {
+    deleteProfile({ variables: { id: parseInt(id, 10) } });
+  };
+
   if (loading) {
     return <Spin size="large" />;
   }
@@ -30,7 +57,7 @@ const ProfileDetails = () => {
       <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
     );
   }
-  return <ProfileDetailsPage name={data.getProfile.name} />;
+  return <ProfileDetailsPage name={data.getProfile.name} onDeleteUser={handleDeleteProfile} />;
 };
 
 export default ProfileDetails;
