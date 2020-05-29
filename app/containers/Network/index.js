@@ -135,7 +135,9 @@ const Network = () => {
   const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const [filterEquipment, { data: equipData }] = useLazyQuery(FILTER_EQUIPMENT);
+  const [filterEquipment, { loading: isEquipLoading, data: equipData }] = useLazyQuery(
+    FILTER_EQUIPMENT
+  );
   const [activeTab, setActiveTab] = useState(location.pathname);
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
@@ -296,6 +298,7 @@ const Network = () => {
 
   return (
     <NetworkPage
+      loading={isEquipLoading}
       onSelect={onSelect}
       onCheck={onCheck}
       checkedLocations={checkedLocations}
