@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
-import { useParams } from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
@@ -25,6 +25,7 @@ const DELETE_PROFILE = gql`
 
 const ProfileDetails = () => {
   const { id } = useParams();
+  const [redirect, setRedirect] = useState(false);
 
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id: parseInt(id, 10) },
@@ -36,6 +37,7 @@ const ProfileDetails = () => {
         message: 'Success',
         description: 'Profile successfully deleted.',
       });
+      setRedirect(true);
     },
     onError: () => {
       notification.error({
@@ -58,6 +60,11 @@ const ProfileDetails = () => {
       <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
     );
   }
+
+  if (redirect) {
+    return <Redirect to="/profiles" />;
+  }
+
   return (
     <ProfileDetailsPage
       name={data.getProfile.name}
