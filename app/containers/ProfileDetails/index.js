@@ -10,6 +10,7 @@ const GET_PROFILE = gql`
     getProfile(id: $id) {
       id
       name
+      profileType
     }
   }
 `;
@@ -33,13 +34,13 @@ const ProfileDetails = () => {
     onCompleted: () => {
       notification.success({
         message: 'Success',
-        description: 'Account successfully deleted.',
+        description: 'Profile successfully deleted.',
       });
     },
     onError: () => {
       notification.error({
         message: 'Error',
-        description: 'Account could not be deleted.',
+        description: 'Profile could not be deleted.',
       });
     },
   });
@@ -57,7 +58,13 @@ const ProfileDetails = () => {
       <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
     );
   }
-  return <ProfileDetailsPage name={data.getProfile.name} onDeleteProfile={handleDeleteProfile} />;
+  return (
+    <ProfileDetailsPage
+      name={data.getProfile.name}
+      profileType={data.getProfile.profileType}
+      onDeleteProfile={handleDeleteProfile}
+    />
+  );
 };
 
 export default ProfileDetails;
