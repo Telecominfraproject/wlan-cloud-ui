@@ -27,9 +27,32 @@ export const FILTER_EQUIPMENT = gql`
         name
         id
         locationId
-        details
         profileId
         inventoryId
+        channel
+        profile {
+          name
+        }
+        status {
+          protocol {
+            details {
+              reportedIpV4Addr
+              reportedMacAddr
+            }
+          }
+          osPerformance {
+            details {
+              uptimeInSeconds
+            }
+          }
+          radioUtilization {
+            details {
+              reportedIpV4Addr
+              capacityDetails
+              noiseFloorDetails
+            }
+          }
+        }
       }
       context {
         lastPage

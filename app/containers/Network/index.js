@@ -1,15 +1,12 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Network as NetworkPage, NetworkTable } from '@tip-wlan/wlan-cloud-ui-library';
 import { useQuery, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, Spin } from 'antd';
 import _ from 'lodash';
+import { Network as NetworkPage, NetworkTable } from '@tip-wlan/wlan-cloud-ui-library';
+
 import UserContext from 'contexts/UserContext';
-import {
-  CLIENT_DEVICES_TABLE_DATA,
-  IS_RADIO_TYPE_5GHZ,
-  IS_RADIO_TYPE_2DOT4GHZ,
-} from 'constants/index.js';
+import { CLIENT_DEVICES_TABLE_DATA } from 'constants/index.js';
 import { GET_ALL_LOCATIONS, FILTER_EQUIPMENT } from 'graphql/queries';
 import styles from './index.module.scss';
 
@@ -21,7 +18,7 @@ const clientDevicesTableColumns = [
   },
   {
     title: 'MAC',
-    dataIndex: 'mac',
+    dataIndex: 'macAddress',
     key: 'mac',
   },
   { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr', key: '1' },
@@ -35,7 +32,16 @@ const clientDevicesTableColumns = [
 ];
 
 const renderTableCell = tabCell => {
-  return <span>{tabCell || 'null'}</span>;
+  if (Array.isArray(tabCell)) {
+    return (
+      <div className={styles.tabColumn}>
+        {tabCell.map(i => (
+          <span>{i}</span>
+        ))}
+      </div>
+    );
+  }
+  return <span>{tabCell}</span>;
 };
 
 const accessPointsTableColumns = [
@@ -65,7 +71,7 @@ const accessPointsTableColumns = [
   },
   {
     title: 'MAC',
-    dataIndex: 'mac',
+    dataIndex: 'macAddress',
     key: 'mac',
     render: renderTableCell,
   },
@@ -91,16 +97,7 @@ const accessPointsTableColumns = [
     title: 'CHANNEL',
     dataIndex: 'channel',
     key: 'channel',
-    render: channel => {
-      return (
-        <div className={styles.tabColumn}>
-          <span>{channel && channel.is2dot4GHz ? channel.is2dot4GHz : 'null'}</span>
-          <span style={{ color: 'darkgray' }}>
-            {channel && channel.is5GHz ? channel.is5GHz : 'null'}
-          </span>
-        </div>
-      );
-    },
+    render: renderTableCell,
   },
   {
     title: 'CAPACITY',
@@ -112,14 +109,7 @@ const accessPointsTableColumns = [
     title: 'NOISE FLOOR',
     dataIndex: 'noiseFloor',
     key: 'noiseFloor',
-    render: noiseFloor => {
-      return (
-        <div className={styles.tabColumn}>
-          <span>{noiseFloor && noiseFloor.is2dot4GHz ? noiseFloor.is2dot4GHz : 'null'}</span>
-          <span>{noiseFloor && noiseFloor.is5GHz ? noiseFloor.is5GHz : 'null'}</span>
-        </div>
-      );
-    },
+    render: renderTableCell,
   },
   {
     title: 'DEVICES',
@@ -181,59 +171,23 @@ const Network = () => {
     ];
   };
 
-  const getRadioDetailsByType = (radioDetails, type, radioType) => {
-    let channel;
-    let noiseFloor;
-    if (type === 'channel') {
-      channel = radioDetails.radioMap[radioType] && radioDetails.radioMap[radioType].channelNumber;
-    } else {
-      noiseFloor =
-        radioDetails.advancedRadioMap[radioType] &&
-        radioDetails.advancedRadioMap[radioType].channelHopSettings.noiseFloorThresholdInDB;
-      return noiseFloor;
-    }
-    return channel;
-  };
-
-  const getRadioDetails = (radioDetails, type) => {
-    const is5GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_5GHZ);
-    const is2dot4GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_2DOT4GHZ);
-    return {
-      is5GHz,
-      is2dot4GHz,
-    };
-  };
-
   const mapAccessPointsTableData = (dataSource = []) => {
     return dataSource.map(
-      ({
-        id,
-        name,
-        alarms,
-        model,
-        ip,
-        mac,
-        inventoryId,
-        uptime,
-        profileId,
-        capacity,
-        devices,
-        details,
-      }) => {
+      ({ id, name, alarms, model, inventoryId, devices, profile, channel, status }) => {
         return {
           key: id,
           name,
           alarms,
           model,
-          ip,
-          mac,
+          ip: status.protocol.details.reportedIpV4Addr,
+          macAddress: status.protocol.details.reportedMacAddr,
           assetId: inventoryId,
-          upTime: uptime,
-          profile: profileId,
-          capacity,
+          upTime: status.osPerformance.details.uptimeInSeconds,
+          profile: profile.name,
+          channel,
+          capacity: status.radioUtilization.details.capacityDetails,
+          noiseFloor: status.radioUtilization.details.noiseFloorDetails,
           devices,
-          channel: getRadioDetails(details, 'channel'),
-          noiseFloor: getRadioDetails(details, 'noiseFloor'),
         };
       }
     );
