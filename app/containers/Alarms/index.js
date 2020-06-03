@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
-import { Alert, Spin, notification } from 'antd';
-import { Alarms as AlarmsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import { Alert, notification } from 'antd';
+import { Alarms as AlarmsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_ALARMS = gql`
@@ -69,7 +69,7 @@ const Alarms = () => {
   };
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {
