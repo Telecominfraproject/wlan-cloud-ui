@@ -13,6 +13,10 @@ const GET_ALL_ALARMS = gql`
         alarmCode
         details
         createdTimestamp
+        equipment {
+          id
+          name
+        }
       }
       context {
         cursor
