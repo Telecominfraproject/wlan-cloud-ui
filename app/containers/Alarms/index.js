@@ -32,7 +32,7 @@ const Alarms = () => {
     variables: { customerId },
   });
 
-  const reloadTable = () => {
+  const handleOnReload = () => {
     refetch()
       .then(() => {
         notification.success({
@@ -78,7 +78,7 @@ const Alarms = () => {
   return (
     <AlarmsPage
       data={data.getAllAlarms.items}
-      onReload={reloadTable}
+      onReload={handleOnReload}
       onLoadMore={handleLoadMore}
       isLastPage={data.getAllAlarms.context.lastPage}
     />
