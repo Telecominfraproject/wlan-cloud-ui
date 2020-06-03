@@ -1,8 +1,13 @@
 import React, { useEffect, useContext, useState } from 'react';
+import gql from 'graphql-tag';
 import { useLocation } from 'react-router-dom';
-import { Network as NetworkPage, NetworkTable } from '@tip-wlan/wlan-cloud-ui-library';
-import { useQuery, useLazyQuery } from '@apollo/react-hooks';
-import { Alert, Spin } from 'antd';
+import {
+  Network as NetworkPage,
+  NetworkTable,
+  BulkEditAccessPoints,
+} from '@tip-wlan/wlan-cloud-ui-library';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { Alert, Spin, notification } from 'antd';
 import _ from 'lodash';
 import UserContext from 'contexts/UserContext';
 import {
@@ -129,20 +134,87 @@ const accessPointsTableColumns = [
   },
 ];
 
+const CREATE_LOCATION = gql`
+  mutation CreateLocation(
+    $locationType: String!
+    $customerId: Int!
+    $parentId: Int!
+    $name: String!
+  ) {
+    createLocation(
+      locationType: $locationType
+      customerId: $customerId
+      parentId: $parentId
+      name: $name
+    ) {
+      locationType
+      customerId
+      parentId
+      name
+    }
+  }
+`;
+
+const UPDATE_LOCATION = gql`
+  mutation UpdateLocation(
+    $id: Int!
+    $locationType: String!
+    $customerId: Int!
+    $parentId: Int!
+    $name: String!
+    $lastModifiedTimestamp: String
+  ) {
+    updateLocation(
+      id: $id
+      locationType: $locationType
+      customerId: $customerId
+      parentId: $parentId
+      name: $name
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      id
+      locationType
+      customerId
+      parentId
+      name
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+const DELETE_LOCATION = gql`
+  query DeleteLocation($id: Int!) {
+    deleteLocation(id: $id) {
+      id
+      locationType
+      customerId
+      parentId
+      name
+      lastModifiedTimestamp
+    }
+  }
+`;
+
 const Network = () => {
   const { customerId } = useContext(UserContext);
   const location = useLocation();
   const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const [filterEquipment, { loading: isEquipLoading, data: equipData, fetchMore }] = useLazyQuery(
-    FILTER_EQUIPMENT
-  );
+  const [
+    filterEquipment,
+    { loading: isEquipLoading, data: equipData, refetch, fetchMore },
+  ] = useLazyQuery(FILTER_EQUIPMENT);
+  const [createLocation] = useMutation(CREATE_LOCATION);
+  const [updateLocation] = useMutation(UPDATE_LOCATION);
+  const [deleteLocation] = useLazyQuery(DELETE_LOCATION);
   const [activeTab, setActiveTab] = useState(location.pathname);
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [devicesData, setDevicesData] = useState([]);
-  const [selected, setSelected] = useState(false);
+  // const [selected, setSelected] = useState(false);
+  const [bulkEditAps, setBulkEditAps] = useState(false);
+  const [locationPath, setLocationPath] = useState([]);
 
   const formatLocationListForTree = list => {
     const checkedTreeLocations = [];
@@ -265,6 +337,79 @@ const Network = () => {
     });
   };
 
+  const handleAddLocation = (name, parentId) => {
+    createLocation({
+      variables: {
+        locationType: 'City',
+        customerId,
+        parentId,
+        name,
+      },
+    })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully added.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be added.',
+        })
+      );
+  };
+
+  const handleEditLocation = (id, parentId, name) => {
+    updateLocation({
+      variables: {
+        id,
+        locationType: 'City',
+        customerId,
+        parentId,
+        name,
+      },
+    })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully edited.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be edited.',
+        })
+      );
+  };
+
+  const handleDeleteLocation = id => {
+    deleteLocation({
+      variables: {
+        id,
+      },
+    })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully deleted.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be deleted.',
+        })
+      );
+  };
+
+  const handleBulkEditAccessPoints = () => {
+    setBulkEditAps(true);
+  };
   useEffect(() => {
     const { pathname } = location;
     if (pathname === '/network/access-points') {
@@ -280,6 +425,25 @@ const Network = () => {
       setLocationsTree(unflattenData[0].children);
     }
   }, [data]);
+  const locations = [];
+
+  const getLocationPath = (node, allLocations) => {
+    const { id: nodeId, parentId: parentNodeId, name: locName } = node;
+    if (parentNodeId === 0) {
+      locations.unshift({ id: nodeId, parentId: parentNodeId, name: locName });
+    } else {
+      locations.unshift({ id: nodeId, parentId: parentNodeId, name: locName });
+      allLocations.forEach(item => {
+        const { name, id, parentId } = item;
+        if (parentNodeId === id && parentId === 0) {
+          locations.unshift({ id, parentId, name });
+        } else if (parentNodeId === id) {
+          getLocationPath(item, data.getAllLocations);
+        }
+      });
+    }
+    return locations;
+  };
 
   useEffect(() => {
     const filteredData = [];
@@ -300,8 +464,10 @@ const Network = () => {
     }
   }, [checkedLocations, activeTab]);
 
-  const onSelect = () => {
-    setSelected(!selected);
+  const onSelect = (selectedKeys, info) => {
+    // setSelected(!selected);
+    const currentLocationPath = getLocationPath(info.node, data.getAllLocations);
+    setLocationPath(currentLocationPath);
   };
 
   const onCheck = checkedKeys => {
@@ -324,6 +490,11 @@ const Network = () => {
       checkedLocations={checkedLocations}
       locations={locationsTree}
       activeTab={activeTab}
+      locationPath={locationPath}
+      onAddLocation={handleAddLocation}
+      onEditLocation={handleEditLocation}
+      onDeleteLocation={handleDeleteLocation}
+      onBulkEditAccessPoints={handleBulkEditAccessPoints}
     >
       {activeTab === '/network/client-devices' ? (
         <NetworkTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />
@@ -339,6 +510,7 @@ const Network = () => {
           }
         />
       )}
+      {bulkEditAps && <BulkEditAccessPoints />}
     </NetworkPage>
   );
 };
