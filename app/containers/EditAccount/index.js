@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { EditAccount as EditAccountPage } from '@tip-wlan/wlan-cloud-ui-library';
 import gql from 'graphql-tag';
 import { useMutation, useQuery } from '@apollo/react-hooks';
-import { notification, Spin, Alert } from 'antd';
+import { notification, Alert } from 'antd';
+import { EditAccount as EditAccountPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 
@@ -77,7 +77,7 @@ const EditAccount = () => {
   };
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {
