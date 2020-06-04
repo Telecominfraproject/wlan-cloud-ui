@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
-import { Alert, Spin, notification } from 'antd';
+import { Alert, notification } from 'antd';
 
-import { Accounts as AccountsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import { Accounts as AccountsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 
@@ -168,7 +168,7 @@ const Accounts = () => {
   };
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {
