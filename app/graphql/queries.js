@@ -27,14 +27,62 @@ export const FILTER_EQUIPMENT = gql`
         name
         id
         locationId
-        details
         profileId
         inventoryId
+        channel
+        profile {
+          name
+        }
+        status {
+          protocol {
+            details {
+              reportedIpV4Addr
+              reportedMacAddr
+            }
+          }
+          osPerformance {
+            details {
+              uptimeInSeconds
+            }
+          }
+          radioUtilization {
+            details {
+              reportedIpV4Addr
+              capacityDetails
+              noiseFloorDetails
+            }
+          }
+        }
       }
       context {
         lastPage
         cursor
       }
+    }
+  }
+`;
+
+export const GET_LOCATION = gql`
+  query GetLocation($id: Int!) {
+    getLocation(id: $id) {
+      id
+      parentId
+      name
+      locationType
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const DELETE_LOCATION = gql`
+  query DeleteLocation($id: Int!) {
+    deleteLocation(id: $id) {
+      id
+      locationType
+      customerId
+      parentId
+      name
+      lastModifiedTimestamp
     }
   }
 `;

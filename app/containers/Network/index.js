@@ -1,22 +1,32 @@
 import React, { useEffect, useContext, useState } from 'react';
-import gql from 'graphql-tag';
 import { useLocation } from 'react-router-dom';
-import {
-  Network as NetworkPage,
-  NetworkTable,
-  BulkEditAccessPoints,
-} from '@tip-wlan/wlan-cloud-ui-library';
+import { Network as NetworkPage, NetworkTable } from '@tip-wlan/wlan-cloud-ui-library';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
 import _ from 'lodash';
 import UserContext from 'contexts/UserContext';
+import { CLIENT_DEVICES_TABLE_DATA } from 'constants/index.js';
 import {
-  CLIENT_DEVICES_TABLE_DATA,
-  IS_RADIO_TYPE_5GHZ,
-  IS_RADIO_TYPE_2DOT4GHZ,
-} from 'constants/index.js';
-import { GET_ALL_LOCATIONS, FILTER_EQUIPMENT } from 'graphql/queries';
+  GET_ALL_LOCATIONS,
+  FILTER_EQUIPMENT,
+  GET_LOCATION,
+  DELETE_LOCATION,
+} from 'graphql/queries';
+import { CREATE_LOCATION, UPDATE_LOCATION } from 'graphql/mutations';
 import styles from './index.module.scss';
+
+const renderTableCell = tabCell => {
+  if (Array.isArray(tabCell)) {
+    return (
+      <div className={styles.tabColumn}>
+        {tabCell.map(i => (
+          <span>{i}</span>
+        ))}
+      </div>
+    );
+  }
+  return <span>{tabCell}</span>;
+};
 
 const clientDevicesTableColumns = [
   {
@@ -26,7 +36,7 @@ const clientDevicesTableColumns = [
   },
   {
     title: 'MAC',
-    dataIndex: 'mac',
+    dataIndex: 'macAddress',
     key: 'mac',
   },
   { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr', key: '1' },
@@ -38,10 +48,6 @@ const clientDevicesTableColumns = [
   { title: 'SIGNAL', dataIndex: 'signal', key: '7' },
   { title: 'STATUS', dataIndex: 'status', key: '8' },
 ];
-
-const renderTableCell = tabCell => {
-  return <span>{tabCell || 'null'}</span>;
-};
 
 const accessPointsTableColumns = [
   {
@@ -70,7 +76,7 @@ const accessPointsTableColumns = [
   },
   {
     title: 'MAC',
-    dataIndex: 'mac',
+    dataIndex: 'macAddress',
     key: 'mac',
     render: renderTableCell,
   },
@@ -96,16 +102,7 @@ const accessPointsTableColumns = [
     title: 'CHANNEL',
     dataIndex: 'channel',
     key: 'channel',
-    render: channel => {
-      return (
-        <div className={styles.tabColumn}>
-          <span>{channel && channel.is2dot4GHz ? channel.is2dot4GHz : 'null'}</span>
-          <span style={{ color: 'darkgray' }}>
-            {channel && channel.is5GHz ? channel.is5GHz : 'null'}
-          </span>
-        </div>
-      );
-    },
+    render: renderTableCell,
   },
   {
     title: 'CAPACITY',
@@ -117,14 +114,7 @@ const accessPointsTableColumns = [
     title: 'NOISE FLOOR',
     dataIndex: 'noiseFloor',
     key: 'noiseFloor',
-    render: noiseFloor => {
-      return (
-        <div className={styles.tabColumn}>
-          <span>{noiseFloor && noiseFloor.is2dot4GHz ? noiseFloor.is2dot4GHz : 'null'}</span>
-          <span>{noiseFloor && noiseFloor.is5GHz ? noiseFloor.is5GHz : 'null'}</span>
-        </div>
-      );
-    },
+    render: renderTableCell,
   },
   {
     title: 'DEVICES',
@@ -134,86 +124,37 @@ const accessPointsTableColumns = [
   },
 ];
 
-const CREATE_LOCATION = gql`
-  mutation CreateLocation(
-    $locationType: String!
-    $customerId: Int!
-    $parentId: Int!
-    $name: String!
-  ) {
-    createLocation(
-      locationType: $locationType
-      customerId: $customerId
-      parentId: $parentId
-      name: $name
-    ) {
-      locationType
-      customerId
-      parentId
-      name
-    }
-  }
-`;
-
-const UPDATE_LOCATION = gql`
-  mutation UpdateLocation(
-    $id: Int!
-    $locationType: String!
-    $customerId: Int!
-    $parentId: Int!
-    $name: String!
-    $lastModifiedTimestamp: String
-  ) {
-    updateLocation(
-      id: $id
-      locationType: $locationType
-      customerId: $customerId
-      parentId: $parentId
-      name: $name
-      lastModifiedTimestamp: $lastModifiedTimestamp
-    ) {
-      id
-      locationType
-      customerId
-      parentId
-      name
-      lastModifiedTimestamp
-    }
-  }
-`;
-
-const DELETE_LOCATION = gql`
-  query DeleteLocation($id: Int!) {
-    deleteLocation(id: $id) {
-      id
-      locationType
-      customerId
-      parentId
-      name
-      lastModifiedTimestamp
-    }
-  }
-`;
-
 const Network = () => {
   const { customerId } = useContext(UserContext);
   const location = useLocation();
-  const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, {
+  const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const [
-    filterEquipment,
-    { loading: isEquipLoading, data: equipData, refetch, fetchMore },
-  ] = useLazyQuery(FILTER_EQUIPMENT);
+  const [filterEquipment, { loading: isEquipLoading, data: equipData, fetchMore }] = useLazyQuery(
+    FILTER_EQUIPMENT
+  );
+  const [getLocation, { data: locationData }] = useLazyQuery(GET_LOCATION);
   const [createLocation] = useMutation(CREATE_LOCATION);
   const [updateLocation] = useMutation(UPDATE_LOCATION);
-  const [deleteLocation] = useLazyQuery(DELETE_LOCATION);
+  const [deleteLocation] = useLazyQuery(DELETE_LOCATION, {
+    onCompleted: () => {
+      refetch();
+      notification.success({
+        message: 'Success',
+        description: 'Location successfully deleted.',
+      });
+    },
+    onError: () => {
+      notification.error({
+        message: 'Error',
+        description: 'Locaton could not be deleted.',
+      });
+    },
+  });
   const [activeTab, setActiveTab] = useState(location.pathname);
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [devicesData, setDevicesData] = useState([]);
-  // const [selected, setSelected] = useState(false);
-  const [bulkEditAps, setBulkEditAps] = useState(false);
   const [locationPath, setLocationPath] = useState([]);
 
   const formatLocationListForTree = list => {
@@ -253,59 +194,23 @@ const Network = () => {
     ];
   };
 
-  const getRadioDetailsByType = (radioDetails, type, radioType) => {
-    let channel;
-    let noiseFloor;
-    if (type === 'channel') {
-      channel = radioDetails.radioMap[radioType] && radioDetails.radioMap[radioType].channelNumber;
-    } else {
-      noiseFloor =
-        radioDetails.advancedRadioMap[radioType] &&
-        radioDetails.advancedRadioMap[radioType].channelHopSettings.noiseFloorThresholdInDB;
-      return noiseFloor;
-    }
-    return channel;
-  };
-
-  const getRadioDetails = (radioDetails, type) => {
-    const is5GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_5GHZ);
-    const is2dot4GHz = getRadioDetailsByType(radioDetails, type, IS_RADIO_TYPE_2DOT4GHZ);
-    return {
-      is5GHz,
-      is2dot4GHz,
-    };
-  };
-
   const mapAccessPointsTableData = (dataSource = []) => {
     return dataSource.map(
-      ({
-        id,
-        name,
-        alarms,
-        model,
-        ip,
-        mac,
-        inventoryId,
-        uptime,
-        profileId,
-        capacity,
-        devices,
-        details,
-      }) => {
+      ({ id, name, alarms, model, inventoryId, devices, profile, channel, status }) => {
         return {
           key: id,
           name,
           alarms,
           model,
-          ip,
-          mac,
+          ip: status.protocol.details.reportedIpV4Addr,
+          macAddress: status.protocol.details.reportedMacAddr,
           assetId: inventoryId,
-          upTime: uptime,
-          profile: profileId,
-          capacity,
+          upTime: status.osPerformance.details.uptimeInSeconds,
+          profile: profile.name,
+          channel,
+          capacity: status.radioUtilization.details.capacityDetails,
+          noiseFloor: status.radioUtilization.details.noiseFloorDetails,
           devices,
-          channel: getRadioDetails(details, 'channel'),
-          noiseFloor: getRadioDetails(details, 'noiseFloor'),
         };
       }
     );
@@ -331,16 +236,22 @@ const Network = () => {
     }
   };
 
+  const handleGetSingleLocation = id => {
+    getLocation({
+      variables: { id },
+    });
+  };
+
   const fetchFilterEquipment = async () => {
     filterEquipment({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
     });
   };
 
-  const handleAddLocation = (name, parentId) => {
+  const handleAddLocation = (name, parentId, locationType) => {
     createLocation({
       variables: {
-        locationType: 'City',
+        locationType,
         customerId,
         parentId,
         name,
@@ -361,14 +272,15 @@ const Network = () => {
       );
   };
 
-  const handleEditLocation = (id, parentId, name) => {
+  const handleEditLocation = (id, parentId, name, locationType, lastModifiedTimestamp) => {
     updateLocation({
       variables: {
-        id,
-        locationType: 'City',
         customerId,
+        id,
         parentId,
         name,
+        locationType,
+        lastModifiedTimestamp,
       },
     })
       .then(() => {
@@ -391,25 +303,9 @@ const Network = () => {
       variables: {
         id,
       },
-    })
-      .then(() => {
-        refetch();
-        notification.success({
-          message: 'Success',
-          description: 'Location successfully deleted.',
-        });
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Location could not be deleted.',
-        })
-      );
+    });
   };
 
-  const handleBulkEditAccessPoints = () => {
-    setBulkEditAps(true);
-  };
   useEffect(() => {
     const { pathname } = location;
     if (pathname === '/network/access-points') {
@@ -465,7 +361,6 @@ const Network = () => {
   }, [checkedLocations, activeTab]);
 
   const onSelect = (selectedKeys, info) => {
-    // setSelected(!selected);
     const currentLocationPath = getLocationPath(info.node, data.getAllLocations);
     setLocationPath(currentLocationPath);
   };
@@ -494,7 +389,8 @@ const Network = () => {
       onAddLocation={handleAddLocation}
       onEditLocation={handleEditLocation}
       onDeleteLocation={handleDeleteLocation}
-      onBulkEditAccessPoints={handleBulkEditAccessPoints}
+      onGetSelectedLocation={handleGetSingleLocation}
+      singleLocationData={locationData && locationData.getLocation}
     >
       {activeTab === '/network/client-devices' ? (
         <NetworkTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />
@@ -510,7 +406,6 @@ const Network = () => {
           }
         />
       )}
-      {bulkEditAps && <BulkEditAccessPoints />}
     </NetworkPage>
   );
 };
