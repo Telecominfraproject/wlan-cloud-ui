@@ -61,3 +61,26 @@ export const FILTER_EQUIPMENT = gql`
     }
   }
 `;
+
+export const FILTER_CLIENT_SESSIONS = gql`
+  query FilterClientSessions($customerId: Int!, $cursor: String) {
+    getAllClientSessions(customerId: $customerId, cursor: $cursor) {
+      items {
+        id
+        macAddress
+        ipAddress
+        hostname
+        ssid
+        radioType
+        signal
+        equipment {
+          name
+        }
+      }
+      context {
+        lastPage
+        cursor
+      }
+    }
+  }
+`;
