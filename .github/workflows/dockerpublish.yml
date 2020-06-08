@@ -29,10 +29,10 @@ jobs:
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
+            docker-compose --file docker-compose.test.yml build --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}} --build-arg GRAPHQL_URL=${{secrets.GRAPHQL_URL}}
             docker-compose --file docker-compose.test.yml run sut
           else
-            docker build . --file Dockerfile --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
+            docker build . --file Dockerfile --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}} --build-arg GRAPHQL_URL=${{secrets.GRAPHQL_URL}}
           fi
   push:
     # Ensure test job passes before pushing image.
@@ -45,14 +45,14 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
+        run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}} --build-arg GRAPHQL_URL=${{secrets.GRAPHQL_URL}}
 
       - name: Login to Docker Hub
         env:
           DOCKER_PASSWORD: ${{ secrets.REPO_PASSWORD }}
         run: |
-          echo "${DOCKER_PASSWORD}" | docker login $DOCKER_REPO --username "build-pipeline" --password-stdin   
-          
+          echo "${DOCKER_PASSWORD}" | docker login $DOCKER_REPO --username "build-pipeline" --password-stdin
+
       - name: Push image
         run: |
           IMAGE_ID=$DOCKER_REPO/$IMAGE_NAME
