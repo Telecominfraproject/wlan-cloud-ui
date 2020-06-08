@@ -17,7 +17,7 @@ COPY package*.json ./
 
 #RUN npm install
 # If you are building your code for production
-ENV GRAPHQL_URL=$GRAPHQL_URL
+ENV GRAPHQL_URL $GRAPHQL_URL
 RUN (echo "@tip-wlan:registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/" && echo "//tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/:_authToken=$NPM_TOKEN") > .npmrc
 RUN npm ci --silent
 RUN npm install react-scripts@3.4.1 -g --silent
