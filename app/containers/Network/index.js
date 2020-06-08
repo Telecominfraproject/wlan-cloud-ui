@@ -9,6 +9,8 @@ import AccessPointDetails from 'containers/Network/containers/AccessPointDetails
 import AccessPoints from 'containers/Network/containers/AccessPoints';
 import ClientDevices from 'containers/Network/containers/ClientDevices';
 import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetails';
+import BulkEditAccessPoints from 'containers/Network/containers/BulkEditAccessPoints';
+
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_LOCATIONS, GET_LOCATION, DELETE_LOCATION } from 'graphql/queries';
 import { CREATE_LOCATION, UPDATE_LOCATION } from 'graphql/mutations';
@@ -201,6 +203,11 @@ const Network = () => {
       singleLocationData={locationData && locationData.getLocation}
     >
       <Switch>
+        <Route
+          exact
+          path={`${path}/access-points/bulk-edit`}
+          render={props => <BulkEditAccessPoints {...props} />}
+        />
         <Route
           exact
           path={`${path}/access-points`}

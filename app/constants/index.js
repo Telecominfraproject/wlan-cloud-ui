@@ -211,14 +211,14 @@ export const ACCESS_POINTS_CHANNEL_TABLE_DATA = [
     channelBandwidth: [-80, -93],
   },
   {
-    key: 0,
+    key: 1,
     name: 'AP100',
     activeChannel: [1, 44],
     backupChannel: [1, 44],
     channelBandwidth: [-80, -93],
   },
   {
-    key: 0,
+    key: 2,
     name: 'AP100',
     activeChannel: [1, 44],
     backupChannel: [1, 44],
