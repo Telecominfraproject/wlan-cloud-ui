@@ -15,7 +15,7 @@ import { getItem, setItem, removeItem } from 'utils/localStorage';
 import history from 'utils/history';
 
 const API_URI =
-  process.env.NODE_ENV !== 'production' || !process.env.GRAPHQL_URL
+  process.env.NODE_ENV === 'development' || !process.env.GRAPHQL_URL
     ? 'http://localhost:4000/'
     : process.env.GRAPHQL_URL;
 const MOUNT_NODE = document.getElementById('root');
