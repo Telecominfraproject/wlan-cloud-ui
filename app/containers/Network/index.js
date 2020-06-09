@@ -1,17 +1,17 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
-import { Alert, notification, Popover, Button } from 'antd';
+import { Alert, notification, Popover } from 'antd';
 import _ from 'lodash';
 import { Network as NetworkPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import AccessPointDetails from 'containers/Network/containers/AccessPointDetails';
 import AccessPoints from 'containers/Network/containers/AccessPoints';
 import ClientDevices from 'containers/Network/containers/ClientDevices';
 import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetails';
+import PopoverMenuContent from 'containers/Network/containers/PopoverMenuContent';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_LOCATIONS, GET_LOCATION, DELETE_LOCATION } from 'graphql/queries';
 import { CREATE_LOCATION, UPDATE_LOCATION } from 'graphql/mutations';
-import styles from './index.module.scss';
 
 const Network = () => {
   const { path } = useRouteMatch();
@@ -57,54 +57,6 @@ const Network = () => {
     });
   };
 
-  const content = (
-    <ul className={styles.popOver}>
-      {locationData && locationData.locationType !== 'FLOOR' && (
-        <li>
-          <Button
-            key={0}
-            role="button"
-            onKeyPress={() => {}}
-            onClick={() => {
-              setAddModal(true);
-            }}
-          >
-            Add Location
-          </Button>
-        </li>
-      )}
-      <li>
-        <Button
-          key={1}
-          role="button"
-          onKeyPress={() => {}}
-          onClick={() => {
-            setEditModal(true);
-          }}
-        >
-          Edit Location
-        </Button>
-      </li>
-      <li>
-        <Button key={2} role="button" onKeyPress={() => {}} onClick={() => {}}>
-          Bulk Edit APs
-        </Button>
-      </li>
-      <li>
-        <Button
-          key={3}
-          role="button"
-          onKeyPress={() => {}}
-          onClick={() => {
-            setDeleteModal(true);
-          }}
-        >
-          Delete Location
-        </Button>
-      </li>
-    </ul>
-  );
-
   const formatLocationListForTree = list => {
     const checkedTreeLocations = [];
     list.forEach(ele => {
@@ -118,7 +70,19 @@ const Network = () => {
       let children = _.filter(array, child => child.parentId === parent.id);
       children = children.map(c => ({
         title: (
-          <Popover content={content} placement="rightTop" trigger="click" destroyTooltipOnHide>
+          <Popover
+            content={
+              <PopoverMenuContent
+                locationData={locationData}
+                setAddModal={setAddModal}
+                setEditModal={setEditModal}
+                setDeleteModal={setDeleteModal}
+              />
+            }
+            placement="rightTop"
+            trigger="click"
+            destroyTooltipOnHide
+          >
             {c.name}
           </Popover>
         ),
