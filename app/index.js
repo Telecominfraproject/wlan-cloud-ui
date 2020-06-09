@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { Router } from 'react-router-dom';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
@@ -12,8 +12,12 @@ import App from 'containers/App';
 import { AUTH_TOKEN } from 'constants/index';
 
 import { getItem, setItem, removeItem } from 'utils/localStorage';
+import history from 'utils/history';
 
-const API_URI = process.env.NODE_ENV !== 'production' ? 'http://localhost:4000/' : '';
+const API_URI =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:4000/'
+    : 'https://wlan-graphql.zone3.lab.connectus.ai/';
 const MOUNT_NODE = document.getElementById('root');
 
 const REFRESH_TOKEN = gql`
@@ -63,6 +67,7 @@ const client = new ApolloClient({
           case 'INTERNAL_SERVER_ERROR':
             if (err.path && err.path[0] === 'updateToken') {
               removeItem(AUTH_TOKEN);
+              history.push('/login');
             }
             return forward(operation);
           default:
@@ -75,7 +80,7 @@ const client = new ApolloClient({
 
 const render = () => {
   ReactDOM.render(
-    <Router>
+    <Router history={history}>
       <ApolloProvider client={client}>
         <App />
       </ApolloProvider>

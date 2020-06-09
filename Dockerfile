@@ -2,7 +2,6 @@
 FROM node:13.12.0-alpine as build
 
 ARG NPM_TOKEN
-
 # Create app directory
 WORKDIR /app
 

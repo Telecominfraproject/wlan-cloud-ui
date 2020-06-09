@@ -1,29 +1,11 @@
 export const AUTH_TOKEN = 'tip-auth-token';
 export const COMPANY = 'Telecom Infra Project';
-
-export const CLIENT_DEVICES_TABLE_CLOUMNS = [
-  {
-    title: '',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: 'Mac',
-    dataIndex: 'mac',
-    key: 'mac',
-  },
-  { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr', key: '1' },
-  { title: 'IP', dataIndex: 'ip', key: '2' },
-  { title: 'HOST NAME', dataIndex: 'hostName', key: '3' },
-  { title: 'ACCESS POINT', dataIndex: 'accessPoint', key: '4' },
-  { title: 'SSID', dataIndex: 'ssid', key: '5' },
-  { title: 'BAND', dataIndex: 'band', key: '6' },
-  { title: 'SIGNAL', dataIndex: 'signal', key: '7' },
-  { title: 'STATUS', dataIndex: 'status', key: '8' },
-];
+export const IS_RADIO_TYPE_5GHZ = 'is5GHz';
+export const IS_RADIO_TYPE_2DOT4GHZ = 'is2dot4GHz';
 
 export const CLIENT_DEVICES_TABLE_DATA = [
   {
+    key: 0,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -37,6 +19,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 3,
   },
   {
+    key: 1,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -50,6 +33,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 7,
   },
   {
+    key: 2,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -63,6 +47,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 3,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -76,6 +61,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 4,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -89,6 +75,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 5,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -102,6 +89,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 2,
   },
   {
+    key: 6,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -115,6 +103,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 7,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -128,6 +117,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 8,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -141,6 +131,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 9,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -154,6 +145,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 10,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -167,6 +159,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 11,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -180,6 +173,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 12,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
@@ -193,6 +187,7 @@ export const CLIENT_DEVICES_TABLE_DATA = [
     locationId: 8,
   },
   {
+    key: 13,
     name: 'Laptop',
     mac: 'DO:C6:37:69:3E:FD',
     osModelMfr: 'Linux',
