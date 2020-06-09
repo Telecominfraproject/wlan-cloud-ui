@@ -78,11 +78,6 @@ export const DELETE_LOCATION = gql`
   query DeleteLocation($id: Int!) {
     deleteLocation(id: $id) {
       id
-      locationType
-      customerId
-      parentId
-      name
-      lastModifiedTimestamp
     }
   }
 `;

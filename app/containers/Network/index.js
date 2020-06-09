@@ -174,6 +174,8 @@ const Network = () => {
   const onSelect = (selectedKeys, info) => {
     const currentLocationPath = getLocationPath(info.node, data.getAllLocations);
     setLocationPath(currentLocationPath);
+    const { id } = info.node;
+    handleGetSingleLocation(id);
   };
 
   const onCheck = checkedKeys => {
@@ -200,7 +202,7 @@ const Network = () => {
       onEditLocation={handleEditLocation}
       onDeleteLocation={handleDeleteLocation}
       onGetSelectedLocation={handleGetSingleLocation}
-      singleLocationData={locationData && locationData.getLocation}
+      selectedLocation={locationData && locationData.getLocation}
     >
       <Switch>
         <Route
