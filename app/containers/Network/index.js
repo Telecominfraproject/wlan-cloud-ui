@@ -4,6 +4,7 @@ import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification, Popover, Button } from 'antd';
 import _ from 'lodash';
 import { Network as NetworkPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+
 import AccessPointDetails from 'containers/Network/containers/AccessPointDetails';
 import AccessPoints from 'containers/Network/containers/AccessPoints';
 import ClientDevices from 'containers/Network/containers/ClientDevices';
@@ -11,19 +12,20 @@ import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetai
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_LOCATIONS, GET_LOCATION, DELETE_LOCATION } from 'graphql/queries';
 import { CREATE_LOCATION, UPDATE_LOCATION } from 'graphql/mutations';
+
 import styles from './index.module.scss';
 
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
   const location = useLocation();
-  const [locationData, setLoctionData] = useState();
+  const [locationData, setLocationData] = useState();
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
   const [getLocation] = useLazyQuery(GET_LOCATION, {
     onCompleted: locData => {
-      setLoctionData(locData && locData.getLocation);
+      setLocationData(locData && locData.getLocation);
     },
     onError: () => {},
   });
@@ -40,7 +42,7 @@ const Network = () => {
     onError: () => {
       notification.error({
         message: 'Error',
-        description: 'Locaton could not be deleted.',
+        description: 'Location could not be deleted.',
       });
     },
   });
@@ -260,7 +262,6 @@ const Network = () => {
       onAddLocation={handleAddLocation}
       onEditLocation={handleEditLocation}
       onDeleteLocation={handleDeleteLocation}
-      onGetSelectedLocation={handleGetSingleLocation}
       selectedLocation={locationData}
       deleteModal={deleteModal}
       editModal={editModal}
