@@ -1,28 +1,32 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
-import { Alert, notification } from 'antd';
+import { Alert, notification, Popover, Button } from 'antd';
 import _ from 'lodash';
 import { Network as NetworkPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
-
 import AccessPointDetails from 'containers/Network/containers/AccessPointDetails';
 import AccessPoints from 'containers/Network/containers/AccessPoints';
 import ClientDevices from 'containers/Network/containers/ClientDevices';
 import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetails';
-import BulkEditAccessPoints from 'containers/Network/containers/BulkEditAccessPoints';
-
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_LOCATIONS, GET_LOCATION, DELETE_LOCATION } from 'graphql/queries';
 import { CREATE_LOCATION, UPDATE_LOCATION } from 'graphql/mutations';
+import styles from './index.module.scss';
 
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
   const location = useLocation();
+  const [locationData, setLoctionData] = useState();
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const [getLocation, { data: locationData }] = useLazyQuery(GET_LOCATION);
+  const [getLocation] = useLazyQuery(GET_LOCATION, {
+    onCompleted: locData => {
+      setLoctionData(locData && locData.getLocation);
+    },
+    onError: () => {},
+  });
   const [createLocation] = useMutation(CREATE_LOCATION);
   const [updateLocation] = useMutation(UPDATE_LOCATION);
   const [deleteLocation] = useLazyQuery(DELETE_LOCATION, {
@@ -43,6 +47,63 @@ const Network = () => {
   const [locationsTree, setLocationsTree] = useState([]);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [locationPath, setLocationPath] = useState([]);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [addModal, setAddModal] = useState(false);
+
+  const handleGetSingleLocation = id => {
+    getLocation({
+      variables: { id },
+    });
+  };
+
+  const content = (
+    <ul className={styles.popOver}>
+      {locationData && locationData.locationType !== 'FLOOR' && (
+        <li>
+          <Button
+            key={0}
+            role="button"
+            onKeyPress={() => {}}
+            onClick={() => {
+              setAddModal(true);
+            }}
+          >
+            Add Location
+          </Button>
+        </li>
+      )}
+      <li>
+        <Button
+          key={1}
+          role="button"
+          onKeyPress={() => {}}
+          onClick={() => {
+            setEditModal(true);
+          }}
+        >
+          Edit Location
+        </Button>
+      </li>
+      <li>
+        <Button key={2} role="button" onKeyPress={() => {}} onClick={() => {}}>
+          Bulk Edit APs
+        </Button>
+      </li>
+      <li>
+        <Button
+          key={3}
+          role="button"
+          onKeyPress={() => {}}
+          onClick={() => {
+            setDeleteModal(true);
+          }}
+        >
+          Delete Location
+        </Button>
+      </li>
+    </ul>
+  );
 
   const formatLocationListForTree = list => {
     const checkedTreeLocations = [];
@@ -56,7 +117,11 @@ const Network = () => {
       const parent = typeof p !== 'undefined' ? p : { id: 0 };
       let children = _.filter(array, child => child.parentId === parent.id);
       children = children.map(c => ({
-        title: c.name,
+        title: (
+          <Popover content={content} placement="rightTop" trigger="click" destroyTooltipOnHide>
+            {c.name}
+          </Popover>
+        ),
         value: `${c.id}`,
         key: c.id,
         ...c,
@@ -79,12 +144,6 @@ const Network = () => {
         children: unflatten(list),
       },
     ];
-  };
-
-  const handleGetSingleLocation = id => {
-    getLocation({
-      variables: { id },
-    });
   };
 
   const handleAddLocation = (name, parentId, locationType) => {
@@ -150,7 +209,7 @@ const Network = () => {
       const unflattenData = formatLocationListForTree(data && data.getAllLocations);
       setLocationsTree(unflattenData[0].children);
     }
-  }, [data]);
+  }, [data, locationData]);
 
   const locations = [];
   const getLocationPath = (node, allLocations) => {
@@ -202,14 +261,15 @@ const Network = () => {
       onEditLocation={handleEditLocation}
       onDeleteLocation={handleDeleteLocation}
       onGetSelectedLocation={handleGetSingleLocation}
-      selectedLocation={locationData && locationData.getLocation}
+      selectedLocation={locationData}
+      deleteModal={deleteModal}
+      editModal={editModal}
+      addModal={addModal}
+      setAddModal={setAddModal}
+      setEditModal={setEditModal}
+      setDeleteModal={setDeleteModal}
     >
       <Switch>
-        <Route
-          exact
-          path={`${path}/access-points/bulk-edit`}
-          render={props => <BulkEditAccessPoints {...props} />}
-        />
         <Route
           exact
           path={`${path}/access-points`}
