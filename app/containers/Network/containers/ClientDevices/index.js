@@ -28,21 +28,21 @@ const clientDevicesTableColumns = [
 
 const ClientDevices = ({ checkedLocations }) => {
   const { customerId } = useContext(UserContext);
-  const [filterClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
+  const [getAllClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
     FILTER_CLIENT_SESSIONS
   );
 
   const handleLoadMore = () => {
-    if (!data.filterClientSessions.context.lastPage) {
+    if (!data.getAllClientSessions.context.lastPage) {
       fetchMore({
-        variables: { cursor: data.filterClientSessions.context.cursor },
+        variables: { cursor: data.getAllClientSessions.context.cursor },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.filterClientSessions;
-          const newItems = fetchMoreResult.filterClientSessions.items;
+          const previousEntry = previousResult.getAllClientSessions;
+          const newItems = fetchMoreResult.getAllClientSessions.items;
 
           return {
-            filterClientSessions: {
-              context: fetchMoreResult.filterClientSessions.context,
+            getAllClientSessions: {
+              context: fetchMoreResult.getAllClientSessions.context,
               items: [...previousEntry.items, ...newItems],
               __typename: previousEntry.__typename,
             },
@@ -53,7 +53,7 @@ const ClientDevices = ({ checkedLocations }) => {
   };
 
   useEffect(() => {
-    filterClientSessions({
+    getAllClientSessions({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
     });
   }, [checkedLocations]);
@@ -71,9 +71,9 @@ const ClientDevices = ({ checkedLocations }) => {
   return (
     <NetworkTable
       tableColumns={clientDevicesTableColumns}
-      tableData={data && data.filterClientSessions && data.filterClientSessions.items}
+      tableData={data && data.getAllClientSessions && data.getAllClientSessions.items}
       onLoadMore={handleLoadMore}
-      isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
+      isLastPage={data && data.getAllClientSessions && data.getAllClientSessions.context.lastPage}
     />
   );
 };
