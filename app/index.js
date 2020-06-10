@@ -15,9 +15,9 @@ import { getItem, setItem, removeItem } from 'utils/localStorage';
 import history from 'utils/history';
 
 const API_URI =
-  process.env.NODE_ENV === 'development' || !process.env.GRAPHQL_URL
+  process.env.NODE_ENV === 'development'
     ? 'http://localhost:4000/'
-    : process.env.GRAPHQL_URL;
+    : 'https://wlan-graphql.zone3.lab.connectus.ai/';
 const MOUNT_NODE = document.getElementById('root');
 
 const REFRESH_TOKEN = gql`
