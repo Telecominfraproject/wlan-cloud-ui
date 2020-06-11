@@ -6,6 +6,7 @@ export const GET_ALL_LOCATIONS = gql`
       id
       name
       parentId
+      locationType
     }
   }
 `;
@@ -58,6 +59,18 @@ export const FILTER_EQUIPMENT = gql`
         lastPage
         cursor
       }
+    }
+  }
+`;
+
+export const GET_LOCATION = gql`
+  query GetLocation($id: Int!) {
+    getLocation(id: $id) {
+      id
+      parentId
+      name
+      locationType
+      lastModifiedTimestamp
     }
   }
 `;
