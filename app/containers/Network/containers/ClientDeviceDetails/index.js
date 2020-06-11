@@ -2,8 +2,10 @@ import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { Alert } from 'antd';
-import { Loading } from '@tip-wlan/wlan-cloud-ui-library';
-
+import {
+  Loading,
+  ClientDeviceDetails as ClientDevicesDetails,
+} from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 import { GET_CLIENT_SESSION } from 'graphql/queries';
 
@@ -24,9 +26,6 @@ const ClientDeviceDetails = () => {
     );
   }
 
-  const { macAddress } = data.getClientSession[0];
-
-  /*
   const {
     macAddress,
     ipAddress,
@@ -35,34 +34,58 @@ const ClientDeviceDetails = () => {
     radioType,
     signal,
     equipment: { name },
-    details: { assocTimestamp, rxMbps, txMbps, rxRateKbps, txRateKbps, 
-      dhcpDetails: {dhcpServerIp, primaryDns, secondaryDns, gatewayIp, subnetMask, leaseTimeInSeconds, leaseStartTimestamp}
+    details: {
+      assocTimestamp,
+      dhcpDetails,
+      metricDetails: { rxBytes, txBytes, rxMbps, txMbps, totalRxPackets, totalTxPackets },
     },
   } = data.getClientSession[0];
 
-  assocTimestamp = Associated On
-  equipment.name = Access Point
-  radioType = Radio Band
-  signal = Signal Strength
-  rxMbps = Rx Rate
-  txMbps = Tx Rate
+  /*
+ assocTimestamp = Associated On
+ equipment.name = Access Point
+ radioType = Radio Band
+ signal = Signal Strength
+ rxMbps = Rx Rate
+ txMbps = Tx Rate
 
-  rxRateKbps = Rx Throughput
-  txRateKbps = Tx Throughput
-  totalRxPackets = Total Rx Packets
-  totalTxPackets = Total Tx Packets
-  
-  dhcpServerIp = DHCP Server
-  primaryDns = Primary DNS
-  secondaryDns = Secondary DNS
-  gatewayIp = Gateway
-  subnetMask = Subnet Mask
-  leaseTimeInSeconds = IP Lease Time
-  leaseStartTimestamp = IP Lease Start
+ rxBytes = Rx Throughput
+ txBytes = Tx Throughput
+ totalRxPackets = Total Rx Packets
+ totalTxPackets = Total Tx Packets
+ 
+ dhcpServerIp = DHCP Server
+ primaryDns = Primary DNS
+ secondaryDns = Secondary DNS
+ gatewayIp = Gateway
+ subnetMask = Subnet Mask
+ leaseTimeInSeconds = IP Lease Time
+ leaseStartTimestamp = IP Lease Start
+ */
 
-  */
-
-  return <h1>Client Device Details: {macAddress}</h1>;
+  return (
+    <>
+      <ClientDevicesDetails
+        macAddress={macAddress}
+        ipAddress={ipAddress}
+        hostname={hostname}
+        ssid={ssid}
+        radioType={radioType}
+        signal={signal}
+        name={name}
+        assocTimestamp={assocTimestamp}
+        rxMbps={rxMbps}
+        txMbps={txMbps}
+        totalRxPackets={totalRxPackets}
+        totalTxPackets={totalTxPackets}
+        dhcpDetails={dhcpDetails}
+        rxBytes={rxBytes}
+        txBytes={txBytes}
+      />
+    </>
+  );
 };
+
+ClientDeviceDetails.propTypes = {};
 
 export default ClientDeviceDetails;
