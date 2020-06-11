@@ -1,30 +1,42 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useMemo, useContext, useState } from 'react';
 import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
-import { useQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { Alert, notification } from 'antd';
 import _ from 'lodash';
-import { Network as NetworkPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { Network as NetworkPage, PopoverMenu, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import AccessPointDetails from 'containers/Network/containers/AccessPointDetails';
 import AccessPoints from 'containers/Network/containers/AccessPoints';
 import ClientDevices from 'containers/Network/containers/ClientDevices';
 import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetails';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_LOCATIONS } from 'graphql/queries';
+import { GET_ALL_LOCATIONS, GET_LOCATION } from 'graphql/queries';
+import { CREATE_LOCATION, UPDATE_LOCATION, DELETE_LOCATION } from 'graphql/mutations';
 
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
   const location = useLocation();
-  const [locationsTree, setLocationsTree] = useState([]);
-  const [checkedLocations, setCheckedLocations] = useState([]);
-  const [selected, setSelected] = useState(false);
-
-  const { loading, error, data } = useQuery(GET_ALL_LOCATIONS, {
+  const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
 
-  const formatLocationListForTree = list => {
+  const [getLocation, { data: selectedLocation }] = useLazyQuery(GET_LOCATION);
+  const [createLocation] = useMutation(CREATE_LOCATION);
+  const [updateLocation] = useMutation(UPDATE_LOCATION);
+  const [deleteLocation] = useMutation(DELETE_LOCATION);
+  const [checkedLocations, setCheckedLocations] = useState([]);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [addModal, setAddModal] = useState(false);
+
+  const handleGetSingleLocation = id => {
+    getLocation({
+      variables: { id },
+    });
+  };
+
+  const formatLocationListForTree = (list = []) => {
     const checkedTreeLocations = [];
     list.forEach(ele => {
       checkedTreeLocations.push(ele.id);
@@ -36,7 +48,16 @@ const Network = () => {
       const parent = typeof p !== 'undefined' ? p : { id: 0 };
       let children = _.filter(array, child => child.parentId === parent.id);
       children = children.map(c => ({
-        title: c.name,
+        title: (
+          <PopoverMenu
+            locationType={c.locationType}
+            setAddModal={setAddModal}
+            setEditModal={setEditModal}
+            setDeleteModal={setDeleteModal}
+          >
+            {c.name}
+          </PopoverMenu>
+        ),
         value: `${c.id}`,
         key: c.id,
         ...c,
@@ -53,7 +74,12 @@ const Network = () => {
     }
     return [
       {
-        title: 'Network',
+        title: (
+          <PopoverMenu locationType="NETWORK" setAddModal={setAddModal}>
+            Network
+          </PopoverMenu>
+        ),
+        id: 0,
         value: '0',
         key: 0,
         children: unflatten(list),
@@ -61,20 +87,89 @@ const Network = () => {
     ];
   };
 
-  useEffect(() => {
-    if (data && data.getAllLocations) {
-      const unflattenData = formatLocationListForTree(data && data.getAllLocations);
-      setLocationsTree(unflattenData[0].children);
-    }
-  }, [data]);
+  const handleAddLocation = (name, parentId, locationType) => {
+    setAddModal(false);
+    createLocation({
+      variables: {
+        locationType,
+        customerId,
+        parentId,
+        name,
+      },
+    })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully added.',
+        });
+        refetch();
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be added.',
+        })
+      );
+  };
 
-  const onSelect = () => {
-    setSelected(!selected);
+  const handleEditLocation = (id, parentId, name, locationType, lastModifiedTimestamp) => {
+    setEditModal(false);
+    updateLocation({
+      variables: {
+        customerId,
+        id,
+        parentId,
+        name,
+        locationType,
+        lastModifiedTimestamp,
+      },
+    })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully edited.',
+        });
+        refetch();
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be edited.',
+        })
+      );
+  };
+
+  const handleDeleteLocation = id => {
+    setDeleteModal(false);
+    deleteLocation({ variables: { id } })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully deleted.',
+        });
+        refetch();
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be deleted.',
+        })
+      );
+  };
+
+  const onSelect = (selectedKeys, info) => {
+    const { id } = info.node;
+    handleGetSingleLocation(id);
   };
 
   const onCheck = checkedKeys => {
     setCheckedLocations(checkedKeys);
   };
+
+  const locationsTree = useMemo(
+    () => formatLocationListForTree(data && data.getAllLocations)[0].children,
+    [data]
+  );
 
   if (loading) {
     return <Loading />;
@@ -91,6 +186,16 @@ const Network = () => {
       checkedLocations={checkedLocations}
       locations={locationsTree}
       activeTab={location.pathname}
+      selectedLocation={selectedLocation && selectedLocation.getLocation}
+      addModal={addModal}
+      editModal={editModal}
+      deleteModal={deleteModal}
+      setAddModal={setAddModal}
+      setEditModal={setEditModal}
+      setDeleteModal={setDeleteModal}
+      onAddLocation={handleAddLocation}
+      onEditLocation={handleEditLocation}
+      onDeleteLocation={handleDeleteLocation}
     >
       <Switch>
         <Route
