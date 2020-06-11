@@ -47,3 +47,11 @@ export const UPDATE_LOCATION = gql`
     }
   }
 `;
+
+export const DELETE_LOCATION = gql`
+  mutation DeleteLocation($id: Int!) {
+    deleteLocation(id: $id) {
+      id
+    }
+  }
+`;

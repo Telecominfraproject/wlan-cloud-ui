@@ -1,53 +1,35 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useMemo, useContext, useState } from 'react';
 import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification, Popover } from 'antd';
 import _ from 'lodash';
-import { Network as NetworkPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import {
+  Network as NetworkPage,
+  PopoverMenuContent,
+  Loading,
+} from '@tip-wlan/wlan-cloud-ui-library';
 
 import AccessPointDetails from 'containers/Network/containers/AccessPointDetails';
 import AccessPoints from 'containers/Network/containers/AccessPoints';
 import ClientDevices from 'containers/Network/containers/ClientDevices';
 import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetails';
-import PopoverMenuContent from 'containers/Network/containers/PopoverMenuContent';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_LOCATIONS, GET_LOCATION, DELETE_LOCATION } from 'graphql/queries';
-import { CREATE_LOCATION, UPDATE_LOCATION } from 'graphql/mutations';
+import { GET_ALL_LOCATIONS, GET_LOCATION } from 'graphql/queries';
+import { CREATE_LOCATION, UPDATE_LOCATION, DELETE_LOCATION } from 'graphql/mutations';
 
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
   const location = useLocation();
-  const [locationData, setLocationData] = useState();
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const [getLocation] = useLazyQuery(GET_LOCATION, {
-    onCompleted: locData => {
-      setLocationData(locData && locData.getLocation);
-    },
-    onError: () => {},
-  });
+
+  const [getLocation, { data: selectedLocation }] = useLazyQuery(GET_LOCATION);
   const [createLocation] = useMutation(CREATE_LOCATION);
   const [updateLocation] = useMutation(UPDATE_LOCATION);
-  const [deleteLocation] = useLazyQuery(DELETE_LOCATION, {
-    onCompleted: () => {
-      refetch();
-      notification.success({
-        message: 'Success',
-        description: 'Location successfully deleted.',
-      });
-    },
-    onError: () => {
-      notification.error({
-        message: 'Error',
-        description: 'Location could not be deleted.',
-      });
-    },
-  });
-  const [locationsTree, setLocationsTree] = useState([]);
+  const [deleteLocation] = useMutation(DELETE_LOCATION);
   const [checkedLocations, setCheckedLocations] = useState([]);
-  const [locationPath, setLocationPath] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
@@ -58,7 +40,7 @@ const Network = () => {
     });
   };
 
-  const formatLocationListForTree = list => {
+  const formatLocationListForTree = (list = []) => {
     const checkedTreeLocations = [];
     list.forEach(ele => {
       checkedTreeLocations.push(ele.id);
@@ -74,7 +56,7 @@ const Network = () => {
           <Popover
             content={
               <PopoverMenuContent
-                locationData={locationData}
+                locationType={c.locationType}
                 setAddModal={setAddModal}
                 setEditModal={setEditModal}
                 setDeleteModal={setDeleteModal}
@@ -103,7 +85,16 @@ const Network = () => {
     }
     return [
       {
-        title: 'Network',
+        title: (
+          <Popover
+            content={<PopoverMenuContent locationType="NETWORK" setAddModal={setAddModal} />}
+            placement="rightTop"
+            trigger="click"
+          >
+            Network
+          </Popover>
+        ),
+        id: 0,
         value: '0',
         key: 0,
         children: unflatten(list),
@@ -112,6 +103,7 @@ const Network = () => {
   };
 
   const handleAddLocation = (name, parentId, locationType) => {
+    setAddModal(false);
     createLocation({
       variables: {
         locationType,
@@ -121,11 +113,11 @@ const Network = () => {
       },
     })
       .then(() => {
-        refetch();
         notification.success({
           message: 'Success',
           description: 'Location successfully added.',
         });
+        refetch();
       })
       .catch(() =>
         notification.error({
@@ -136,6 +128,7 @@ const Network = () => {
   };
 
   const handleEditLocation = (id, parentId, name, locationType, lastModifiedTimestamp) => {
+    setEditModal(false);
     updateLocation({
       variables: {
         customerId,
@@ -147,11 +140,11 @@ const Network = () => {
       },
     })
       .then(() => {
-        refetch();
         notification.success({
           message: 'Success',
           description: 'Location successfully edited.',
         });
+        refetch();
       })
       .catch(() =>
         notification.error({
@@ -162,42 +155,24 @@ const Network = () => {
   };
 
   const handleDeleteLocation = id => {
-    deleteLocation({
-      variables: {
-        id,
-      },
-    });
-  };
-
-  useEffect(() => {
-    if (data && data.getAllLocations) {
-      const unflattenData = formatLocationListForTree(data && data.getAllLocations);
-      setLocationsTree(unflattenData[0].children);
-    }
-  }, [data, locationData]);
-
-  const locations = [];
-  const getLocationPath = (node, allLocations) => {
-    const { id: nodeId, parentId: parentNodeId, name: locName } = node;
-    if (parentNodeId === 0) {
-      locations.unshift({ id: nodeId, parentId: parentNodeId, name: locName });
-    } else {
-      locations.unshift({ id: nodeId, parentId: parentNodeId, name: locName });
-      allLocations.forEach(item => {
-        const { name, id, parentId } = item;
-        if (parentNodeId === id && parentId === 0) {
-          locations.unshift({ id, parentId, name });
-        } else if (parentNodeId === id) {
-          getLocationPath(item, data.getAllLocations);
-        }
-      });
-    }
-    return locations;
+    setDeleteModal(false);
+    deleteLocation({ variables: { id } })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully deleted.',
+        });
+        refetch();
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be deleted.',
+        })
+      );
   };
 
   const onSelect = (selectedKeys, info) => {
-    const currentLocationPath = getLocationPath(info.node, data.getAllLocations);
-    setLocationPath(currentLocationPath);
     const { id } = info.node;
     handleGetSingleLocation(id);
   };
@@ -205,6 +180,11 @@ const Network = () => {
   const onCheck = checkedKeys => {
     setCheckedLocations(checkedKeys);
   };
+
+  const locationsTree = useMemo(
+    () => formatLocationListForTree(data && data.getAllLocations)[0].children,
+    [data]
+  );
 
   if (loading) {
     return <Loading />;
@@ -221,17 +201,16 @@ const Network = () => {
       checkedLocations={checkedLocations}
       locations={locationsTree}
       activeTab={location.pathname}
-      locationPath={locationPath}
-      onAddLocation={handleAddLocation}
-      onEditLocation={handleEditLocation}
-      onDeleteLocation={handleDeleteLocation}
-      selectedLocation={locationData}
-      deleteModal={deleteModal}
-      editModal={editModal}
+      selectedLocation={selectedLocation && selectedLocation.getLocation}
       addModal={addModal}
+      editModal={editModal}
+      deleteModal={deleteModal}
       setAddModal={setAddModal}
       setEditModal={setEditModal}
       setDeleteModal={setDeleteModal}
+      onAddLocation={handleAddLocation}
+      onEditLocation={handleEditLocation}
+      onDeleteLocation={handleDeleteLocation}
     >
       <Switch>
         <Route

@@ -6,6 +6,7 @@ export const GET_ALL_LOCATIONS = gql`
       id
       name
       parentId
+      locationType
     }
   }
 `;
@@ -70,14 +71,6 @@ export const GET_LOCATION = gql`
       name
       locationType
       lastModifiedTimestamp
-    }
-  }
-`;
-
-export const DELETE_LOCATION = gql`
-  query DeleteLocation($id: Int!) {
-    deleteLocation(id: $id) {
-      id
     }
   }
 `;
