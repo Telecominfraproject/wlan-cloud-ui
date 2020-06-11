@@ -1,13 +1,9 @@
 import React, { useMemo, useContext, useState } from 'react';
 import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
-import { Alert, notification, Popover } from 'antd';
+import { Alert, notification } from 'antd';
 import _ from 'lodash';
-import {
-  Network as NetworkPage,
-  PopoverMenuContent,
-  Loading,
-} from '@tip-wlan/wlan-cloud-ui-library';
+import { Network as NetworkPage, PopoverMenu, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import AccessPointDetails from 'containers/Network/containers/AccessPointDetails';
 import AccessPoints from 'containers/Network/containers/AccessPoints';
@@ -53,21 +49,14 @@ const Network = () => {
       let children = _.filter(array, child => child.parentId === parent.id);
       children = children.map(c => ({
         title: (
-          <Popover
-            content={
-              <PopoverMenuContent
-                locationType={c.locationType}
-                setAddModal={setAddModal}
-                setEditModal={setEditModal}
-                setDeleteModal={setDeleteModal}
-              />
-            }
-            placement="rightTop"
-            trigger="click"
-            destroyTooltipOnHide
+          <PopoverMenu
+            locationType={c.locationType}
+            setAddModal={setAddModal}
+            setEditModal={setEditModal}
+            setDeleteModal={setDeleteModal}
           >
             {c.name}
-          </Popover>
+          </PopoverMenu>
         ),
         value: `${c.id}`,
         key: c.id,
@@ -86,13 +75,9 @@ const Network = () => {
     return [
       {
         title: (
-          <Popover
-            content={<PopoverMenuContent locationType="NETWORK" setAddModal={setAddModal} />}
-            placement="rightTop"
-            trigger="click"
-          >
+          <PopoverMenu locationType="NETWORK" setAddModal={setAddModal}>
             Network
-          </Popover>
+          </PopoverMenu>
         ),
         id: 0,
         value: '0',
