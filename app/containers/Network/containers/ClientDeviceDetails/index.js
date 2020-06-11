@@ -2,16 +2,31 @@ import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import { Alert } from 'antd';
-import { Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import moment from 'moment';
+import { Loading, DeviceHistory } from '@tip-wlan/wlan-cloud-ui-library';
 
+import { METRICS_DATA } from 'constants/index';
 import UserContext from 'contexts/UserContext';
-import { GET_CLIENT_SESSION } from 'graphql/queries';
+import { GET_CLIENT_SESSION, FILTER_SERVICE_METRICS } from 'graphql/queries';
 
 const ClientDeviceDetails = () => {
+  const toTime = moment();
+  const fromTime = toTime.subtract(4, 'hours');
+
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
   const { loading, error, data } = useQuery(GET_CLIENT_SESSION, {
     variables: { customerId, macAddress: id },
+  });
+
+  const { loading: metricsLoading, error: metricsError } = useQuery(FILTER_SERVICE_METRICS, {
+    variables: {
+      customerId,
+      fromTime: fromTime.unix(),
+      toTime: toTime.unix(),
+      clientMacs: [id],
+      dataTypes: ['Client'],
+    },
   });
 
   if (loading) {
@@ -23,8 +38,6 @@ const ClientDeviceDetails = () => {
       <Alert message="Error" description="Failed to load Client Device." type="error" showIcon />
     );
   }
-
-  const { macAddress } = data.getClientSession[0];
 
   /*
   const {
@@ -62,7 +75,15 @@ const ClientDeviceDetails = () => {
 
   */
 
-  return <h1>Client Device Details: {macAddress}</h1>;
+  return (
+    <>
+      <h1>Client Device Details: {data.getClientSession[0].macAddress}</h1>
+      {metricsError && (
+        <Alert message="Error" description="Failed to load History˝." type="error" showIcon />
+      )}
+      <DeviceHistory loading={metricsLoading} historyDate={toTime} data={METRICS_DATA} />
+    </>
+  );
 };
 
 export default ClientDeviceDetails;
