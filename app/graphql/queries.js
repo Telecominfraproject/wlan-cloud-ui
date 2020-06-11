@@ -6,6 +6,7 @@ export const GET_ALL_LOCATIONS = gql`
       id
       name
       parentId
+      locationType
     }
   }
 `;
@@ -58,6 +59,59 @@ export const FILTER_EQUIPMENT = gql`
         lastPage
         cursor
       }
+    }
+  }
+`;
+
+export const GET_LOCATION = gql`
+  query GetLocation($id: Int!) {
+    getLocation(id: $id) {
+      id
+      parentId
+      name
+      locationType
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const FILTER_CLIENT_SESSIONS = gql`
+  query FilterClientSessions($customerId: Int!, $cursor: String) {
+    getAllClientSessions(customerId: $customerId, cursor: $cursor) {
+      items {
+        id
+        macAddress
+        ipAddress
+        hostname
+        ssid
+        radioType
+        signal
+        equipment {
+          name
+        }
+      }
+      context {
+        lastPage
+        cursor
+      }
+    }
+  }
+`;
+
+export const GET_CLIENT_SESSION = gql`
+  query GetClientSession($customerId: Int!, $macAddress: String!) {
+    getClientSession(customerId: $customerId, macAddress: $macAddress) {
+      id
+      macAddress
+      ipAddress
+      hostname
+      ssid
+      radioType
+      signal
+      equipment {
+        name
+      }
+      details
     }
   }
 `;
