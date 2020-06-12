@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 import { Alert, Spin } from 'antd';
+import { OS_STATS_DATA } from 'constants/index';
+
 import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 const GET_EQUIPMENT = gql`
@@ -57,7 +59,7 @@ const AccessPointDetails = () => {
 
   return (
     <div>
-      <AccessPointDetailsPage data={data.getEquipment} />
+      <AccessPointDetailsPage data={data.getEquipment} osData={OS_STATS_DATA} />
     </div>
   );
 };
