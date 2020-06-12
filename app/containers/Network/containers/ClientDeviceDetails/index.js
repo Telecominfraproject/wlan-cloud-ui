@@ -44,11 +44,12 @@ const ClientDeviceDetails = () => {
   equipment.name = Access Point
   radioType = Radio Band
   signal = Signal Strength
-  rxMbps = Rx Rate
-  txMbps = Tx Rate
+  rxRateKbps = Rx Rate
+  txRateKbps = Tx Rate
 
-  rxRateKbps = Rx Throughput
-  txRateKbps = Tx Throughput
+  Data Transfered = rxBytes + txBytes
+  rxMbps = Rx Throughput
+  txMbps = Tx Throughputhttps://www.lowes.ca/product/bathtub-shower-door-glass/jade-bath-60-in-sliding-bathroom-door-330585448
   totalRxPackets = Total Rx Packets
   totalTxPackets = Total Tx Packets
   
