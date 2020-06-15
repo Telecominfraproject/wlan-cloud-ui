@@ -1,4 +1,7 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin');
+/* eslint-disable import/no-extraneous-dependencies */
+const webpack = require('webpack');
+
 const commonPaths = require('./paths');
 
 module.exports = {
@@ -42,6 +45,9 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: commonPaths.templatePath,
       favicon: './app/images/favicon.ico',
+    }),
+    new webpack.DefinePlugin({
+      'process.env.GRAPHQL_URL': JSON.stringify(process.env.GRAPHQL_URL),
     }),
   ],
 };
