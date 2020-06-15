@@ -36,6 +36,9 @@ const GET_EQUIPMENT = gql`
         clientDetails {
           detailsJSON
         }
+        osPerformance {
+          detailsJSON
+        }
       }
     }
   }
@@ -43,7 +46,7 @@ const GET_EQUIPMENT = gql`
 
 const AccessPointDetails = () => {
   const { id } = useParams();
-  const { loading, error, data } = useQuery(GET_EQUIPMENT, {
+  const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
     variables: { id: parseInt(id, 10) },
   });
 
@@ -57,10 +60,16 @@ const AccessPointDetails = () => {
     );
   }
 
+  const refetchData = () => {
+    refetch();
+  };
+
   return (
-    <div>
-      <AccessPointDetailsPage data={data.getEquipment} osData={OS_STATS_DATA} />
-    </div>
+    <AccessPointDetailsPage
+      data={data.getEquipment}
+      osData={OS_STATS_DATA}
+      handleRefetch={refetchData}
+    />
   );
 };
 
