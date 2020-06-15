@@ -1,11 +1,12 @@
 import React from 'react';
 import { BulkEditAccessPoints } from '@tip-wlan/wlan-cloud-ui-library';
 import { ACCESS_POINTS_CHANNEL_TABLE_DATA } from 'constants/index.js';
+import styles from './index.module.scss';
 
 const renderTableCell = tabCell => {
   if (Array.isArray(tabCell)) {
     return (
-      <div>
+      <div className={styles.tabColumn}>
         {tabCell.map(i => (
           <span>{i}</span>
         ))}
@@ -17,21 +18,39 @@ const renderTableCell = tabCell => {
 const accessPointsChannelTableColumns = [
   { title: 'NAME', dataIndex: 'name', key: 'name', render: renderTableCell },
   {
-    title: 'ACTIVE CHANNEL',
-    dataIndex: 'activeChannel',
-    key: 'activeChannel',
+    title: 'CHANNEL',
+    dataIndex: 'channel',
+    key: 'channel',
     render: renderTableCell,
   },
   {
-    title: 'BACKUP CHANNEL',
-    dataIndex: 'backupChannel',
-    key: 'backupChannel',
+    title: 'CELL SIZE',
+    dataIndex: 'cellSize',
+    key: 'cellSize',
     render: renderTableCell,
   },
   {
-    title: 'CHANNEL BANDWIDTH',
-    dataIndex: 'channelBandwidth',
-    key: 'channelBandwidth',
+    title: 'PROB RESPONSE THRESHOLD',
+    dataIndex: 'probResponseThreshold',
+    key: 'probResponseThreshold',
+    render: renderTableCell,
+  },
+  {
+    title: 'CLIENT DISCONNECT THRESHOLD',
+    dataIndex: 'clientDisconnectThreshold',
+    key: 'clientDisconnectThreshold',
+    render: renderTableCell,
+  },
+  {
+    title: 'SNR (% DROP)',
+    dataIndex: 'snr',
+    key: 'snr',
+    render: renderTableCell,
+  },
+  {
+    title: 'MIN LOAD',
+    dataIndex: 'minLoad',
+    key: 'minLoad',
     render: renderTableCell,
   },
 ];
