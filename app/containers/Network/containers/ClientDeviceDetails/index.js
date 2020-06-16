@@ -8,7 +8,6 @@ import {
   ClientDeviceDetails as ClientDevicesDetailsPage,
 } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { METRICS_DATA } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_CLIENT_SESSION, FILTER_SERVICE_METRICS } from 'graphql/queries';
 
@@ -21,7 +20,12 @@ const ClientDeviceDetails = () => {
   const { loading, error, data, refetch } = useQuery(GET_CLIENT_SESSION, {
     variables: { customerId, macAddress: id },
   });
-  const { loading: metricsLoading, error: metricsError } = useQuery(FILTER_SERVICE_METRICS, {
+  const {
+    loading: metricsLoading,
+    error: metricsError,
+    data: metricsData,
+    refetch: metricsRefetch,
+  } = useQuery(FILTER_SERVICE_METRICS, {
     variables: {
       customerId,
       fromTime: fromTime.unix(),
@@ -32,6 +36,7 @@ const ClientDeviceDetails = () => {
   });
 
   const handleOnRefresh = () => {
+    metricsRefetch();
     refetch()
       .then(() => {
         notification.success({
@@ -63,8 +68,10 @@ const ClientDeviceDetails = () => {
       onRefresh={handleOnRefresh}
       metricsLoading={metricsLoading}
       metricsError={metricsError}
+      metricsData={
+        metricsData && metricsData.filterServiceMetrics && metricsData.filterServiceMetrics.items
+      }
       historyDate={toTime}
-      metricsData={METRICS_DATA}
     />
   );
 };
