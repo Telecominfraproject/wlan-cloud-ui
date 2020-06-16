@@ -76,8 +76,8 @@ export const GET_LOCATION = gql`
 `;
 
 export const FILTER_CLIENT_SESSIONS = gql`
-  query FilterClientSessions($customerId: Int!, $cursor: String) {
-    getAllClientSessions(customerId: $customerId, cursor: $cursor) {
+  query FilterClientSessions($customerId: Int!, $locationIds: [Int], $cursor: String) {
+    filterClientSessions(customerId: $customerId, locationIds: $locationIds, cursor: $cursor) {
       items {
         id
         macAddress
