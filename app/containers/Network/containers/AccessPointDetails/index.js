@@ -40,6 +40,14 @@ const GET_EQUIPMENT = gql`
           detailsJSON
         }
       }
+      model
+      alarmsCount
+      alarms {
+        severity
+        alarmCode
+        details
+        createdTimestamp
+      }
     }
   }
 `;
