@@ -32,7 +32,7 @@ export const FILTER_EQUIPMENT = gql`
         inventoryId
         channel
         model
-        alarms
+        alarmsCount
         profile {
           name
         }
