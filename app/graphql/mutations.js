@@ -55,3 +55,11 @@ export const DELETE_LOCATION = gql`
     }
   }
 `;
+
+export const UPDATE_EQUIPMENT_BULK = gql`
+  mutation UpdateEquipmentBulk($items: [EquipmentRrmUpdate]) {
+    updateEquipmentBulk(items: $items) {
+      success
+    }
+  }
+`;
