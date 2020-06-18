@@ -14,6 +14,7 @@ const GET_ALL_PROFILES = gql`
         id
         name
         profileType
+        details
       }
       context {
         cursor

@@ -12,6 +12,7 @@ const GET_PROFILE = gql`
       id
       name
       profileType
+      details
     }
   }
 `;
@@ -129,6 +130,7 @@ const ProfileDetails = () => {
     <ProfileDetailsPage
       name={data.getProfile.name}
       profileType={data.getProfile.profileType}
+      details={data.getProfile.details}
       onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
     />
