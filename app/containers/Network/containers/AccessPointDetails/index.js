@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 import { Alert, Spin } from 'antd';
-import { OS_STATS_DATA } from 'constants/index';
-
 import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import { OS_STATS_DATA } from 'constants/index';
 
 const GET_EQUIPMENT = gql`
   query GetEquipment($id: Int!) {
@@ -64,7 +63,12 @@ const AccessPointDetails = () => {
 
   if (error) {
     return (
-      <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
+      <Alert
+        message="Error"
+        description="Failed to load Access Point data."
+        type="error"
+        showIcon
+      />
     );
   }
 
@@ -76,7 +80,7 @@ const AccessPointDetails = () => {
     <AccessPointDetailsPage
       data={data.getEquipment}
       osData={OS_STATS_DATA}
-      handleRefetch={refetchData}
+      handleRefresh={refetchData}
     />
   );
 };
