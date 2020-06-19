@@ -174,6 +174,7 @@ const BulkEditAPs = () => {
       const minLoadDetails = Object.values(getRadioDetails(details, 'minLoad'));
       return {
         key,
+        id: key,
         name,
         channel,
         cellSize: cellSizeDetails,
@@ -189,66 +190,76 @@ const BulkEditAPs = () => {
   const editedRowsArr = [];
   const handleSaveChanges = updatedRows => {
     if (updatedRows.length > 0) {
-      updatedRows.map(item => {
-        const tempObj = {
-          equipmentId: 0,
-          perRadioDetails: {
-            is5GHzU: {
-              channelNumber: item.channel[0],
-              rxCellSizeDb: {
-                auto: true,
-                value: item.cellSize[0],
+      updatedRows.map(
+        ({
+          id: equipmentId,
+          channel,
+          cellSize,
+          probeResponseThreshold,
+          clientDisconnectThreshold,
+          snrDrop,
+          minLoad,
+        }) => {
+          const tempObj = {
+            equipmentId,
+            perRadioDetails: {
+              is5GHzU: {
+                channelNumber: channel[0],
+                rxCellSizeDb: {
+                  auto: true,
+                  value: cellSize[0],
+                },
+                probeResponseThresholdDb: {
+                  auto: true,
+                  value: probeResponseThreshold[0],
+                },
+                clientDisconnectThresholdDb: {
+                  auto: true,
+                  value: clientDisconnectThreshold[0],
+                },
+                dropInSnrPercentage: snrDrop[0],
+                minLoadFactor: minLoad[0],
               },
-              probeResponseThresholdDb: {
-                auto: true,
-                value: item.probeResponseThreshold[0],
+              is5GHzL: {
+                channelNumber: channel[2],
+                rxCellSizeDb: {
+                  auto: true,
+                  value: cellSize[1],
+                },
+                probeResponseThresholdDb: {
+                  auto: true,
+                  value: probeResponseThreshold[1],
+                },
+                clientDisconnectThresholdDb: {
+                  auto: true,
+                  value: clientDisconnectThreshold[1],
+                },
+                dropInSnrPercentage: snrDrop[1],
+                minLoadFactor: minLoad[1],
               },
-              clientDisconnectThresholdDb: {
-                auto: true,
-                value: item.clientDisconnectThreshold[0],
+              is2dot4GHz: {
+                channelNumber: channel[1],
+                rxCellSizeDb: {
+                  auto: true,
+                  value: cellSize[2],
+                },
+                probeResponseThresholdDb: {
+                  auto: true,
+                  value: probeResponseThreshold[2],
+                },
+                clientDisconnectThresholdDb: {
+                  auto: true,
+                  value: clientDisconnectThreshold[2],
+                },
+                dropInSnrPercentage: snrDrop[2],
+                minLoadFactor: minLoad[2],
               },
-              dropInSnrPercentage: item.snrDrop[0],
-              minLoadFactor: item.minLoad[0],
             },
-            is5GHzL: {
-              channelNumber: item.channel[1],
-              rxCellSizeDb: {
-                auto: true,
-                value: item.cellSize[1],
-              },
-              probeResponseThresholdDb: {
-                auto: true,
-                value: item.probeResponseThreshold[1],
-              },
-              clientDisconnectThresholdDb: {
-                auto: true,
-                value: item.clientDisconnectThreshold[1],
-              },
-              dropInSnrPercentage: item.snrDrop[1],
-              minLoadFactor: item.minLoad[1],
-            },
-            is2dot4GHz: {
-              channelNumber: item.channel[2],
-              rxCellSizeDb: {
-                auto: true,
-                value: item.cellSize[2],
-              },
-              probeResponseThresholdDb: {
-                auto: true,
-                value: item.probeResponseThreshold[2],
-              },
-              clientDisconnectThresholdDb: {
-                auto: true,
-                value: item.clientDisconnectThreshold[2],
-              },
-              dropInSnrPercentage: item.snrDrop[2],
-              minLoadFactor: item.minLoad[2],
-            },
-          },
-        };
-        editedRowsArr.push(tempObj);
-        return tempObj;
-      });
+          };
+          editedRowsArr.push(tempObj);
+          return tempObj;
+        }
+      );
       updateEquipmentBulk({
         variables: { items: editedRowsArr },
       })
@@ -299,6 +310,7 @@ const BulkEditAPs = () => {
       <Alert message="Error" description="Failed to load equipments data." type="error" showIcon />
     );
   }
+
   return (
     <BulkEditAccessPoints
       tableColumns={accessPointsChannelTableColumns}

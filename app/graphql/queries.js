@@ -31,6 +31,8 @@ export const FILTER_EQUIPMENT = gql`
         profileId
         inventoryId
         channel
+        model
+        alarmsCount
         profile {
           name
         }
@@ -135,6 +137,38 @@ export const GET_CLIENT_SESSION = gql`
         name
       }
       details
+    }
+  }
+`;
+
+export const FILTER_SERVICE_METRICS = gql`
+  query FilterServiceMetrics(
+    $customerId: Int!
+    $cursor: String
+    $fromTime: Int!
+    $toTime: Int!
+    $clientMacs: [String]
+    $dataTypes: [String]
+  ) {
+    filterServiceMetrics(
+      customerId: $customerId
+      cursor: $cursor
+      fromTime: $fromTime
+      toTime: $toTime
+      clientMacs: $clientMacs
+      dataTypes: $dataTypes
+    ) {
+      items {
+        dataType
+        createdTimestamp
+        rssi
+        rxBytes
+        txBytes
+      }
+      context {
+        lastPage
+        cursor
+      }
     }
   }
 `;

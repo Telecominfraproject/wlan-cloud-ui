@@ -30,7 +30,7 @@ const accessPointsTableColumns = [
   },
   {
     title: 'ALARMS',
-    dataIndex: 'alarms',
+    dataIndex: 'alarmsCount',
     render: renderTableCell,
   },
   {
