@@ -49,6 +49,11 @@ const accessPointsTableColumns = [
     render: renderTableCell,
   },
   {
+    title: 'MANUFACTURER',
+    dataIndex: ['status', 'protocol', 'details', 'manufacturer'],
+    render: renderTableCell,
+  },
+  {
     title: 'ASSET ID',
     dataIndex: 'inventoryId',
     render: renderTableCell,
@@ -80,7 +85,7 @@ const accessPointsTableColumns = [
   },
   {
     title: 'DEVICES',
-    dataIndex: 'devices',
+    dataIndex: ['status', 'clientDetails', 'details', 'numClientsPerRadio'],
     render: renderTableCell,
   },
 ];

@@ -41,6 +41,7 @@ export const FILTER_EQUIPMENT = gql`
             details {
               reportedIpV4Addr
               reportedMacAddr
+              manufacturer
             }
           }
           osPerformance {
@@ -53,6 +54,11 @@ export const FILTER_EQUIPMENT = gql`
               reportedIpV4Addr
               capacityDetails
               noiseFloorDetails
+            }
+          }
+          clientDetails {
+            details {
+              numClientsPerRadio
             }
           }
         }
@@ -88,6 +94,7 @@ export const FILTER_CLIENT_SESSIONS = gql`
         ssid
         radioType
         signal
+        manufacturer
         equipment {
           name
         }
@@ -110,6 +117,7 @@ export const GET_CLIENT_SESSION = gql`
       ssid
       radioType
       signal
+      manufacturer
       equipment {
         name
       }
