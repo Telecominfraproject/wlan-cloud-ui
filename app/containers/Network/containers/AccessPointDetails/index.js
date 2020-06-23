@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
@@ -51,7 +52,7 @@ const GET_EQUIPMENT = gql`
   }
 `;
 
-const AccessPointDetails = () => {
+const AccessPointDetails = ({ locations }) => {
   const { id } = useParams();
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
     variables: { id: parseInt(id, 10) },
@@ -81,8 +82,12 @@ const AccessPointDetails = () => {
       data={data.getEquipment}
       osData={OS_STATS_DATA}
       handleRefresh={refetchData}
+      locations={locations}
     />
   );
 };
 
+AccessPointDetails.propTypes = {
+  locations: PropTypes.instanceOf(Array).isRequired,
+};
 export default AccessPointDetails;
