@@ -67,7 +67,6 @@ const Network = () => {
 
   const handleSetBulkEditApIds = id => {
     getChildNodes([id]);
-    // setSelectedLocationIds([id]);
   };
 
   const formatLocationListForTree = (list = []) => {
