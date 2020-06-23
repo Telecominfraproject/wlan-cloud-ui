@@ -16,7 +16,7 @@ const clientDevicesTableColumns = [
     title: 'MAC',
     dataIndex: 'macAddress',
   },
-  { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr' },
+  { title: 'MANUFACTURER', dataIndex: 'manufacturer' },
   { title: 'IP', dataIndex: 'ipAddress' },
   { title: 'HOST NAME', dataIndex: 'hostname' },
   { title: 'ACCESS POINT', dataIndex: ['equipment', 'name'] },
