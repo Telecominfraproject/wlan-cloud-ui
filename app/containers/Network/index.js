@@ -28,6 +28,7 @@ const Network = () => {
   const [updateLocation] = useMutation(UPDATE_LOCATION);
   const [deleteLocation] = useMutation(DELETE_LOCATION);
   const [checkedLocations, setCheckedLocations] = useState([]);
+  const [selectedLocationIds, setSelectedLocationIds] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
@@ -160,9 +161,27 @@ const Network = () => {
       );
   };
 
+  const locationIdsArray = [];
+  const getChildNodes = locations => {
+    const childArr = [];
+    locations.forEach(a => {
+      locationIdsArray.push(a);
+
+      data.getAllLocations.forEach(b => {
+        if (b.parentId === a) childArr.push(b.id);
+      });
+    });
+    if (childArr.length > 0) {
+      getChildNodes(childArr);
+    } else {
+      setSelectedLocationIds(locationIdsArray);
+    }
+  };
+
   const onSelect = (selectedKeys, info) => {
     const { id } = info.node;
     handleGetSingleLocation(id);
+    getChildNodes(selectedKeys);
   };
 
   const onCheck = checkedKeys => {
@@ -181,6 +200,7 @@ const Network = () => {
   if (error) {
     return <Alert message="Error" description="Failed to load locations." type="error" showIcon />;
   }
+
   return (
     <NetworkPage
       onSelect={onSelect}
@@ -203,7 +223,9 @@ const Network = () => {
         <Route
           exact
           path={`${path}/access-points/bulk-edit/:id`}
-          render={props => <BulkEditAccessPoints {...props} />}
+          render={props => (
+            <BulkEditAccessPoints selectedLocationIds={selectedLocationIds} {...props} />
+          )}
         />
         <Route
           exact

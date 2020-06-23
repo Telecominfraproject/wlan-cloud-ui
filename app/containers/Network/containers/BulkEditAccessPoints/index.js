@@ -1,10 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import { Alert, notification } from 'antd';
-import { useQuery, useLazyQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { BulkEditAccessPoints, Loading } from '@tip-wlan/wlan-cloud-ui-library';
-import { IS_2DOT4GHZ, IS_5GHZL, IS_5GHZU } from 'constants/index.js';
-import { GET_ALL_LOCATIONS, FILTER_EQUIPMENT_BULK_EDIT_APS } from 'graphql/queries';
+import { FILTER_EQUIPMENT_BULK_EDIT_APS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_BULK } from 'graphql/mutations';
 
 import UserContext from 'contexts/UserContext';
@@ -68,127 +67,147 @@ const accessPointsChannelTableColumns = [
   },
 ];
 
-const BulkEditAPs = () => {
+const BulkEditAPs = ({ selectedLocationIds }) => {
   const { customerId } = useContext(UserContext);
-  const [selectedLocationIds, setSelectedLocationIds] = useState([]);
-  const { id } = useParams();
-  const { data } = useQuery(GET_ALL_LOCATIONS, {
-    variables: { customerId },
+  const {
+    loading: filterEquipmentLoading,
+    error: filterEquipmentError,
+    refetch,
+    data: equipData,
+    fetchMore,
+  } = useQuery(FILTER_EQUIPMENT_BULK_EDIT_APS, {
+    variables: { customerId, locationIds: selectedLocationIds, equipmentType: 'AP' },
   });
-  const [
-    filterEquipment,
-    {
-      loading: filterEquipmentLoading,
-      error: filterEquipmentError,
-      refetch,
-      data: equipData,
-      fetchMore,
-    },
-  ] = useLazyQuery(FILTER_EQUIPMENT_BULK_EDIT_APS, {
-    variables: { customerId },
-  });
+
   const [updateEquipmentBulk] = useMutation(UPDATE_EQUIPMENT_BULK);
 
-  const fetchFilterEquipmentBulkEditAps = locationIds => {
-    filterEquipment({
-      variables: {
-        customerId,
-        locationIds,
-        equipmentType: 'AP',
-      },
-    });
-  };
-
-  const locationIdsArray = [];
-  const getChildNodes = locations => {
-    const childArr = [];
-    locations.forEach(a => {
-      locationIdsArray.push(a);
-      data.getAllLocations.forEach(b => {
-        if (b.parentId === a) childArr.push(b.id);
-      });
-    });
-    if (childArr.length > 0) {
-      getChildNodes(childArr);
-    } else {
-      setSelectedLocationIds(locationIdsArray);
-    }
-  };
-
-  useEffect(() => {
-    const locationId = parseInt(id, 10);
-    getChildNodes([locationId]);
-  }, [data, id]);
-
-  useEffect(() => {
-    fetchFilterEquipmentBulkEditAps(selectedLocationIds);
-  }, [selectedLocationIds]);
-
-  const getRadioDetailsByType = (radioDetails, type, radioType) => {
+  const getRadioDetails = (radioDetails, type) => {
     if (type === 'cellSize') {
-      const cellSize = radioDetails.radioMap[radioType].rxCellSizeDb.value;
-      return cellSize;
+      const cellSizeValues = [];
+      Object.keys(radioDetails.radioMap).map(i => {
+        return cellSizeValues.push(radioDetails.radioMap[i].rxCellSizeDb.value);
+      });
+      return cellSizeValues;
     }
     if (type === 'probeResponseThreshold') {
-      const probeResponseThreshold =
-        radioDetails.radioMap[radioType].probeResponseThresholdDb.value;
-      return probeResponseThreshold;
+      const probeResponseThresholdValues = [];
+      Object.keys(radioDetails.radioMap).map(i => {
+        return probeResponseThresholdValues.push(
+          radioDetails.radioMap[i].probeResponseThresholdDb.value
+        );
+      });
+      return probeResponseThresholdValues;
     }
     if (type === 'clientDisconnectThreshold') {
-      const clientDisconnectThreshold =
-        radioDetails.radioMap[radioType].clientDisconnectThresholdDb.value;
-      return clientDisconnectThreshold;
+      const clientDisconnectThresholdValues = [];
+      Object.keys(radioDetails.radioMap).map(i => {
+        return clientDisconnectThresholdValues.push(
+          radioDetails.radioMap[i].clientDisconnectThresholdDb.value
+        );
+      });
+      return clientDisconnectThresholdValues;
     }
     if (type === 'snrDrop') {
-      const snrDrop = radioDetails.advancedRadioMap[radioType].bestApSettings.dropInSnrPercentage;
-      return snrDrop;
+      const snrDropValues = [];
+      Object.keys(radioDetails.advancedRadioMap).map(i => {
+        return snrDropValues.push(
+          radioDetails.advancedRadioMap[i].bestApSettings.dropInSnrPercentage
+        );
+      });
+      return snrDropValues;
     }
-    // if (type === 'minLoad') {
-    const minLoad = radioDetails.advancedRadioMap[radioType].bestApSettings.minLoadFactor;
-    return minLoad;
-    // }
-  };
 
-  const getRadioDetails = (radioDetails, type) => {
-    const is5GHzU = getRadioDetailsByType(radioDetails, type, IS_5GHZU);
-    const is5GHzL = getRadioDetailsByType(radioDetails, type, IS_5GHZL);
-    const is2dot4GHz = getRadioDetailsByType(radioDetails, type, IS_2DOT4GHZ);
-
-    return {
-      is5GHzU,
-      is5GHzL,
-      is2dot4GHz,
-    };
+    const minLoadValue = [];
+    Object.keys(radioDetails.advancedRadioMap).map(i => {
+      return minLoadValue.push(radioDetails.advancedRadioMap[i].bestApSettings.minLoadFactor);
+    });
+    return minLoadValue;
   };
 
   const setAccessPointsBulkEditTableData = (dataSource = []) => {
     const tableData = dataSource.items.map(({ id: key, name, channel, details }) => {
-      const cellSizeDetails = Object.values(getRadioDetails(details, 'cellSize'));
-      const probeResponseThresholdDetails = Object.values(
-        getRadioDetails(details, 'probeResponseThreshold')
-      );
-      const clientDisconnectThresholdDetails = Object.values(
-        getRadioDetails(details, 'clientDisconnectThreshold')
-      );
-      const snrDropDetails = Object.values(getRadioDetails(details, 'snrDrop'));
-      const minLoadDetails = Object.values(getRadioDetails(details, 'minLoad'));
       return {
         key,
         id: key,
         name,
         channel,
-        cellSize: cellSizeDetails,
-        probeResponseThreshold: probeResponseThresholdDetails,
-        clientDisconnectThreshold: clientDisconnectThresholdDetails,
-        snrDrop: snrDropDetails,
-        minLoad: minLoadDetails,
+        cellSize: getRadioDetails(details, 'cellSize'),
+        probeResponseThreshold: getRadioDetails(details, 'probeResponseThreshold'),
+        clientDisconnectThreshold: getRadioDetails(details, 'clientDisconnectThreshold'),
+        snrDrop: getRadioDetails(details, 'snrDrop'),
+        minLoad: getRadioDetails(details, 'minLoad'),
       };
     });
     return tableData;
   };
 
-  const editedRowsArr = [];
+  const setUpdatedBulkEditTableData = (
+    equipmentId,
+    channel,
+    cellSize,
+    probeResponseThreshold,
+    clientDisconnectThreshold,
+    snrDrop,
+    minLoad,
+    dataSource = []
+  ) => {
+    const updatedItems = [];
+    let dropInSnrPercentage;
+    let minLoadFactor;
+    dataSource.items.forEach(({ id: itemId, details }) => {
+      if (equipmentId === itemId) {
+        Object.keys(details.radioMap).forEach((i, dataIndex) => {
+          const frequencies = {};
+          dropInSnrPercentage = snrDrop[dataIndex];
+          minLoadFactor = minLoad[dataIndex];
+
+          frequencies[`${i}`] = {
+            channelNumber: channel[dataIndex],
+            rxCellSizeDb: {
+              auto: true,
+              value: cellSize[dataIndex],
+            },
+            probeResponseThresholdDb: {
+              auto: true,
+              value: probeResponseThreshold[dataIndex],
+            },
+            clientDisconnectThresholdDb: {
+              auto: true,
+              value: clientDisconnectThreshold[dataIndex],
+            },
+            dropInSnrPercentage,
+            minLoadFactor,
+          };
+          updatedItems.push(frequencies);
+        });
+      }
+    });
+    return updatedItems;
+  };
+
+  const updateEquipments = editedRowsArr => {
+    updateEquipmentBulk({
+      variables: { items: editedRowsArr },
+    })
+      .then(resp => {
+        if (resp.data.updateEquipmentBulk.success) {
+          notification.success({
+            message: 'Success',
+            description: 'Equipment(s) successfully edited.',
+          });
+          refetch();
+        }
+      })
+      .catch(() => {
+        notification.error({
+          message: 'Error',
+          description: 'Equipment(s) could not be edited.',
+        });
+      });
+  };
+
   const handleSaveChanges = updatedRows => {
+    const editedRowsArr = [];
     if (updatedRows.length > 0) {
       updatedRows.map(
         ({
@@ -200,84 +219,30 @@ const BulkEditAPs = () => {
           snrDrop,
           minLoad,
         }) => {
+          const updatedEuips = setUpdatedBulkEditTableData(
+            equipmentId,
+            channel,
+            cellSize,
+            probeResponseThreshold,
+            clientDisconnectThreshold,
+            snrDrop,
+            minLoad,
+            equipData && equipData.filterEquipment
+          );
           const tempObj = {
             equipmentId,
-            perRadioDetails: {
-              is5GHzU: {
-                channelNumber: channel[0],
-                rxCellSizeDb: {
-                  auto: true,
-                  value: cellSize[0],
-                },
-                probeResponseThresholdDb: {
-                  auto: true,
-                  value: probeResponseThreshold[0],
-                },
-                clientDisconnectThresholdDb: {
-                  auto: true,
-                  value: clientDisconnectThreshold[0],
-                },
-                dropInSnrPercentage: snrDrop[0],
-                minLoadFactor: minLoad[0],
-              },
-              is5GHzL: {
-                channelNumber: channel[2],
-                rxCellSizeDb: {
-                  auto: true,
-                  value: cellSize[1],
-                },
-                probeResponseThresholdDb: {
-                  auto: true,
-                  value: probeResponseThreshold[1],
-                },
-                clientDisconnectThresholdDb: {
-                  auto: true,
-                  value: clientDisconnectThreshold[1],
-                },
-                dropInSnrPercentage: snrDrop[1],
-                minLoadFactor: minLoad[1],
-              },
-              is2dot4GHz: {
-                channelNumber: channel[1],
-                rxCellSizeDb: {
-                  auto: true,
-                  value: cellSize[2],
-                },
-                probeResponseThresholdDb: {
-                  auto: true,
-                  value: probeResponseThreshold[2],
-                },
-                clientDisconnectThresholdDb: {
-                  auto: true,
-                  value: clientDisconnectThreshold[2],
-                },
-                dropInSnrPercentage: snrDrop[2],
-                minLoadFactor: minLoad[2],
-              },
-            },
+            perRadioDetails: {},
           };
-          editedRowsArr.push(tempObj);
-          return tempObj;
+          updatedEuips.map(item => {
+            Object.keys(item).forEach(i => {
+              tempObj.perRadioDetails[i] = item[i];
+            });
+            return tempObj;
+          });
+          return editedRowsArr.push(tempObj);
         }
       );
-      updateEquipmentBulk({
-        variables: { items: editedRowsArr },
-      })
-        .then(resp => {
-          if (resp.data.updateEquipmentBulk.success) {
-            notification.success({
-              message: 'Success',
-              description: 'Equipment(s) successfully edited.',
-            });
-            refetch();
-          }
-        })
-        .catch(() => {
-          notification.error({
-            message: 'Error',
-            description: 'Equipment(s) could not be edited.',
-          });
-        });
+      updateEquipments(editedRowsArr);
     }
   };
 
@@ -327,4 +292,9 @@ const BulkEditAPs = () => {
     />
   );
 };
+
+BulkEditAPs.propTypes = {
+  selectedLocationIds: PropTypes.instanceOf(Array).isRequired,
+};
+
 export default BulkEditAPs;
