@@ -39,6 +39,27 @@ const Network = () => {
     });
   };
 
+  let locationIdsArray = [];
+  const getChildNodes = locations => {
+    const childArr = [];
+    locations.forEach(a => {
+      locationIdsArray.push(a);
+      data.getAllLocations.forEach(b => {
+        if (b.parentId === a) childArr.push(b.id);
+      });
+    });
+    if (childArr.length > 0) {
+      getChildNodes(childArr);
+    } else {
+      setSelectedLocationIds(locationIdsArray);
+      locationIdsArray = [];
+    }
+  };
+
+  const handleSetBulkEditApIds = id => {
+    getChildNodes([id]);
+  };
+
   const formatLocationListForTree = (list = []) => {
     const checkedTreeLocations = [];
     list.forEach(ele => {
@@ -58,6 +79,7 @@ const Network = () => {
             setAddModal={setAddModal}
             setEditModal={setEditModal}
             setDeleteModal={setDeleteModal}
+            setBulkEditApIds={handleSetBulkEditApIds}
           >
             {c.name}
           </PopoverMenu>
@@ -161,26 +183,9 @@ const Network = () => {
       );
   };
 
-  const locationIdsArray = [];
-  const getChildNodes = locations => {
-    const childArr = [];
-    locations.forEach(a => {
-      locationIdsArray.push(a);
-      data.getAllLocations.forEach(b => {
-        if (b.parentId === a) childArr.push(b.id);
-      });
-    });
-    if (childArr.length > 0) {
-      getChildNodes(childArr);
-    } else {
-      setSelectedLocationIds(locationIdsArray);
-    }
-  };
-
   const onSelect = (selectedKeys, info) => {
     const { id } = info.node;
     handleGetSingleLocation(id);
-    getChildNodes(selectedKeys);
   };
 
   const onCheck = checkedKeys => {
