@@ -1,4 +1,4 @@
-import React, { useMemo, useContext, useState } from 'react';
+import React, { useMemo, useContext, useState, useEffect } from 'react';
 import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
@@ -29,6 +29,7 @@ const Network = () => {
   const [deleteLocation] = useMutation(DELETE_LOCATION);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [selectedLocationIds, setSelectedLocationIds] = useState([]);
+  const [bulkEditInitialLocationIds, setBulkEditInitialLocationIds] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
@@ -39,25 +40,34 @@ const Network = () => {
     });
   };
 
-  let locationIdsArray = [];
+  useEffect(() => {
+    if (!location.pathname.includes('bulk-edit')) {
+      setBulkEditInitialLocationIds([]);
+    }
+  }, [location]);
+
+  let locationIds = [];
   const getChildNodes = locations => {
-    const childArr = [];
+    const childNodes = [];
     locations.forEach(a => {
-      locationIdsArray.push(a);
+      locationIds.push(a);
       data.getAllLocations.forEach(b => {
-        if (b.parentId === a) childArr.push(b.id);
+        if (b.parentId === a) childNodes.push(b.id);
       });
     });
-    if (childArr.length > 0) {
-      getChildNodes(childArr);
+    if (childNodes.length > 0) {
+      getChildNodes(childNodes);
     } else {
-      setSelectedLocationIds(locationIdsArray);
-      locationIdsArray = [];
+      setSelectedLocationIds(locationIds);
+      setCheckedLocations(locationIds);
+      setBulkEditInitialLocationIds(locationIds);
+      locationIds = [];
     }
   };
 
   const handleSetBulkEditApIds = id => {
     getChildNodes([id]);
+    // setSelectedLocationIds([id]);
   };
 
   const formatLocationListForTree = (list = []) => {
@@ -188,8 +198,20 @@ const Network = () => {
     handleGetSingleLocation(id);
   };
 
-  const onCheck = checkedKeys => {
+  const findCommonElements = (arr1, arr2) => {
+    return arr1.some(item => arr2.includes(item));
+  };
+
+  const onCheck = (checkedKeys, info) => {
+    const { id } = info.node;
     setCheckedLocations(checkedKeys);
+    if (bulkEditInitialLocationIds.length > 0) {
+      if (findCommonElements(bulkEditInitialLocationIds, [id])) {
+        setSelectedLocationIds(checkedKeys);
+      } else {
+        setCheckedLocations(selectedLocationIds);
+      }
+    }
   };
 
   const locationsTree = useMemo(
