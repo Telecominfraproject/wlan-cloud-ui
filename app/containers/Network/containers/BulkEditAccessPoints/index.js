@@ -1,8 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, notification } from 'antd';
+import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { BulkEditAccessPoints, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+
 import { FILTER_EQUIPMENT_BULK_EDIT_APS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_BULK } from 'graphql/mutations';
 
@@ -13,8 +15,9 @@ const renderTableCell = tabCell => {
   if (Array.isArray(tabCell)) {
     return (
       <div className={styles.tabColumn}>
-        {tabCell.map(i => (
-          <span>{i}</span>
+        {tabCell.map((i, key) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <span key={key}>{i}</span>
         ))}
       </div>
     );
@@ -67,8 +70,54 @@ const accessPointsChannelTableColumns = [
   },
 ];
 
-const BulkEditAPs = ({ selectedLocationIds }) => {
+const getLocationPath = (selectedId, locations) => {
+  const locationsPath = [];
+
+  const treeRecurse = (parentNodeId, node) => {
+    if (node.id === parentNodeId) {
+      locationsPath.unshift(node.id);
+
+      if (node.children) {
+        const flatten = children => {
+          children.forEach(i => {
+            locationsPath.unshift(i.id);
+            if (i.children) {
+              flatten(i.children);
+            }
+          });
+        };
+
+        flatten(node.children);
+      }
+      return node;
+    }
+    if (node.children) {
+      let parent;
+      node.children.some(i => {
+        parent = treeRecurse(parentNodeId, i);
+        return parent;
+      });
+      return parent;
+    }
+
+    return null;
+  };
+
+  if (selectedId) {
+    treeRecurse(selectedId, locations[0]);
+  }
+
+  return locationsPath;
+};
+
+const BulkEditAPs = ({ locations, checkedLocations }) => {
+  const { id } = useParams();
   const { customerId } = useContext(UserContext);
+  const locationIds = useMemo(() => {
+    const locationPath = getLocationPath(parseInt(id, 10), locations);
+    return locationPath.filter(f => checkedLocations.includes(f));
+  }, [id, locations, checkedLocations]);
+
   const {
     loading: filterEquipmentLoading,
     error: filterEquipmentError,
@@ -76,8 +125,7 @@ const BulkEditAPs = ({ selectedLocationIds }) => {
     data: equipData,
     fetchMore,
   } = useQuery(FILTER_EQUIPMENT_BULK_EDIT_APS, {
-    variables: { customerId, locationIds: selectedLocationIds, equipmentType: 'AP' },
-    fetchPolicy: 'network-only',
+    variables: { customerId, locationIds, equipmentType: 'AP' },
   });
 
   const [updateEquipmentBulk] = useMutation(UPDATE_EQUIPMENT_BULK);
@@ -286,7 +334,10 @@ const BulkEditAPs = ({ selectedLocationIds }) => {
       }
       onLoadMore={handleLoadMore}
       isLastPage={
-        equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
+        equipData &&
+        equipData.filterEquipment &&
+        equipData.filterEquipment.context &&
+        equipData.filterEquipment.context.lastPage
       }
       onSaveChanges={handleSaveChanges}
     />
@@ -294,7 +345,13 @@ const BulkEditAPs = ({ selectedLocationIds }) => {
 };
 
 BulkEditAPs.propTypes = {
-  selectedLocationIds: PropTypes.instanceOf(Array).isRequired,
+  locations: PropTypes.instanceOf(Array),
+  checkedLocations: PropTypes.instanceOf(Array),
+};
+
+BulkEditAPs.defaultProps = {
+  locations: [],
+  checkedLocations: [],
 };
 
 export default BulkEditAPs;

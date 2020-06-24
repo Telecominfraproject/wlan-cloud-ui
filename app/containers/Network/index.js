@@ -1,4 +1,4 @@
-import React, { useMemo, useContext, useState, useEffect } from 'react';
+import React, { useMemo, useContext, useState } from 'react';
 import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
@@ -28,8 +28,6 @@ const Network = () => {
   const [updateLocation] = useMutation(UPDATE_LOCATION);
   const [deleteLocation] = useMutation(DELETE_LOCATION);
   const [checkedLocations, setCheckedLocations] = useState([]);
-  const [selectedLocationIds, setSelectedLocationIds] = useState([]);
-  const [bulkEditInitialLocationIds, setBulkEditInitialLocationIds] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
@@ -38,35 +36,6 @@ const Network = () => {
     getLocation({
       variables: { id },
     });
-  };
-
-  useEffect(() => {
-    if (!location.pathname.includes('bulk-edit')) {
-      setBulkEditInitialLocationIds([]);
-    }
-  }, [location]);
-
-  let locationIds = [];
-  const getChildNodes = locations => {
-    const childNodes = [];
-    locations.forEach(a => {
-      locationIds.push(a);
-      data.getAllLocations.forEach(b => {
-        if (b.parentId === a) childNodes.push(b.id);
-      });
-    });
-    if (childNodes.length > 0) {
-      getChildNodes(childNodes);
-    } else {
-      setSelectedLocationIds(locationIds);
-      setCheckedLocations(locationIds);
-      setBulkEditInitialLocationIds(locationIds);
-      locationIds = [];
-    }
-  };
-
-  const handleSetBulkEditApIds = id => {
-    getChildNodes([id]);
   };
 
   const formatLocationListForTree = (list = []) => {
@@ -88,7 +57,6 @@ const Network = () => {
             setAddModal={setAddModal}
             setEditModal={setEditModal}
             setDeleteModal={setDeleteModal}
-            setBulkEditApIds={handleSetBulkEditApIds}
           >
             {c.name}
           </PopoverMenu>
@@ -197,20 +165,8 @@ const Network = () => {
     handleGetSingleLocation(id);
   };
 
-  const findCommonElements = (arr1, arr2) => {
-    return arr1.some(item => arr2.includes(item));
-  };
-
-  const onCheck = (checkedKeys, info) => {
-    const { id } = info.node;
+  const onCheck = checkedKeys => {
     setCheckedLocations(checkedKeys);
-    if (bulkEditInitialLocationIds.length > 0) {
-      if (findCommonElements(bulkEditInitialLocationIds, [id])) {
-        setSelectedLocationIds(checkedKeys);
-      } else {
-        setCheckedLocations(selectedLocationIds);
-      }
-    }
   };
 
   const locationsTree = useMemo(
@@ -249,7 +205,11 @@ const Network = () => {
           exact
           path={`${path}/access-points/bulk-edit/:id`}
           render={props => (
-            <BulkEditAccessPoints selectedLocationIds={selectedLocationIds} {...props} />
+            <BulkEditAccessPoints
+              locations={locationsTree}
+              checkedLocations={checkedLocations}
+              {...props}
+            />
           )}
         />
         <Route
