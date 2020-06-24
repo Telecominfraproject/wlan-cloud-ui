@@ -77,6 +77,7 @@ const BulkEditAPs = ({ selectedLocationIds }) => {
     fetchMore,
   } = useQuery(FILTER_EQUIPMENT_BULK_EDIT_APS, {
     variables: { customerId, locationIds: selectedLocationIds, equipmentType: 'AP' },
+    fetchPolicy: 'network-only',
   });
 
   const [updateEquipmentBulk] = useMutation(UPDATE_EQUIPMENT_BULK);
@@ -253,7 +254,6 @@ const BulkEditAPs = ({ selectedLocationIds }) => {
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const previousEntry = previousResult.filterEquipment;
           const newItems = fetchMoreResult.filterEquipment.items;
-
           return {
             filterEquipment: {
               context: fetchMoreResult.filterEquipment.context,
