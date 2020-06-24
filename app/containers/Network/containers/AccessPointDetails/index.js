@@ -1,20 +1,26 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
-import UserContext from 'contexts/UserContext';
 import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 import { OS_STATS_DATA } from 'constants/index';
 
 const GET_EQUIPMENT = gql`
   query GetEquipment($id: Int!) {
     getEquipment(id: $id) {
-      name
-      locationId
-      serial
+      id
+      equipmentType
       inventoryId
+      customerId
+      profileId
+      locationId
+      name
+      latitude
+      longitude
+      serial
+      lastModifiedTimestamp
       details
       profile {
         name
@@ -56,6 +62,7 @@ const GET_EQUIPMENT = gql`
 
 const UPDATE_EQUIPMENT = gql`
   mutation UpdateEquipment(
+    $id: Int!
     $equipmentType: String!
     $inventoryId: String!
     $customerId: Int!
@@ -69,6 +76,7 @@ const UPDATE_EQUIPMENT = gql`
     $details: JSONObject
   ) {
     updateEquipment(
+      id: $id
       equipmentType: $equipmentType
       inventoryId: $inventoryId
       customerId: $customerId
@@ -81,6 +89,7 @@ const UPDATE_EQUIPMENT = gql`
       lastModifiedTimestamp: $lastModifiedTimestamp
       details: $details
     ) {
+      id
       equipmentType
       inventoryId
       customerId
@@ -98,7 +107,6 @@ const UPDATE_EQUIPMENT = gql`
 
 const AccessPointDetails = ({ locations }) => {
   const { id } = useParams();
-  const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
     variables: { id: parseInt(id, 10) },
   });
@@ -127,6 +135,7 @@ const AccessPointDetails = ({ locations }) => {
   const handleUpdateEquipment = (
     equipmentType,
     inventoryId,
+    customerId,
     profileId,
     locationId,
     name,
@@ -138,6 +147,7 @@ const AccessPointDetails = ({ locations }) => {
   ) => {
     updateEquipment({
       variables: {
+        id,
         equipmentType,
         inventoryId,
         customerId,
