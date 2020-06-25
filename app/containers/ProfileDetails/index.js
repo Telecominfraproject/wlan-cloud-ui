@@ -57,7 +57,7 @@ const UPDATE_PROFILE = gql`
 
 const ProfileDetails = () => {
   const { id } = useParams();
-  const { customerId, childProfileIds } = useContext(UserContext);
+  const { customerId } = useContext(UserContext);
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
   const [redirect, setRedirect] = useState(false);
@@ -86,7 +86,13 @@ const ProfileDetails = () => {
     deleteProfile({ variables: { id: parseInt(id, 10) } });
   };
 
-  const handleUpdateProfile = (profileType, name, lastModifiedTimestamp, details) => {
+  const handleUpdateProfile = (
+    profileType,
+    name,
+    childProfileIds,
+    lastModifiedTimestamp,
+    details
+  ) => {
     updateProfile({
       variables: {
         id,

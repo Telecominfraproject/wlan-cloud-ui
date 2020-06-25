@@ -30,10 +30,10 @@ const CREATE_PROFILE = gql`
 `;
 
 const AddProfile = () => {
-  const { customerId, childProfileIds } = useContext(UserContext);
+  const { customerId } = useContext(UserContext);
   const [createProfile] = useMutation(CREATE_PROFILE);
 
-  const handleAddProfile = (profileType, name, details) => {
+  const handleAddProfile = (profileType, name, childProfileIds, details) => {
     createProfile({
       variables: {
         profileType,
