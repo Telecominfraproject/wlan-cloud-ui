@@ -49,6 +49,30 @@ const App = () => {
 
   const updateUser = newUser => setUser({ ...user, ...newUser });
 
+  const titleList = ['Access Points', 'Client Devices', 'Usage Information'];
+  const statsArr = [
+    {
+      'Total Provisioned': 12,
+      'In Service': 25,
+      'With Clients': 12,
+      'Out Of Service': 2,
+      'Never Connected': 5,
+    },
+    {
+      'Total Associated': 250,
+      '5G Associated': 220,
+      '2.4G Associated': 30,
+    },
+    {
+      'Total 24 hrs Volume (US+DS)': 112.3,
+      'Total Average traffic (US)': '2.4 Mb/s',
+      'Total Average traffic (DS)': '10.3 Mb/s',
+      'Total 24 hrs Unique Devices': 110,
+      'Most Active AP': 'AP120',
+      'Most Active Client': 'client_mac',
+    },
+  ];
+
   return (
     <UserProvider
       id={user.id}
@@ -66,7 +90,13 @@ const App = () => {
         <Switch>
           <UnauthenticatedRoute exact path="/login" component={Login} />
           <ProtectedRouteWithLayout exact path="/" component={RedirectToDashboard} />
-          <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
+          <ProtectedRouteWithLayout
+            exact
+            path="/dashboard"
+            titleList={titleList}
+            statsArr={statsArr}
+            component={Dashboard}
+          />
           <ProtectedRouteWithLayout path="/network" component={Network} />
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
