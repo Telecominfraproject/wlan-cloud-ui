@@ -13,7 +13,7 @@ const ProtectedRouteWithLayout = ({ component: Component, ...rest }) => (
     render={props =>
       getItem(AUTH_TOKEN) ? (
         <MasterLayout>
-          <Component {...props} {...rest} />
+          <Component {...props} />
         </MasterLayout>
       ) : (
         <Redirect
