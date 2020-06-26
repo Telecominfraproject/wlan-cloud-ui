@@ -1,48 +1,81 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { NetworkTable } from '@tip-wlan/wlan-cloud-ui-library';
+import { useLazyQuery } from '@apollo/react-hooks';
+import { Alert } from 'antd';
+import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { CLIENT_DEVICES_TABLE_DATA } from 'constants/index.js';
+import UserContext from 'contexts/UserContext';
+import { FILTER_CLIENT_SESSIONS } from 'graphql/queries';
 
 const clientDevicesTableColumns = [
   {
     title: '',
     dataIndex: 'name',
-    key: 'name',
   },
   {
     title: 'MAC',
     dataIndex: 'macAddress',
-    key: 'mac',
   },
-  { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr', key: '1' },
-  { title: 'IP', dataIndex: 'ip', key: '2' },
-  { title: 'HOST NAME', dataIndex: 'hostName', key: '3' },
-  { title: 'ACCESS POINT', dataIndex: 'accessPoint', key: '4' },
-  { title: 'SSID', dataIndex: 'ssid', key: '5' },
-  { title: 'BAND', dataIndex: 'band', key: '6' },
-  { title: 'SIGNAL', dataIndex: 'signal', key: '7' },
-  { title: 'STATUS', dataIndex: 'status', key: '8' },
+  { title: 'MANUFACTURER', dataIndex: 'manufacturer' },
+  { title: 'IP', dataIndex: 'ipAddress' },
+  { title: 'HOST NAME', dataIndex: 'hostname' },
+  { title: 'ACCESS POINT', dataIndex: ['equipment', 'name'] },
+  { title: 'SSID', dataIndex: 'ssid' },
+  { title: 'BAND', dataIndex: 'radioType' },
+  { title: 'SIGNAL', dataIndex: 'signal' },
+  { title: 'STATUS', dataIndex: 'status' },
 ];
 
 const ClientDevices = ({ checkedLocations }) => {
-  const [devicesData, setDevicesData] = useState([]);
+  const { customerId } = useContext(UserContext);
+  const [filterClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
+    FILTER_CLIENT_SESSIONS
+  );
+
+  const handleLoadMore = () => {
+    if (!data.filterClientSessions.context.lastPage) {
+      fetchMore({
+        variables: { cursor: data.filterClientSessions.context.cursor },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.filterClientSessions;
+          const newItems = fetchMoreResult.filterClientSessions.items;
+
+          return {
+            filterClientSessions: {
+              context: fetchMoreResult.filterClientSessions.context,
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
 
   useEffect(() => {
-    const filteredData = [];
-    if (checkedLocations.length > 0) {
-      checkedLocations.forEach(locationId => {
-        CLIENT_DEVICES_TABLE_DATA.filter(d => {
-          return d.locationId === locationId ? filteredData.push(d) : '';
-        });
-        setDevicesData(filteredData);
-      });
-    } else {
-      setDevicesData(filteredData);
-    }
+    filterClientSessions({
+      variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
+    });
   }, [checkedLocations]);
 
-  return <NetworkTable tableColumns={clientDevicesTableColumns} tableData={devicesData} />;
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return (
+      <Alert message="Error" description="Failed to load client devices." type="error" showIcon />
+    );
+  }
+
+  return (
+    <NetworkTable
+      tableColumns={clientDevicesTableColumns}
+      tableData={data && data.filterClientSessions && data.filterClientSessions.items}
+      onLoadMore={handleLoadMore}
+      isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
+    />
+  );
 };
 
 ClientDevices.propTypes = {

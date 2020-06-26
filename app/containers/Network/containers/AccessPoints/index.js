@@ -26,73 +26,66 @@ const accessPointsTableColumns = [
   {
     title: 'NAME',
     dataIndex: 'name',
-    key: 'name',
     render: renderTableCell,
   },
   {
     title: 'ALARMS',
-    dataIndex: 'alarms',
-    key: 'alarms',
+    dataIndex: 'alarmsCount',
     render: renderTableCell,
   },
   {
     title: 'MODEL',
     dataIndex: 'model',
-    key: 'model',
     render: renderTableCell,
   },
   {
     title: 'IP',
-    dataIndex: 'ip',
-    key: 'ip',
+    dataIndex: ['status', 'protocol', 'details', 'reportedIpV4Addr'],
     render: renderTableCell,
   },
   {
     title: 'MAC',
-    dataIndex: 'macAddress',
-    key: 'mac',
+    dataIndex: ['status', 'protocol', 'details', 'reportedMacAddr'],
+    render: renderTableCell,
+  },
+  {
+    title: 'MANUFACTURER',
+    dataIndex: ['status', 'protocol', 'details', 'manufacturer'],
     render: renderTableCell,
   },
   {
     title: 'ASSET ID',
-    dataIndex: 'assetId',
-    key: 'assetId',
+    dataIndex: 'inventoryId',
     render: renderTableCell,
   },
   {
     title: 'UP TIME',
-    dataIndex: 'upTime',
-    key: 'upTime',
+    dataIndex: ['status', 'osPerformance', 'details', 'uptimeInSeconds'],
     render: renderTableCell,
   },
   {
     title: 'PROFILE',
-    dataIndex: 'profile',
-    key: 'profile',
+    dataIndex: ['profile', 'name'],
     render: renderTableCell,
   },
   {
     title: 'CHANNEL',
     dataIndex: 'channel',
-    key: 'channel',
     render: renderTableCell,
   },
   {
     title: 'CAPACITY',
-    dataIndex: 'capacity',
-    key: 'capacity',
+    dataIndex: ['status', 'radioUtilization', 'details', 'capacityDetails'],
     render: renderTableCell,
   },
   {
     title: 'NOISE FLOOR',
-    dataIndex: 'noiseFloor',
-    key: 'noiseFloor',
+    dataIndex: ['status', 'radioUtilization', 'details', 'noiseFloorDetails'],
     render: renderTableCell,
   },
   {
     title: 'DEVICES',
-    dataIndex: 'devices',
-    key: 'devices',
+    dataIndex: ['status', 'clientDetails', 'details', 'numClientsPerRadio'],
     render: renderTableCell,
   },
 ];
@@ -102,28 +95,6 @@ const AccessPoints = ({ checkedLocations }) => {
   const [filterEquipment, { loading, error, data: equipData, fetchMore }] = useLazyQuery(
     FILTER_EQUIPMENT
   );
-
-  const mapAccessPointsTableData = (dataSource = []) => {
-    return dataSource.map(
-      ({ id, name, alarms, model, inventoryId, devices, profile, channel, status }) => {
-        return {
-          key: id,
-          name,
-          alarms,
-          model,
-          ip: status.protocol.details.reportedIpV4Addr,
-          macAddress: status.protocol.details.reportedMacAddr,
-          assetId: inventoryId,
-          upTime: status.osPerformance.details.uptimeInSeconds,
-          profile: profile.name,
-          channel,
-          capacity: status.radioUtilization.details.capacityDetails,
-          noiseFloor: status.radioUtilization.details.noiseFloorDetails,
-          devices,
-        };
-      }
-    );
-  };
 
   const handleLoadMore = () => {
     if (!equipData.filterEquipment.context.lastPage) {
@@ -166,9 +137,7 @@ const AccessPoints = ({ checkedLocations }) => {
   return (
     <NetworkTable
       tableColumns={accessPointsTableColumns}
-      tableData={mapAccessPointsTableData(
-        equipData && equipData.filterEquipment && equipData.filterEquipment.items
-      )}
+      tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}
       onLoadMore={handleLoadMore}
       isLastPage={
         equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
