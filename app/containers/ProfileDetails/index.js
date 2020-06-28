@@ -1,17 +1,24 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 import { useParams, Redirect } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useLazyQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
-import UserContext from 'contexts/UserContext';
 
 const GET_PROFILE = gql`
   query GetProfile($id: Int!) {
     getProfile(id: $id) {
       id
-      name
       profileType
+      customerId
+      name
+      childProfiles {
+        id
+        name
+      }
+      childProfileIds
+      createdTimestamp
+      lastModifiedTimestamp
       details
     }
   }
@@ -57,7 +64,6 @@ const UPDATE_PROFILE = gql`
 
 const ProfileDetails = () => {
   const { id } = useParams();
-  const { customerId } = useContext(UserContext);
   const [updateProfile] = useMutation(UPDATE_PROFILE);
 
   const [redirect, setRedirect] = useState(false);
@@ -87,20 +93,15 @@ const ProfileDetails = () => {
   };
 
   const handleUpdateProfile = (
-    profileType,
     name,
-    childProfileIds,
-    lastModifiedTimestamp,
-    details
+    details,
+    childProfileIds = data.getProfile.childProfileIds
   ) => {
     updateProfile({
       variables: {
-        id,
-        profileType,
-        customerId,
+        ...data.getProfile,
         name,
         childProfileIds,
-        lastModifiedTimestamp,
         details,
       },
     })
