@@ -6,6 +6,7 @@ import { Alert, Spin, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
+import { GET_ALL_PROFILES } from 'graphql/queries';
 
 const GET_PROFILE = gql`
   query GetProfile($id: Int!) {
@@ -24,23 +25,6 @@ const GET_PROFILE = gql`
       createdTimestamp
       lastModifiedTimestamp
       details
-    }
-  }
-`;
-
-const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: Int!, $cursor: String, $type: String) {
-    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
-      items {
-        id
-        name
-        profileType
-        details
-      }
-      context {
-        cursor
-        lastPage
-      }
     }
   }
 `;

@@ -1,9 +1,11 @@
 import React, { useContext } from 'react';
 import { AddProfile as AddProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
 import gql from 'graphql-tag';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { notification } from 'antd';
+
 import UserContext from 'contexts/UserContext';
+import { GET_ALL_PROFILES } from 'graphql/queries';
 
 const CREATE_PROFILE = gql`
   mutation CreateProfile(
@@ -31,6 +33,9 @@ const CREATE_PROFILE = gql`
 
 const AddProfile = () => {
   const { customerId } = useContext(UserContext);
+  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES, {
+    variables: { customerId, type: 'ssid' },
+  });
   const [createProfile] = useMutation(CREATE_PROFILE);
 
   const handleAddProfile = (profileType, name, details, childProfileIds = []) => {
@@ -57,7 +62,14 @@ const AddProfile = () => {
       );
   };
 
-  return <AddProfilePage onCreateProfile={handleAddProfile} />;
+  return (
+    <AddProfilePage
+      onCreateProfile={handleAddProfile}
+      ssidProfiles={
+        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
+      }
+    />
+  );
 };
 
 export default AddProfile;
