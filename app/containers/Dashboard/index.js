@@ -51,6 +51,14 @@ const Dashboard = () => {
     totalAssociated += associatedClientsCountPerRadio[i];
   });
 
+  const { is2dot4GHz, is5GHzL, is5GHzU } = associatedClientsCountPerRadio;
+
+  const frequencies = {
+    '2.4GHz': is2dot4GHz,
+    '5GHzL': is5GHzL,
+    '5GHzU': is5GHzU,
+  };
+
   const statsArr = [
     {
       'Total Provisioned': totalProvisionedEquipment,
@@ -59,7 +67,7 @@ const Dashboard = () => {
     },
     {
       'Total Associated': totalAssociated,
-      ...associatedClientsCountPerRadio,
+      ...frequencies,
     },
     {
       'Total Average traffic (US)': formatBytes(trafficBytesUpstream),
