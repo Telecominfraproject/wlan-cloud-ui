@@ -202,3 +202,18 @@ export const GET_ALL_PROFILES = gql`
     }
   }
 `;
+
+export const GET_ALL_STATUS = gql`
+  query GetAllStatus($customerId: Int!, $statusDataTypes: [String]) {
+    getAllStatus(customerId: $customerId, statusDataTypes: $statusDataTypes) {
+      items {
+        customerId
+        detailsJSON
+      }
+      context {
+        lastPage
+        cursor
+      }
+    }
+  }
+`;
