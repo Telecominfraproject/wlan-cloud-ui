@@ -37,8 +37,8 @@ const Dashboard = () => {
 
   const {
     associatedClientsCountPerRadio,
-    // clientCountPerOui,
-    // sequipmentCountPerOui,
+    clientCountPerOui,
+    equipmentCountPerOui,
     totalProvisionedEquipment,
     equipmentInServiceCount,
     equipmentWithClientsCount,
@@ -66,8 +66,9 @@ const Dashboard = () => {
       'Total Average traffic (DS)': formatBytes(trafficBytesDownstream),
     },
   ];
+  const pieChartData = [equipmentCountPerOui, clientCountPerOui];
 
-  return <DashboardPage titleList={titleList} statsArr={statsArr} />;
+  return <DashboardPage titleList={titleList} statsArr={statsArr} pieChartData={pieChartData} />;
 };
 
 export default Dashboard;
