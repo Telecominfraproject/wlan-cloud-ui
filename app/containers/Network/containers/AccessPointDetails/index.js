@@ -133,6 +133,7 @@ const AccessPointDetails = ({ locations }) => {
   };
 
   const handleUpdateEquipment = (
+    equipmentId,
     equipmentType,
     inventoryId,
     customerId,
@@ -147,7 +148,7 @@ const AccessPointDetails = ({ locations }) => {
   ) => {
     updateEquipment({
       variables: {
-        id,
+        id: equipmentId,
         equipmentType,
         inventoryId,
         customerId,
