@@ -70,6 +70,35 @@ const accessPointsChannelTableColumns = [
   },
 ];
 
+const getBreadcrumbPath = (id, locations) => {
+  const locationsPath = [];
+  const treeRecurse = (parentNodeId, node) => {
+    if (node.id === parentNodeId) {
+      locationsPath.unshift(node);
+      return node;
+    }
+    if (node.children) {
+      let parent;
+      node.children.some(i => {
+        parent = treeRecurse(parentNodeId, i);
+        return parent;
+      });
+      if (parent) {
+        locationsPath.unshift(node);
+      }
+      return parent;
+    }
+    return null;
+  };
+
+  treeRecurse(id, {
+    id: 0,
+    children: locations,
+  });
+
+  return locationsPath;
+};
+
 const getLocationPath = (selectedId, locations) => {
   const locationsPath = [];
 
@@ -104,7 +133,7 @@ const getLocationPath = (selectedId, locations) => {
   };
 
   if (selectedId) {
-    treeRecurse(selectedId, locations[0]);
+    treeRecurse(selectedId, { id: 0, children: locations });
   }
 
   return locationsPath;
@@ -340,6 +369,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
         equipData.filterEquipment.context.lastPage
       }
       onSaveChanges={handleSaveChanges}
+      breadcrumbPath={getBreadcrumbPath(parseInt(id, 10), locations)}
     />
   );
 };
