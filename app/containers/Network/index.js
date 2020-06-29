@@ -9,6 +9,8 @@ import AccessPointDetails from 'containers/Network/containers/AccessPointDetails
 import AccessPoints from 'containers/Network/containers/AccessPoints';
 import ClientDevices from 'containers/Network/containers/ClientDevices';
 import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetails';
+import BulkEditAccessPoints from 'containers/Network/containers/BulkEditAccessPoints';
+
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_LOCATIONS, GET_LOCATION } from 'graphql/queries';
 import { CREATE_LOCATION, UPDATE_LOCATION, DELETE_LOCATION } from 'graphql/mutations';
@@ -50,6 +52,7 @@ const Network = () => {
       children = children.map(c => ({
         title: (
           <PopoverMenu
+            locationId={c.id}
             locationType={c.locationType}
             setAddModal={setAddModal}
             setEditModal={setEditModal}
@@ -198,6 +201,17 @@ const Network = () => {
       onDeleteLocation={handleDeleteLocation}
     >
       <Switch>
+        <Route
+          exact
+          path={`${path}/access-points/bulk-edit/:id`}
+          render={props => (
+            <BulkEditAccessPoints
+              locations={locationsTree}
+              checkedLocations={checkedLocations}
+              {...props}
+            />
+          )}
+        />
         <Route
           exact
           path={`${path}/access-points`}
