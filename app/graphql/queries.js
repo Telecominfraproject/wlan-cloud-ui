@@ -31,6 +31,8 @@ export const FILTER_EQUIPMENT = gql`
         profileId
         inventoryId
         channel
+        model
+        alarmsCount
         profile {
           name
         }
@@ -39,6 +41,7 @@ export const FILTER_EQUIPMENT = gql`
             details {
               reportedIpV4Addr
               reportedMacAddr
+              manufacturer
             }
           }
           osPerformance {
@@ -51,6 +54,11 @@ export const FILTER_EQUIPMENT = gql`
               reportedIpV4Addr
               capacityDetails
               noiseFloorDetails
+            }
+          }
+          clientDetails {
+            details {
+              numClientsPerRadio
             }
           }
         }
@@ -76,8 +84,8 @@ export const GET_LOCATION = gql`
 `;
 
 export const FILTER_CLIENT_SESSIONS = gql`
-  query FilterClientSessions($customerId: Int!, $cursor: String) {
-    getAllClientSessions(customerId: $customerId, cursor: $cursor) {
+  query FilterClientSessions($customerId: Int!, $locationIds: [Int], $cursor: String) {
+    filterClientSessions(customerId: $customerId, locationIds: $locationIds, cursor: $cursor) {
       items {
         id
         macAddress
@@ -86,6 +94,7 @@ export const FILTER_CLIENT_SESSIONS = gql`
         ssid
         radioType
         signal
+        manufacturer
         equipment {
           name
         }
@@ -108,10 +117,43 @@ export const GET_CLIENT_SESSION = gql`
       ssid
       radioType
       signal
+      manufacturer
       equipment {
         name
       }
       details
+    }
+  }
+`;
+
+export const FILTER_SERVICE_METRICS = gql`
+  query FilterServiceMetrics(
+    $customerId: Int!
+    $cursor: String
+    $fromTime: Int!
+    $toTime: Int!
+    $clientMacs: [String]
+    $dataTypes: [String]
+  ) {
+    filterServiceMetrics(
+      customerId: $customerId
+      cursor: $cursor
+      fromTime: $fromTime
+      toTime: $toTime
+      clientMacs: $clientMacs
+      dataTypes: $dataTypes
+    ) {
+      items {
+        dataType
+        createdTimestamp
+        rssi
+        rxBytes
+        txBytes
+      }
+      context {
+        lastPage
+        cursor
+      }
     }
   }
 `;

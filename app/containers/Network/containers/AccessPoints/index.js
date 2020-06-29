@@ -30,7 +30,7 @@ const accessPointsTableColumns = [
   },
   {
     title: 'ALARMS',
-    dataIndex: 'alarms',
+    dataIndex: 'alarmsCount',
     render: renderTableCell,
   },
   {
@@ -46,6 +46,11 @@ const accessPointsTableColumns = [
   {
     title: 'MAC',
     dataIndex: ['status', 'protocol', 'details', 'reportedMacAddr'],
+    render: renderTableCell,
+  },
+  {
+    title: 'MANUFACTURER',
+    dataIndex: ['status', 'protocol', 'details', 'manufacturer'],
     render: renderTableCell,
   },
   {
@@ -80,7 +85,7 @@ const accessPointsTableColumns = [
   },
   {
     title: 'DEVICES',
-    dataIndex: 'devices',
+    dataIndex: ['status', 'clientDetails', 'details', 'numClientsPerRadio'],
     render: renderTableCell,
   },
 ];
