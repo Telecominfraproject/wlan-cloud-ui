@@ -1,28 +1,69 @@
-import React from 'react';
-import { Dashboard as DashboardPage } from '@tip-wlan/wlan-cloud-ui-library';
+import React, { useContext } from 'react';
+import { useQuery } from '@apollo/react-hooks';
+import { Alert } from 'antd';
+import { Dashboard as DashboardPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+
+import UserContext from 'contexts/UserContext';
+import { GET_ALL_STATUS } from 'graphql/queries';
+
+function formatBytes(bytes, decimals = 2) {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  // eslint-disable-next-line no-restricted-properties
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
 
 const Dashboard = () => {
+  const { customerId } = useContext(UserContext);
+  const { loading, error, data } = useQuery(GET_ALL_STATUS, {
+    variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
+  });
+
   const titleList = ['Access Points', 'Client Devices', 'Usage Information'];
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return <Alert message="Error" description="Failed to load Dashboard" type="error" showIcon />;
+  }
+
+  const {
+    associatedClientsCountPerRadio,
+    // clientCountPerOui,
+    // sequipmentCountPerOui,
+    totalProvisionedEquipment,
+    equipmentInServiceCount,
+    equipmentWithClientsCount,
+    trafficBytesDownstream,
+    trafficBytesUpstream,
+  } = data.getAllStatus.items[0].detailsJSON;
+
+  let totalAssociated = 0;
+  Object.keys(associatedClientsCountPerRadio).forEach(i => {
+    totalAssociated += associatedClientsCountPerRadio[i];
+  });
+
   const statsArr = [
     {
-      'Total Provisioned': 12,
-      'In Service': 25,
-      'With Clients': 12,
-      'Out Of Service': 2,
-      'Never Connected': 5,
+      'Total Provisioned': totalProvisionedEquipment,
+      'In Service': equipmentInServiceCount,
+      'With Clients': equipmentWithClientsCount,
     },
     {
-      'Total Associated': 250,
-      '5G Associated': 220,
-      '2.4G Associated': 30,
+      'Total Associated': totalAssociated,
+      ...associatedClientsCountPerRadio,
     },
     {
-      'Total 24 hrs Volume (US+DS)': 112.3,
-      'Total Average traffic (US)': '2.4 Mb/s',
-      'Total Average traffic (DS)': '10.3 Mb/s',
-      'Total 24 hrs Unique Devices': 110,
-      'Most Active AP': 'AP120',
-      'Most Active Client': 'client_mac',
+      'Total Average traffic (US)': formatBytes(trafficBytesUpstream),
+      'Total Average traffic (DS)': formatBytes(trafficBytesDownstream),
     },
   ];
 
