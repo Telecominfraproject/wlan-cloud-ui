@@ -37,7 +37,6 @@ const Profiles = () => {
   const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_PROFILES, {
     variables: { customerId },
   });
-
   const [deleteProfile] = useLazyQuery(DELETE_PROFILE, {
     onCompleted: () => {
       refetch();

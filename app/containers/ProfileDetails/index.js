@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useLazyQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
+import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
+
+import UserContext from 'contexts/UserContext';
 
 const GET_PROFILE = gql`
   query GetProfile($id: Int!) {
@@ -15,11 +17,30 @@ const GET_PROFILE = gql`
       childProfiles {
         id
         name
+        profileType
+        details
       }
       childProfileIds
       createdTimestamp
       lastModifiedTimestamp
       details
+    }
+  }
+`;
+
+const GET_ALL_PROFILES = gql`
+  query GetAllProfiles($customerId: Int!, $cursor: String, $type: String) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
+      items {
+        id
+        name
+        profileType
+        details
+      }
+      context {
+        cursor
+        lastPage
+      }
     }
   }
 `;
@@ -63,14 +84,18 @@ const UPDATE_PROFILE = gql`
 `;
 
 const ProfileDetails = () => {
+  const { customerId } = useContext(UserContext);
   const { id } = useParams();
-  const [updateProfile] = useMutation(UPDATE_PROFILE);
 
   const [redirect, setRedirect] = useState(false);
 
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id: parseInt(id, 10) },
   });
+  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES, {
+    variables: { customerId, type: 'ssid' },
+  });
+  const [updateProfile] = useMutation(UPDATE_PROFILE);
 
   const [deleteProfile] = useLazyQuery(DELETE_PROFILE, {
     onCompleted: () => {
@@ -138,8 +163,12 @@ const ProfileDetails = () => {
       name={data.getProfile.name}
       profileType={data.getProfile.profileType}
       details={data.getProfile.details}
+      childProfileIds={data.getProfile.childProfileIds}
       onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
+      ssidProfiles={
+        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
+      }
     />
   );
 };
