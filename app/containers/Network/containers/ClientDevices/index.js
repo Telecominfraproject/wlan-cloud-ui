@@ -16,7 +16,7 @@ const clientDevicesTableColumns = [
     title: 'MAC',
     dataIndex: 'macAddress',
   },
-  { title: 'OS/MODEL/MFR', dataIndex: 'osModelMfr' },
+  { title: 'MANUFACTURER', dataIndex: 'manufacturer' },
   { title: 'IP', dataIndex: 'ipAddress' },
   { title: 'HOST NAME', dataIndex: 'hostname' },
   { title: 'ACCESS POINT', dataIndex: ['equipment', 'name'] },
@@ -28,21 +28,21 @@ const clientDevicesTableColumns = [
 
 const ClientDevices = ({ checkedLocations }) => {
   const { customerId } = useContext(UserContext);
-  const [getAllClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
+  const [filterClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
     FILTER_CLIENT_SESSIONS
   );
 
   const handleLoadMore = () => {
-    if (!data.getAllClientSessions.context.lastPage) {
+    if (!data.filterClientSessions.context.lastPage) {
       fetchMore({
-        variables: { cursor: data.getAllClientSessions.context.cursor },
+        variables: { cursor: data.filterClientSessions.context.cursor },
         updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllClientSessions;
-          const newItems = fetchMoreResult.getAllClientSessions.items;
+          const previousEntry = previousResult.filterClientSessions;
+          const newItems = fetchMoreResult.filterClientSessions.items;
 
           return {
-            getAllClientSessions: {
-              context: fetchMoreResult.getAllClientSessions.context,
+            filterClientSessions: {
+              context: fetchMoreResult.filterClientSessions.context,
               items: [...previousEntry.items, ...newItems],
               __typename: previousEntry.__typename,
             },
@@ -53,7 +53,7 @@ const ClientDevices = ({ checkedLocations }) => {
   };
 
   useEffect(() => {
-    getAllClientSessions({
+    filterClientSessions({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
     });
   }, [checkedLocations]);
@@ -71,9 +71,9 @@ const ClientDevices = ({ checkedLocations }) => {
   return (
     <NetworkTable
       tableColumns={clientDevicesTableColumns}
-      tableData={data && data.getAllClientSessions && data.getAllClientSessions.items}
+      tableData={data && data.filterClientSessions && data.filterClientSessions.items}
       onLoadMore={handleLoadMore}
-      isLastPage={data && data.getAllClientSessions && data.getAllClientSessions.context.lastPage}
+      isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
     />
   );
 };
