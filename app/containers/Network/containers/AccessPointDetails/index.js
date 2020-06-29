@@ -4,8 +4,10 @@ import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
+import moment from 'moment';
 import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
-import { OS_STATS_DATA } from 'constants/index';
+
+import { FILTER_SERVICE_METRICS } from 'graphql/queries';
 import UserContext from 'contexts/UserContext';
 
 const GET_EQUIPMENT = gql`
@@ -142,18 +144,33 @@ export const GET_ALL_PROFILES = gql`
 `;
 
 const AccessPointDetails = ({ locations }) => {
+  const toTime = moment();
+  const fromTime = toTime.subtract(24, 'hours');
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
 
+  const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
+    variables: { id: parseInt(id, 10) },
+  });
   const { data: dataProfiles, error: errorProfiles, loading: landingProfiles } = useQuery(
     GET_ALL_PROFILES,
     {
       variables: { customerId, type: 'equipment_ap' },
     }
   );
-
-  const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
-    variables: { id: parseInt(id, 10) },
+  const {
+    loading: metricsLoading,
+    error: metricsError,
+    data: metricsData,
+    refetch: metricsRefetch,
+  } = useQuery(FILTER_SERVICE_METRICS, {
+    variables: {
+      customerId,
+      fromTime: fromTime.unix(),
+      toTime: toTime.unix(),
+      equipmentIds: [parseInt(id, 10)],
+      dataTypes: ['ApNode'],
+    },
   });
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
@@ -186,6 +203,7 @@ const AccessPointDetails = ({ locations }) => {
 
   const refetchData = () => {
     refetch();
+    metricsRefetch();
   };
 
   const handleUpdateEquipment = (
@@ -239,7 +257,11 @@ const AccessPointDetails = ({ locations }) => {
       onUpdateEquipment={handleUpdateEquipment}
       data={data.getEquipment}
       profiles={dataProfiles.getAllProfiles.items}
-      osData={OS_STATS_DATA}
+      osData={{
+        loading: metricsLoading,
+        error: metricsError,
+        data: metricsData && metricsData.filterServiceMetrics.items,
+      }}
       locations={locations}
     />
   );

@@ -133,6 +133,7 @@ export const FILTER_SERVICE_METRICS = gql`
     $fromTime: Int!
     $toTime: Int!
     $clientMacs: [String]
+    $equipmentIds: [ID]
     $dataTypes: [String]
   ) {
     filterServiceMetrics(
@@ -141,6 +142,7 @@ export const FILTER_SERVICE_METRICS = gql`
       fromTime: $fromTime
       toTime: $toTime
       clientMacs: $clientMacs
+      equipmentIds: $equipmentIds
       dataTypes: $dataTypes
     ) {
       items {
