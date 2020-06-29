@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
@@ -6,6 +6,7 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
 import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 import { OS_STATS_DATA } from 'constants/index';
+import UserContext from 'contexts/UserContext';
 
 const GET_EQUIPMENT = gql`
   query GetEquipment($id: Int!) {
@@ -31,6 +32,9 @@ const GET_EQUIPMENT = gql`
         }
       }
       status {
+        firmware {
+          detailsJSON
+        }
         protocol {
           detailsJSON
           details {
@@ -56,6 +60,21 @@ const GET_EQUIPMENT = gql`
         details
         createdTimestamp
       }
+    }
+  }
+`;
+
+export const GET_ALL_FIRMWARE = gql`
+  query GetAllFirmware {
+    getAllFirmware {
+      id
+      equipmentId
+      modelId
+      versionName
+      description
+      filename
+      commit
+      releaseDate
     }
   }
 `;
@@ -105,15 +124,41 @@ const UPDATE_EQUIPMENT = gql`
   }
 `;
 
+export const GET_ALL_PROFILES = gql`
+  query GetAllProfiles($customerId: Int!, $cursor: String, $type: String) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
+      items {
+        id
+        name
+        profileType
+        details
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
+
 const AccessPointDetails = ({ locations }) => {
   const { id } = useParams();
+  const { customerId } = useContext(UserContext);
+
+  const { data: dataProfiles, error: errorProfiles, loading: landingProfiles } = useQuery(
+    GET_ALL_PROFILES,
+    {
+      variables: { customerId, type: 'equipment_ap' },
+    }
+  );
+
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
     variables: { id: parseInt(id, 10) },
   });
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
 
-  if (loading) {
+  if (loading || landingProfiles) {
     return <Spin size="large" />;
   }
 
@@ -128,6 +173,17 @@ const AccessPointDetails = ({ locations }) => {
     );
   }
 
+  if (errorProfiles) {
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load Access Point profiles."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
   const refetchData = () => {
     refetch();
   };
@@ -136,7 +192,7 @@ const AccessPointDetails = ({ locations }) => {
     equipmentId,
     equipmentType,
     inventoryId,
-    customerId,
+    custId,
     profileId,
     locationId,
     name,
@@ -151,7 +207,7 @@ const AccessPointDetails = ({ locations }) => {
         id: equipmentId,
         equipmentType,
         inventoryId,
-        customerId,
+        customerId: custId,
         profileId,
         locationId,
         name,
@@ -168,6 +224,7 @@ const AccessPointDetails = ({ locations }) => {
           description: 'Equipment settings successfully updated.',
         });
       })
+
       .catch(() =>
         notification.error({
           message: 'Error',
@@ -181,6 +238,7 @@ const AccessPointDetails = ({ locations }) => {
       handleRefresh={refetchData}
       onUpdateEquipment={handleUpdateEquipment}
       data={data.getEquipment}
+      profiles={dataProfiles.getAllProfiles.items}
       osData={OS_STATS_DATA}
       locations={locations}
     />
