@@ -188,6 +188,23 @@ export const FILTER_SERVICE_METRICS = gql`
   }
 `;
 
+export const GET_ALL_PROFILES = gql`
+  query GetAllProfiles($customerId: Int!, $cursor: String, $type: String) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
+      items {
+        id
+        name
+        profileType
+        details
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
+
 export const GET_ALL_STATUS = gql`
   query GetAllStatus($customerId: Int!, $statusDataTypes: [String]) {
     getAllStatus(customerId: $customerId, statusDataTypes: $statusDataTypes) {

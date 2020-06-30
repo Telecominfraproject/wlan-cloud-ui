@@ -13,6 +13,9 @@ import Login from 'containers/Login';
 import Network from 'containers/Network';
 import Dashboard from 'containers/Dashboard';
 import Profiles from 'containers/Profiles';
+import AddProfile from 'containers/AddProfile';
+import ProfileDetails from 'containers/ProfileDetails';
+
 import Alarms from 'containers/Alarms';
 import EditAccount from 'containers/EditAccount';
 import Accounts from 'containers/Accounts';
@@ -71,6 +74,9 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
           <ProtectedRouteWithLayout path="/network" component={Network} />
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
+          <ProtectedRouteWithLayout exact path="/profiles/:id" component={ProfileDetails} />
+          <ProtectedRouteWithLayout exact path="/addprofile" component={AddProfile} />
+
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
           {user.role === 'SuperUser' && (
