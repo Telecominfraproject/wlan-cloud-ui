@@ -217,7 +217,11 @@ const Network = () => {
           path={`${path}/access-points`}
           render={props => <AccessPoints checkedLocations={checkedLocations} {...props} />}
         />
-        <Route exact path={`${path}/access-points/:id`} component={AccessPointDetails} />
+        <Route
+          exact
+          path={`${path}/access-points/:id`}
+          render={props => <AccessPointDetails locations={locationsTree} {...props} />}
+        />
         <Route
           exact
           path={`${path}/client-devices`}
