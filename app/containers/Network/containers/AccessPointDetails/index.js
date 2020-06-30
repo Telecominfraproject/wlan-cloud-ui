@@ -68,7 +68,6 @@ export const GET_ALL_FIRMWARE = gql`
   query GetAllFirmware {
     getAllFirmware {
       id
-      equipmentId
       modelId
       versionName
       description
@@ -132,6 +131,11 @@ export const GET_ALL_PROFILES = gql`
         name
         profileType
         details
+        childProfiles {
+          id
+          name
+          details
+        }
       }
       context {
         cursor
@@ -152,13 +156,17 @@ const AccessPointDetails = ({ locations }) => {
     }
   );
 
+  const { data: dataFirmware, error: errorFirmware, loading: landingFirmware } = useQuery(
+    GET_ALL_FIRMWARE
+  );
+
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
     variables: { id: parseInt(id, 10) },
   });
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
 
-  if (loading || landingProfiles) {
+  if (loading || landingProfiles || landingFirmware) {
     return <Spin size="large" />;
   }
 
@@ -178,6 +186,17 @@ const AccessPointDetails = ({ locations }) => {
       <Alert
         message="Error"
         description="Failed to load Access Point profiles."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
+  if (errorFirmware) {
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load Access Point firmware."
         type="error"
         showIcon
       />
@@ -239,6 +258,7 @@ const AccessPointDetails = ({ locations }) => {
       onUpdateEquipment={handleUpdateEquipment}
       data={data.getEquipment}
       profiles={dataProfiles.getAllProfiles.items}
+      firmware={dataFirmware.getAllFirmware}
       osData={OS_STATS_DATA}
       locations={locations}
     />
