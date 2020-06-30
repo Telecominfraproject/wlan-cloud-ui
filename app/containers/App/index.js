@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Switch, Redirect } from 'react-router-dom';
 
-import { ThemeProvider, Dashboard } from '@tip-wlan/wlan-cloud-ui-library';
+import { ThemeProvider } from '@tip-wlan/wlan-cloud-ui-library';
 
 import logo from 'images/tip-logo.png';
 import logoMobile from 'images/tip-logo-mobile.png';
 
 import { AUTH_TOKEN, COMPANY } from 'constants/index';
 import Login from 'containers/Login';
+
 import Network from 'containers/Network';
+import Dashboard from 'containers/Dashboard';
 import Profiles from 'containers/Profiles';
 import Alarms from 'containers/Alarms';
 import EditAccount from 'containers/EditAccount';

@@ -71,6 +71,34 @@ export const FILTER_EQUIPMENT = gql`
   }
 `;
 
+export const FILTER_EQUIPMENT_BULK_EDIT_APS = gql`
+  query FilterEquipment(
+    $locationIds: [Int]
+    $customerId: Int!
+    $equipmentType: String
+    $cursor: String
+  ) {
+    filterEquipment(
+      customerId: $customerId
+      locationIds: $locationIds
+      equipmentType: $equipmentType
+      cursor: $cursor
+    ) {
+      items {
+        name
+        id
+        locationId
+        channel
+        details
+      }
+      context {
+        lastPage
+        cursor
+      }
+    }
+  }
+`;
+
 export const GET_LOCATION = gql`
   query GetLocation($id: Int!) {
     getLocation(id: $id) {
@@ -151,6 +179,25 @@ export const FILTER_SERVICE_METRICS = gql`
         rssi
         rxBytes
         txBytes
+      }
+      context {
+        lastPage
+        cursor
+      }
+    }
+  }
+`;
+
+export const GET_ALL_STATUS = gql`
+  query GetAllStatus($customerId: Int!, $statusDataTypes: [String]) {
+    getAllStatus(customerId: $customerId, statusDataTypes: $statusDataTypes) {
+      items {
+        customerId
+        detailsJSON
+        details {
+          equipmentCountPerOui
+          clientCountPerOui
+        }
       }
       context {
         lastPage
