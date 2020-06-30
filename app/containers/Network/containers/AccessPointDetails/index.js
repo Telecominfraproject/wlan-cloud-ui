@@ -49,6 +49,9 @@ const GET_EQUIPMENT = gql`
         }
         clientDetails {
           detailsJSON
+          details {
+            numClientsPerRadio
+          }
         }
         osPerformance {
           detailsJSON
