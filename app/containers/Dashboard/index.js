@@ -37,19 +37,26 @@ const Dashboard = () => {
 
   const {
     associatedClientsCountPerRadio,
-    // clientCountPerOui,
-    // sequipmentCountPerOui,
     totalProvisionedEquipment,
     equipmentInServiceCount,
     equipmentWithClientsCount,
     trafficBytesDownstream,
     trafficBytesUpstream,
   } = data.getAllStatus.items[0].detailsJSON;
+  const { clientCountPerOui, equipmentCountPerOui } = data.getAllStatus.items[0].details;
 
   let totalAssociated = 0;
   Object.keys(associatedClientsCountPerRadio).forEach(i => {
     totalAssociated += associatedClientsCountPerRadio[i];
   });
+
+  const { is2dot4GHz, is5GHzL, is5GHzU } = associatedClientsCountPerRadio;
+
+  const frequencies = {
+    '2.4GHz': is2dot4GHz,
+    '5GHz (L)': is5GHzL,
+    '5GHz (U)': is5GHzU,
+  };
 
   const statsArr = [
     {
@@ -59,15 +66,16 @@ const Dashboard = () => {
     },
     {
       'Total Associated': totalAssociated,
-      ...associatedClientsCountPerRadio,
+      ...frequencies,
     },
     {
-      'Total Average traffic (US)': formatBytes(trafficBytesUpstream),
-      'Total Average traffic (DS)': formatBytes(trafficBytesDownstream),
+      'Total Traffic (US)': formatBytes(trafficBytesUpstream),
+      'Total Traffic (DS)': formatBytes(trafficBytesDownstream),
     },
   ];
+  const pieChartData = [equipmentCountPerOui, clientCountPerOui];
 
-  return <DashboardPage titleList={titleList} statsArr={statsArr} />;
+  return <DashboardPage titleList={titleList} statsArr={statsArr} pieChartData={pieChartData} />;
 };
 
 export default Dashboard;
