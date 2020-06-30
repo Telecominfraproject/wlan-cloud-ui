@@ -192,6 +192,10 @@ export const GET_ALL_STATUS = gql`
       items {
         customerId
         detailsJSON
+        details {
+          equipmentCountPerOui
+          clientCountPerOui
+        }
       }
       context {
         lastPage
