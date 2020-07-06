@@ -63,3 +63,11 @@ export const UPDATE_EQUIPMENT_BULK = gql`
     }
   }
 `;
+
+export const FILE_UPLOAD = gql`
+  mutation FileUpload($fileName: String, $file: Upload) {
+    fileUpload(fileName: $fileName, file: $file) {
+      success
+    }
+  }
+`;

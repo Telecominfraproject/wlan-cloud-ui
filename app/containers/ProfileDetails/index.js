@@ -7,6 +7,7 @@ import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-li
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
+import { FILE_UPLOAD } from 'graphql/mutations';
 
 const GET_PROFILE = gql`
   query GetProfile($id: Int!) {
@@ -97,6 +98,8 @@ const ProfileDetails = () => {
     },
   });
 
+  const [fileUpload] = useMutation(FILE_UPLOAD);
+
   const handleDeleteProfile = () => {
     deleteProfile({ variables: { id: parseInt(id, 10) } });
   };
@@ -128,6 +131,21 @@ const ProfileDetails = () => {
       );
   };
 
+  const handleFileUpload = (fileName, file) =>
+    fileUpload({ variables: { fileName, file } })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'File successfully uploaded.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'File could not be uploaded.',
+        })
+      );
+
   if (loading) {
     return <Spin size="large" />;
   }
@@ -153,6 +171,7 @@ const ProfileDetails = () => {
       ssidProfiles={
         (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
       }
+      fileUpload={handleFileUpload}
     />
   );
 };
