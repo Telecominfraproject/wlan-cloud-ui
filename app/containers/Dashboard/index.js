@@ -50,12 +50,13 @@ const Dashboard = () => {
     totalAssociated += associatedClientsCountPerRadio[i];
   });
 
-  const { is2dot4GHz, is5GHzL, is5GHzU } = associatedClientsCountPerRadio;
+  const { is2dot4GHz, is5GHz, is5GHzL, is5GHzU } = associatedClientsCountPerRadio;
 
   const frequencies = {
-    '2.4GHz': is2dot4GHz,
-    '5GHz (L)': is5GHzL,
-    '5GHz (U)': is5GHzU,
+    '2.4GHz': is2dot4GHz || 0,
+    '5GHz': is5GHz || 0,
+    '5GHz (L)': is5GHzL || 0,
+    '5GHz (U)': is5GHzU || 0,
   };
 
   const statsArr = [
