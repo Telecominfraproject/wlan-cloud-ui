@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
-import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 
 import { Accounts as AccountsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
@@ -62,7 +62,7 @@ const UPDATE_USER = gql`
 `;
 
 const DELETE_USER = gql`
-  query DeleteUser($id: Int!) {
+  mutation DeleteUser($id: Int!) {
     deleteUser(id: $id) {
       id
     }
@@ -77,21 +77,7 @@ const Accounts = () => {
   });
   const [createUser] = useMutation(CREATE_USER);
   const [updateUser] = useMutation(UPDATE_USER);
-  const [deleteUser] = useLazyQuery(DELETE_USER, {
-    onCompleted: () => {
-      refetch();
-      notification.success({
-        message: 'Success',
-        description: 'Account successfully deleted.',
-      });
-    },
-    onError: () => {
-      notification.error({
-        message: 'Error',
-        description: 'Account could not be deleted.',
-      });
-    },
-  });
+  const [deleteUser] = useMutation(DELETE_USER);
 
   const handleLoadMore = () => {
     if (!data.getAllUsers.context.lastPage) {
@@ -164,7 +150,20 @@ const Accounts = () => {
   };
 
   const handleDeleteUser = id => {
-    deleteUser({ variables: { id } });
+    deleteUser({ variables: { id } })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Account successfully deleted.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Account could not be deleted.',
+        })
+      );
   };
 
   if (loading) {
