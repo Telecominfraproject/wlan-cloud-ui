@@ -13,6 +13,8 @@ import Login from 'containers/Login';
 import Network from 'containers/Network';
 import Dashboard from 'containers/Dashboard';
 import Profiles from 'containers/Profiles';
+import System from 'containers/System';
+
 import AddProfile from 'containers/AddProfile';
 import ProfileDetails from 'containers/ProfileDetails';
 
@@ -78,6 +80,7 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/addprofile" component={AddProfile} />
 
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
+          <ProtectedRouteWithLayout exact path="/system" component={System} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
           {user.role === 'SuperUser' && (
             <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
