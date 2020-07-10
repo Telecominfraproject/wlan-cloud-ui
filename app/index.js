@@ -20,7 +20,7 @@ import history from 'utils/history';
 const API_URI =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:4000/'
-    : 'https://wlan-graphql.tip.lab.connectus.ai/';
+    : 'https://wlan-graphql.zone3.lab.connectus.ai/';
 const MOUNT_NODE = document.getElementById('root');
 
 const cache = new InMemoryCache();
