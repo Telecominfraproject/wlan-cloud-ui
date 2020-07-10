@@ -45,7 +45,7 @@ const MasterLayout = ({ children }) => {
     },
     {
       key: 'system',
-      path: '/System',
+      path: '/system',
       text: 'System',
     },
   ];
@@ -73,7 +73,7 @@ const MasterLayout = ({ children }) => {
     },
     {
       key: 'system',
-      path: '/System',
+      path: '/system',
       text: 'System',
     },
     {
