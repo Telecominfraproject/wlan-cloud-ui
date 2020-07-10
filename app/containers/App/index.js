@@ -75,12 +75,13 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/" component={RedirectToDashboard} />
           <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
           <ProtectedRouteWithLayout path="/network" component={Network} />
+          <ProtectedRouteWithLayout path="/system" component={System} />
+
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
           <ProtectedRouteWithLayout exact path="/profiles/:id" component={ProfileDetails} />
           <ProtectedRouteWithLayout exact path="/addprofile" component={AddProfile} />
 
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
-          <ProtectedRouteWithLayout exact path="/system" component={System} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
           {user.role === 'SuperUser' && (
             <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
