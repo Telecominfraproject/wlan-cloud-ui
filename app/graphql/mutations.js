@@ -1,5 +1,15 @@
 import gql from 'graphql-tag';
 
+export const REFRESH_TOKEN = gql`
+  mutation UpdateToken($refreshToken: String!) {
+    updateToken(refreshToken: $refreshToken) {
+      access_token
+      refresh_token
+      expires_in
+    }
+  }
+`;
+
 export const CREATE_LOCATION = gql`
   mutation CreateLocation(
     $locationType: String!
@@ -60,6 +70,15 @@ export const UPDATE_EQUIPMENT_BULK = gql`
   mutation UpdateEquipmentBulk($items: [EquipmentRrmUpdate]) {
     updateEquipmentBulk(items: $items) {
       success
+    }
+  }
+`;
+
+export const FILE_UPLOAD = gql`
+  mutation FileUpload($fileName: String, $file: Upload) {
+    fileUpload(fileName: $fileName, file: $file) {
+      fileName
+      baseUrl
     }
   }
 `;
