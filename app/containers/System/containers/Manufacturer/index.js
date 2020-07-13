@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 import { useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { notification } from 'antd';
 import { Manufacturer as ManufacturerPage } from '@tip-wlan/wlan-cloud-ui-library';
+import { FILE_UPLOAD } from 'graphql/mutations';
 
 const GET_OUI = gql`
   query GetOui($oui: String!) {
@@ -37,6 +38,7 @@ const System = () => {
       });
     },
   });
+  const [fileUpload] = useMutation(FILE_UPLOAD);
 
   const handleUpdateOUI = (oui, manufacturerAlias, manufacturerName) => {
     updateOUI({
@@ -64,11 +66,26 @@ const System = () => {
     searchOUI({ variables: { oui } });
   };
 
+  const handleFileUpload = (fileName, file) =>
+    fileUpload({ variables: { fileName, file } })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'File successfully uploaded.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'File could not be uploaded.',
+        })
+      );
   return (
     <ManufacturerPage
       onSearchOUI={handleSearchOUI}
       onUpdateOUI={handleUpdateOUI}
       returnedOUI={data && data.getOui}
+      fileUpload={handleFileUpload}
     />
   );
 };
