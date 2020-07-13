@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import gql from 'graphql-tag';
-import { useQuery, useLazyQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
+import { FILE_UPLOAD } from 'graphql/mutations';
 
 const GET_PROFILE = gql`
   query GetProfile($id: Int!) {
@@ -25,14 +26,6 @@ const GET_PROFILE = gql`
       createdTimestamp
       lastModifiedTimestamp
       details
-    }
-  }
-`;
-
-const DELETE_PROFILE = gql`
-  query DeleteProfile($id: Int!) {
-    deleteProfile(id: $id) {
-      id
     }
   }
 `;
@@ -67,6 +60,14 @@ const UPDATE_PROFILE = gql`
   }
 `;
 
+const DELETE_PROFILE = gql`
+  mutation DeleteProfile($id: Int!) {
+    deleteProfile(id: $id) {
+      id
+    }
+  }
+`;
+
 const ProfileDetails = () => {
   const { customerId } = useContext(UserContext);
   const { id } = useParams();
@@ -80,25 +81,26 @@ const ProfileDetails = () => {
     variables: { customerId, type: 'ssid' },
   });
   const [updateProfile] = useMutation(UPDATE_PROFILE);
+  const [deleteProfile] = useMutation(DELETE_PROFILE);
 
-  const [deleteProfile] = useLazyQuery(DELETE_PROFILE, {
-    onCompleted: () => {
-      notification.success({
-        message: 'Success',
-        description: 'Profile successfully deleted.',
-      });
-      setRedirect(true);
-    },
-    onError: () => {
-      notification.error({
-        message: 'Error',
-        description: 'Profile could not be deleted.',
-      });
-    },
-  });
+  const [fileUpload] = useMutation(FILE_UPLOAD);
 
   const handleDeleteProfile = () => {
-    deleteProfile({ variables: { id: parseInt(id, 10) } });
+    deleteProfile({ variables: { id: parseInt(id, 10) } })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Profile successfully deleted.',
+        });
+
+        setRedirect(true);
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Profile could not be deleted.',
+        })
+      );
   };
 
   const handleUpdateProfile = (
@@ -128,6 +130,21 @@ const ProfileDetails = () => {
       );
   };
 
+  const handleFileUpload = (fileName, file) =>
+    fileUpload({ variables: { fileName, file } })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'File successfully uploaded.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'File could not be uploaded.',
+        })
+      );
+
   if (loading) {
     return <Spin size="large" />;
   }
@@ -153,6 +170,7 @@ const ProfileDetails = () => {
       ssidProfiles={
         (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
       }
+      fileUpload={handleFileUpload}
     />
   );
 };
