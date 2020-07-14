@@ -8,6 +8,7 @@ import moment from 'moment';
 import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { FILTER_SERVICE_METRICS } from 'graphql/queries';
+import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 
 const GET_EQUIPMENT = gql`
@@ -181,47 +182,11 @@ const AccessPointDetails = ({ locations }) => {
   });
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
+  const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
 
   const { data: dataFirmware, error: errorFirmware, loading: landingFirmware } = useQuery(
     GET_ALL_FIRMWARE
   );
-
-  if (loading || landingProfiles || landingFirmware) {
-    return <Spin size="large" />;
-  }
-
-  if (error) {
-    return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point data."
-        type="error"
-        showIcon
-      />
-    );
-  }
-
-  if (errorProfiles) {
-    return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point profiles."
-        type="error"
-        showIcon
-      />
-    );
-  }
-
-  if (errorFirmware) {
-    return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point firmware."
-        type="error"
-        showIcon
-      />
-    );
-  }
 
   const refetchData = () => {
     refetch();
@@ -273,6 +238,65 @@ const AccessPointDetails = ({ locations }) => {
       );
   };
 
+  const handleUpdateEquipmentFirmware = (equipmentId, firmwareVersionId) =>
+    updateEquipmentFirmware({ variables: { equipmentId, firmwareVersionId } })
+      .then(firmwareResp => {
+        if (firmwareResp && firmwareResp.updateEquipmentFirmware.success === false) {
+          notification.error({
+            message: 'Error',
+            description: 'Equipment Firmware Upgrade could not be updated.',
+          });
+        } else {
+          notification.success({
+            message: 'Success',
+            description: 'Equipment Firmware Upgrade in progress',
+          });
+        }
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Equipment Firmware Upgrade could not be updated.',
+        })
+      );
+
+  if (loading || landingProfiles || landingFirmware) {
+    return <Spin size="large" />;
+  }
+
+  if (error) {
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load Access Point data."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
+  if (errorProfiles) {
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load Access Point profiles."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
+  if (errorFirmware) {
+    return (
+      <Alert
+        message="Error"
+        description="Failed to load Access Point firmware."
+        type="error"
+        showIcon
+      />
+    );
+  }
+
   return (
     <AccessPointDetailsPage
       handleRefresh={refetchData}
@@ -286,6 +310,7 @@ const AccessPointDetails = ({ locations }) => {
       }}
       firmware={dataFirmware.getAllFirmware}
       locations={locations}
+      onUpdateEquipmentFirmware={handleUpdateEquipmentFirmware}
     />
   );
 };
