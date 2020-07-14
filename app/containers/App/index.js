@@ -13,6 +13,8 @@ import Login from 'containers/Login';
 import Network from 'containers/Network';
 import Dashboard from 'containers/Dashboard';
 import Profiles from 'containers/Profiles';
+import System from 'containers/System';
+
 import AddProfile from 'containers/AddProfile';
 import ProfileDetails from 'containers/ProfileDetails';
 
@@ -73,6 +75,8 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/" component={RedirectToDashboard} />
           <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
           <ProtectedRouteWithLayout path="/network" component={Network} />
+          <ProtectedRouteWithLayout path="/system" component={System} />
+
           <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
           <ProtectedRouteWithLayout exact path="/profiles/:id" component={ProfileDetails} />
           <ProtectedRouteWithLayout exact path="/addprofile" component={AddProfile} />
