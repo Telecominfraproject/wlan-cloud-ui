@@ -215,6 +215,7 @@ export const GET_ALL_STATUS = gql`
           equipmentCountPerOui
           clientCountPerOui
         }
+        alarmsCount
       }
       context {
         lastPage
