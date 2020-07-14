@@ -91,3 +91,11 @@ export const OUI_UPLOAD = gql`
     }
   }
 `;
+
+export const UPDATE_EQUIPMENT_FIRMWARE = gql`
+  mutation UpdateEquipmentFirmware($equipmentId: ID, $firmwareVersionId: ID) {
+    updateEquipmentFirmware(equipmentId: $equipmentId, firmwareVersionId: $firmwareVersionId) {
+      success
+    }
+  }
+`;
