@@ -12,8 +12,13 @@ import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetai
 import BulkEditAccessPoints from 'containers/Network/containers/BulkEditAccessPoints';
 
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_LOCATIONS, GET_LOCATION } from 'graphql/queries';
-import { CREATE_LOCATION, UPDATE_LOCATION, DELETE_LOCATION } from 'graphql/mutations';
+import { GET_ALL_LOCATIONS, GET_LOCATION, GET_ALL_PROFILES } from 'graphql/queries';
+import {
+  CREATE_LOCATION,
+  UPDATE_LOCATION,
+  DELETE_LOCATION,
+  CREATE_EQUIPMENT,
+} from 'graphql/mutations';
 
 const Network = () => {
   const { path } = useRouteMatch();
@@ -22,15 +27,23 @@ const Network = () => {
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
+  const { loading: loadingProfile, error: errorProfile, data: apProfiles } = useQuery(
+    GET_ALL_PROFILES,
+    {
+      variables: { customerId, type: 'equipment_ap' },
+    }
+  );
 
   const [getLocation, { data: selectedLocation }] = useLazyQuery(GET_LOCATION);
   const [createLocation] = useMutation(CREATE_LOCATION);
   const [updateLocation] = useMutation(UPDATE_LOCATION);
   const [deleteLocation] = useMutation(DELETE_LOCATION);
+  const [createEquipment] = useMutation(CREATE_EQUIPMENT);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
+  const [apModal, setApModal] = useState(false);
 
   const handleGetSingleLocation = id => {
     getLocation({
@@ -57,6 +70,7 @@ const Network = () => {
             setAddModal={setAddModal}
             setEditModal={setEditModal}
             setDeleteModal={setDeleteModal}
+            setApModal={setApModal}
           >
             {c.name}
           </PopoverMenu>
@@ -160,6 +174,24 @@ const Network = () => {
       );
   };
 
+  const handleCreateEquipment = (inventoryId, locationId, name, profileId) => {
+    setApModal(false);
+    createEquipment({ variables: { customerId, inventoryId, locationId, name, profileId } })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Equipment successfully created.',
+        });
+        refetch();
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Equipment could not be created.',
+        })
+      );
+  };
+
   const onSelect = (selectedKeys, info) => {
     const { id } = info.node;
     handleGetSingleLocation(id);
@@ -174,12 +206,16 @@ const Network = () => {
     [data]
   );
 
-  if (loading) {
+  if (loading || loadingProfile) {
     return <Loading />;
   }
 
   if (error) {
     return <Alert message="Error" description="Failed to load locations." type="error" showIcon />;
+  }
+
+  if (errorProfile) {
+    return <Alert message="Error" description="Failed to load profiles." type="error" showIcon />;
   }
 
   return (
@@ -193,12 +229,16 @@ const Network = () => {
       addModal={addModal}
       editModal={editModal}
       deleteModal={deleteModal}
+      apModal={apModal}
       setAddModal={setAddModal}
       setEditModal={setEditModal}
       setDeleteModal={setDeleteModal}
+      setApModal={setApModal}
       onAddLocation={handleAddLocation}
       onEditLocation={handleEditLocation}
       onDeleteLocation={handleDeleteLocation}
+      onCreateEquipment={handleCreateEquipment}
+      profiles={(apProfiles && apProfiles.getAllProfiles && apProfiles.getAllProfiles.items) || []}
     >
       <Switch>
         <Route
