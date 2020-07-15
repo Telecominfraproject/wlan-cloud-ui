@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 
 import { GET_ALL_STATUS_ALARMS } from 'graphql/queries';
 
-import { AppLayout as Layout, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { AppLayout as Layout } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { AUTH_TOKEN } from 'constants/index';
 
@@ -18,6 +18,27 @@ const MasterLayout = ({ children }) => {
 
   const client = useApolloClient();
   const location = useLocation();
+
+  const { data } = useQuery(GET_ALL_STATUS_ALARMS, {
+    variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
+  });
+
+  const alarmsCount = useMemo(() => {
+    const alarmsArr =
+      (data &&
+        data.getAllStatus &&
+        data.getAllStatus.items[0] &&
+        data.getAllStatus.items[0].alarmsCount &&
+        data.getAllStatus.items[0].alarmsCount.totalCountsPerAlarmCodeMap) ||
+      {};
+    let totalAlarms = 0;
+    if (alarmsArr) {
+      Object.keys(alarmsArr).forEach(i => {
+        totalAlarms += alarmsArr[i];
+      });
+    }
+    return totalAlarms;
+  }, [data]);
 
   const handleLogout = () => {
     removeItem(AUTH_TOKEN);
@@ -90,39 +111,13 @@ const MasterLayout = ({ children }) => {
     });
   }
 
-  const { loading, data } = useQuery(GET_ALL_STATUS_ALARMS, {
-    variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
-  });
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  const alarmsArr =
-    (data &&
-      data.getAllStatus &&
-      data.getAllStatus.items[0] &&
-      data.getAllStatus.items[0].alarmsCount &&
-      data.getAllStatus.items[0].alarmsCount.totalCountsPerAlarmCodeMap) ||
-    {};
-
-  const findAlarmCount = () => {
-    let totalAlarms = 0;
-    if (alarmsArr) {
-      Object.keys(alarmsArr).forEach(i => {
-        totalAlarms += alarmsArr[i];
-      });
-    }
-    return totalAlarms;
-  };
-
   return (
     <Layout
       onLogout={handleLogout}
       locationState={location}
       menuItems={menuItems}
       mobileMenuItems={mobileMenuItems}
-      totalAlarms={findAlarmCount()}
+      totalAlarms={alarmsCount}
     >
       {children}
     </Layout>
