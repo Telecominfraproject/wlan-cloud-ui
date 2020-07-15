@@ -215,6 +215,25 @@ export const GET_ALL_STATUS = gql`
           equipmentCountPerOui
           clientCountPerOui
         }
+      }
+      context {
+        lastPage
+        cursor
+      }
+    }
+  }
+`;
+
+export const GET_ALL_STATUS_ALARMS = gql`
+  query GetAllStatus($customerId: Int!, $statusDataTypes: [String]) {
+    getAllStatus(customerId: $customerId, statusDataTypes: $statusDataTypes) {
+      items {
+        customerId
+        detailsJSON
+        details {
+          equipmentCountPerOui
+          clientCountPerOui
+        }
         alarmsCount
       }
       context {

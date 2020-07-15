@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { Alert } from 'antd';
 import { useLocation } from 'react-router-dom';
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 
-import { GET_ALL_STATUS } from 'graphql/queries';
+import { GET_ALL_STATUS_ALARMS } from 'graphql/queries';
 
 import { AppLayout as Layout, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -91,7 +90,7 @@ const MasterLayout = ({ children }) => {
     });
   }
 
-  const { loading, error, data } = useQuery(GET_ALL_STATUS, {
+  const { loading, data } = useQuery(GET_ALL_STATUS_ALARMS, {
     variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
   });
 
@@ -99,16 +98,23 @@ const MasterLayout = ({ children }) => {
     return <Loading />;
   }
 
-  if (error) {
-    return <Alert message="Error" description="Failed to load Alarms" type="error" showIcon />;
-  }
+  const alarmsArr =
+    (data &&
+      data.getAllStatus &&
+      data.getAllStatus.items[0] &&
+      data.getAllStatus.items[0].alarmsCount &&
+      data.getAllStatus.items[0].alarmsCount.totalCountsPerAlarmCodeMap) ||
+    {};
 
-  const alarms = data.getAllStatus.items[0].alarmsCount.totalCountsPerAlarmCodeMap;
-
-  let totalAlarms = 0;
-  Object.keys(alarms).forEach(i => {
-    totalAlarms += alarms[i];
-  });
+  const findAlarmCount = () => {
+    let totalAlarms = 0;
+    if (alarmsArr) {
+      Object.keys(alarmsArr).forEach(i => {
+        totalAlarms += alarmsArr[i];
+      });
+    }
+    return totalAlarms;
+  };
 
   return (
     <Layout
@@ -116,7 +122,7 @@ const MasterLayout = ({ children }) => {
       locationState={location}
       menuItems={menuItems}
       mobileMenuItems={mobileMenuItems}
-      totalAlarms={totalAlarms}
+      totalAlarms={findAlarmCount()}
     >
       {children}
     </Layout>
