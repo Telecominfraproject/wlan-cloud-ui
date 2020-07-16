@@ -99,3 +99,26 @@ export const UPDATE_EQUIPMENT_FIRMWARE = gql`
     }
   }
 `;
+
+export const DELETE_TRACK_ASSIGNMENT = gql`
+  mutation UpdateEquipmentFirmware($firmwareTrackId: ID!, $firmwareVersionId: ID!) {
+    deleteFirmwareTrackAssignment(
+      firmwareTrackId: $firmwareTrackId
+      firmwareVersionId: $firmwareVersionId
+    ) {
+      trackRecordId
+      firmwareVersionRecordId
+      modelId
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const DELETE_FIRMWARE = gql`
+  mutation DeleteFirmware($id: ID!) {
+    deleteFirmware(id: $id) {
+      id
+    }
+  }
+`;

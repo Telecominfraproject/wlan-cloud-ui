@@ -237,3 +237,14 @@ export const GET_ALL_FIRMWARE = gql`
     }
   }
 `;
+
+export const GET_TRACK_ASSIGNMENTS = gql`
+  query GetAllFirmwareTrackAssignment {
+    getAllFirmwareTrackAssignment {
+      modelId
+      firmwareVersionRecordId
+      trackRecordId
+      lastModifiedTimestamp
+    }
+  }
+`;
