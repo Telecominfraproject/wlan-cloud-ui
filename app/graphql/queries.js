@@ -223,3 +223,9 @@ export const GET_ALL_STATUS = gql`
     }
   }
 `;
+
+export const GET_ALARM_COUNT = gql`
+  query GetAlarmCount($customerId: Int!) {
+    getAlarmCount(customerId: $customerId)
+  }
+`;
