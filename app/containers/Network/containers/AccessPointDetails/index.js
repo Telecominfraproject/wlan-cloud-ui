@@ -301,7 +301,14 @@ const AccessPointDetails = ({ locations }) => {
     <AccessPointDetailsPage
       handleRefresh={refetchData}
       onUpdateEquipment={handleUpdateEquipment}
-      data={data.getEquipment}
+      data={{
+        ...data.getEquipment,
+        protocol:
+          data.getEquipment.status && data.getEquipment.status.protocol
+            ? data.getEquipment.status.protocol
+            : {},
+        details: data.getEquipment.details ? data.getEquipment.details : {},
+      }}
       profiles={dataProfiles.getAllProfiles.items}
       osData={{
         loading: metricsLoading,
