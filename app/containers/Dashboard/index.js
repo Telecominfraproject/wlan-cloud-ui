@@ -35,6 +35,8 @@ const Dashboard = () => {
     return <Alert message="Error" description="Failed to load Dashboard" type="error" showIcon />;
   }
 
+  const status = data.getAllStatus.items.length > 0 ? data.getAllStatus.items[0] : {};
+
   const {
     associatedClientsCountPerRadio,
     totalProvisionedEquipment,
@@ -42,8 +44,8 @@ const Dashboard = () => {
     equipmentWithClientsCount,
     trafficBytesDownstream,
     trafficBytesUpstream,
-  } = data.getAllStatus.items[0].detailsJSON;
-  const { clientCountPerOui, equipmentCountPerOui } = data.getAllStatus.items[0].details;
+  } = status.detailsJSON;
+  const { clientCountPerOui, equipmentCountPerOui } = status.details;
 
   let totalAssociated = 0;
   Object.keys(associatedClientsCountPerRadio).forEach(i => {
