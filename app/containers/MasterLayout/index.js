@@ -1,9 +1,9 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
 
-import { GET_ALL_STATUS_ALARMS } from 'graphql/queries';
+import { GET_ALARM_COUNT } from 'graphql/queries';
 
 import { AppLayout as Layout } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -19,26 +19,9 @@ const MasterLayout = ({ children }) => {
   const client = useApolloClient();
   const location = useLocation();
 
-  const { data } = useQuery(GET_ALL_STATUS_ALARMS, {
-    variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
+  const { data } = useQuery(GET_ALARM_COUNT, {
+    variables: { customerId },
   });
-
-  const alarmsCount = useMemo(() => {
-    const alarmsArr =
-      (data &&
-        data.getAllStatus &&
-        data.getAllStatus.items[0] &&
-        data.getAllStatus.items[0].alarmsCount &&
-        data.getAllStatus.items[0].alarmsCount.totalCountsPerAlarmCodeMap) ||
-      {};
-    let totalAlarms = 0;
-    if (alarmsArr) {
-      Object.keys(alarmsArr).forEach(i => {
-        totalAlarms += alarmsArr[i];
-      });
-    }
-    return totalAlarms;
-  }, [data]);
 
   const handleLogout = () => {
     removeItem(AUTH_TOKEN);
@@ -117,7 +100,7 @@ const MasterLayout = ({ children }) => {
       locationState={location}
       menuItems={menuItems}
       mobileMenuItems={mobileMenuItems}
-      totalAlarms={alarmsCount}
+      totalAlarms={data && data.getAlarmCount}
     >
       {children}
     </Layout>

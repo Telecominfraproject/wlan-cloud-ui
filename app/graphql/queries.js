@@ -224,22 +224,8 @@ export const GET_ALL_STATUS = gql`
   }
 `;
 
-export const GET_ALL_STATUS_ALARMS = gql`
-  query GetAllStatus($customerId: Int!, $statusDataTypes: [String]) {
-    getAllStatus(customerId: $customerId, statusDataTypes: $statusDataTypes) {
-      items {
-        customerId
-        detailsJSON
-        details {
-          equipmentCountPerOui
-          clientCountPerOui
-        }
-        alarmsCount
-      }
-      context {
-        lastPage
-        cursor
-      }
-    }
+export const GET_ALARM_COUNT = gql`
+  query GetAlarmCount($customerId: Int!) {
+    getAlarmCount(customerId: $customerId)
   }
 `;
