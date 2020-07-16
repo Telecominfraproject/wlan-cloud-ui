@@ -206,16 +206,12 @@ const Network = () => {
     [data]
   );
 
-  if (loading || loadingProfile) {
+  if (loading) {
     return <Loading />;
   }
 
   if (error) {
     return <Alert message="Error" description="Failed to load locations." type="error" showIcon />;
-  }
-
-  if (errorProfile) {
-    return <Alert message="Error" description="Failed to load profiles." type="error" showIcon />;
   }
 
   return (
@@ -239,6 +235,8 @@ const Network = () => {
       onDeleteLocation={handleDeleteLocation}
       onCreateEquipment={handleCreateEquipment}
       profiles={(apProfiles && apProfiles.getAllProfiles && apProfiles.getAllProfiles.items) || []}
+      loadingProfile={loadingProfile}
+      errorProfile={errorProfile}
     >
       <Switch>
         <Route
