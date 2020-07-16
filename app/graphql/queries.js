@@ -223,3 +223,17 @@ export const GET_ALL_STATUS = gql`
     }
   }
 `;
+
+export const GET_ALL_FIRMWARE = gql`
+  query GetAllFirmware {
+    getAllFirmware {
+      id
+      modelId
+      versionName
+      description
+      filename
+      commit
+      releaseDate
+    }
+  }
+`;
