@@ -83,10 +83,43 @@ export const FILE_UPLOAD = gql`
   }
 `;
 
+export const OUI_UPLOAD = gql`
+  mutation OuiUpload($fileName: String, $file: Upload) {
+    ouiUpload(fileName: $fileName, file: $file) {
+      fileName
+      baseUrl
+    }
+  }
+`;
+
 export const UPDATE_EQUIPMENT_FIRMWARE = gql`
   mutation UpdateEquipmentFirmware($equipmentId: ID, $firmwareVersionId: ID) {
     updateEquipmentFirmware(equipmentId: $equipmentId, firmwareVersionId: $firmwareVersionId) {
       success
+    }
+  }
+`;
+
+export const CREATE_EQUIPMENT = gql`
+  mutation CreateEquipment(
+    $customerId: Int!
+    $inventoryId: String!
+    $locationId: Int!
+    $name: String!
+    $profileId: Int!
+  ) {
+    createEquipment(
+      customerId: $customerId
+      inventoryId: $inventoryId
+      locationId: $locationId
+      name: $name
+      profileId: $profileId
+    ) {
+      locationId
+      customerId
+      inventoryId
+      name
+      profileId
     }
   }
 `;

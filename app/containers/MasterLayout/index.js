@@ -44,6 +44,11 @@ const MasterLayout = ({ children }) => {
       path: '/profiles',
       text: 'Profiles',
     },
+    {
+      key: 'system',
+      path: '/system',
+      text: 'System',
+    },
   ];
 
   const mobileMenuItems = [
@@ -62,7 +67,11 @@ const MasterLayout = ({ children }) => {
       path: '/profiles',
       text: 'Profiles',
     },
-
+    {
+      key: 'system',
+      path: '/system',
+      text: 'System',
+    },
     {
       key: 'settings',
       text: 'Settings',
