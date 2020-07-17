@@ -2,7 +2,12 @@ import React from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import { GET_ALL_FIRMWARE, GET_TRACK_ASSIGNMENTS } from 'graphql/queries';
-import { DELETE_TRACK_ASSIGNMENT, DELETE_FIRMWARE } from 'graphql/mutations';
+import {
+  DELETE_TRACK_ASSIGNMENT,
+  DELETE_FIRMWARE,
+  CREATE_FIRMWARE,
+  UPDATE_FIRMWARE,
+} from 'graphql/mutations';
 import { Firmware as FirmwarePage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 const Firmware = () => {
@@ -16,6 +21,8 @@ const Firmware = () => {
 
   const [deleteTrackAssignment] = useMutation(DELETE_TRACK_ASSIGNMENT);
   const [deleteFirmware] = useMutation(DELETE_FIRMWARE);
+  const [createFirmware] = useMutation(CREATE_FIRMWARE);
+  const [updateFirmware] = useMutation(UPDATE_FIRMWARE);
 
   const handleDeleteTrackAssignment = (firmwareTrackId, firmwareVersionId) => {
     deleteTrackAssignment({
@@ -38,6 +45,81 @@ const Firmware = () => {
         })
       );
   };
+  const handleCreateFirmware = (
+    modelId,
+    versionName,
+    description,
+    filename,
+    commit,
+    releaseDate,
+    validationCode
+  ) => {
+    createFirmware({
+      variables: {
+        modelId,
+        versionName,
+        description,
+        filename,
+        commit,
+        releaseDate,
+        validationCode,
+      },
+    })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Firmware version successfully created.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Firmware version could not be created.',
+        })
+      );
+  };
+
+  const handleUpdateFirmware = (
+    id,
+    modelId,
+    versionName,
+    description,
+    filename,
+    commit,
+    releaseDate,
+    validationCode,
+    createdTimestamp,
+    lastModifiedTimestamp
+  ) => {
+    updateFirmware({
+      variables: {
+        id,
+        modelId,
+        versionName,
+        description,
+        filename,
+        commit,
+        releaseDate,
+        validationCode,
+        createdTimestamp,
+        lastModifiedTimestamp,
+      },
+    })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Firmware version successfully updated.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Firmware version could not be updated.',
+        })
+      );
+  };
 
   const handleDeleteFirmware = id => {
     deleteFirmware({
@@ -49,13 +131,13 @@ const Firmware = () => {
         refetch();
         notification.success({
           message: 'Success',
-          description: 'Firmware successfully deleted.',
+          description: 'Firmware version successfully deleted.',
         });
       })
       .catch(() =>
         notification.error({
           message: 'Error',
-          description: 'Firmware could not be deleted.',
+          description: 'Firmware version could not be deleted.',
         })
       );
   };
@@ -87,6 +169,8 @@ const Firmware = () => {
       trackAssignmentData={trackAssignmentData && trackAssignmentData.getAllFirmwareTrackAssignment}
       onDeleteTrackAssignment={handleDeleteTrackAssignment}
       onDeleteFirmware={handleDeleteFirmware}
+      onCreateFirnware={handleCreateFirmware}
+      onUpdateFirmware={handleUpdateFirmware}
     />
   );
 };

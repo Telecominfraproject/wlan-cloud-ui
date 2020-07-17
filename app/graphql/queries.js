@@ -234,6 +234,9 @@ export const GET_ALL_FIRMWARE = gql`
       filename
       commit
       releaseDate
+      validationCode
+      createdTimestamp
+      lastModifiedTimestamp
     }
   }
 `;

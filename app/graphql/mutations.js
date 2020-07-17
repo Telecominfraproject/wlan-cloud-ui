@@ -122,3 +122,72 @@ export const DELETE_FIRMWARE = gql`
     }
   }
 `;
+
+export const CREATE_FIRMWARE = gql`
+  mutation CreateFirmware(
+    $modelId: String!
+    $versionName: String
+    $description: String
+    $filename: String
+    $commit: String
+    $releaseDate: String
+    $validationCode: String
+  ) {
+    createFirmware(
+      modelId: $modelId
+      versionName: $versionName
+      description: $description
+      filename: $filename
+      commit: $commit
+      releaseDate: $releaseDate
+      validationCode: $validationCode
+    ) {
+      modelId
+      versionName
+      description
+      filename
+      commit
+      releaseDate
+      validationCode
+    }
+  }
+`;
+
+export const UPDATE_FIRMWARE = gql`
+  mutation UpdateFirmware(
+    $id: ID!
+    $modelId: String!
+    $versionName: String
+    $description: String
+    $filename: String
+    $commit: String
+    $releaseDate: String
+    $validationCode: String
+    $createdTimestamp: String
+    $lastModifiedTimestamp: String
+  ) {
+    updateFirmware(
+      id: $id
+      modelId: $modelId
+      versionName: $versionName
+      description: $description
+      filename: $filename
+      commit: $commit
+      releaseDate: $releaseDate
+      validationCode: $validationCode
+      createdTimestamp: $createdTimestamp
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      id
+      modelId
+      versionName
+      description
+      filename
+      commit
+      releaseDate
+      validationCode
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;
