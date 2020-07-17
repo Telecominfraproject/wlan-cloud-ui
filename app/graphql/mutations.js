@@ -115,14 +115,6 @@ export const DELETE_TRACK_ASSIGNMENT = gql`
   }
 `;
 
-export const DELETE_FIRMWARE = gql`
-  mutation DeleteFirmware($id: ID!) {
-    deleteFirmware(id: $id) {
-      id
-    }
-  }
-`;
-
 export const CREATE_FIRMWARE = gql`
   mutation CreateFirmware(
     $modelId: String!
@@ -188,6 +180,14 @@ export const UPDATE_FIRMWARE = gql`
       validationCode
       createdTimestamp
       lastModifiedTimestamp
+    }
+  }
+`;
+
+export const DELETE_FIRMWARE = gql`
+  mutation DeleteFirmware($id: ID!) {
+    deleteFirmware(id: $id) {
+      id
     }
   }
 `;
