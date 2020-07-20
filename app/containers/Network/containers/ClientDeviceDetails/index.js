@@ -28,8 +28,8 @@ const ClientDeviceDetails = () => {
   } = useQuery(FILTER_SERVICE_METRICS, {
     variables: {
       customerId,
-      fromTime: fromTime.unix(),
-      toTime: toTime.unix(),
+      fromTime: fromTime.valueOf().toString(),
+      toTime: toTime.valueOf().toString(),
       clientMacs: [id],
       dataTypes: ['Client'],
     },

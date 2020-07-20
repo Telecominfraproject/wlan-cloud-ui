@@ -7,7 +7,7 @@ import { EditAccount as EditAccountPage, Loading } from '@tip-wlan/wlan-cloud-ui
 import UserContext from 'contexts/UserContext';
 
 const GET_USER = gql`
-  query GetUser($id: Int!) {
+  query GetUser($id: ID!) {
     getUser(id: $id) {
       id
       username
@@ -20,11 +20,11 @@ const GET_USER = gql`
 
 const UPDATE_USER = gql`
   mutation UpdateUser(
-    $id: Int!
+    $id: ID!
     $username: String!
     $password: String!
     $role: String!
-    $customerId: Int!
+    $customerId: ID!
     $lastModifiedTimestamp: String
   ) {
     updateUser(

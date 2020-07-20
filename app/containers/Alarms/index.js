@@ -7,7 +7,7 @@ import { Alarms as AlarmsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_ALARMS = gql`
-  query GetAllAlarms($customerId: Int!, $cursor: String) {
+  query GetAllAlarms($customerId: ID!, $cursor: String) {
     getAllAlarms(customerId: $customerId, cursor: $cursor) {
       items {
         severity

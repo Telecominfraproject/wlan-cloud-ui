@@ -8,7 +8,7 @@ import { Accounts as AccountsPage, Loading } from '@tip-wlan/wlan-cloud-ui-libra
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_USERS = gql`
-  query GetAllUsers($customerId: Int!, $cursor: String) {
+  query GetAllUsers($customerId: ID!, $cursor: String) {
     getAllUsers(customerId: $customerId, cursor: $cursor) {
       items {
         id
@@ -26,7 +26,7 @@ const GET_ALL_USERS = gql`
 `;
 
 const CREATE_USER = gql`
-  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: Int!) {
+  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: ID!) {
     createUser(username: $username, password: $password, role: $role, customerId: $customerId) {
       username
       role
@@ -37,11 +37,11 @@ const CREATE_USER = gql`
 
 const UPDATE_USER = gql`
   mutation UpdateUser(
-    $id: Int!
+    $id: ID!
     $username: String!
     $password: String!
     $role: String!
-    $customerId: Int!
+    $customerId: ID!
     $lastModifiedTimestamp: String
   ) {
     updateUser(
@@ -62,7 +62,7 @@ const UPDATE_USER = gql`
 `;
 
 const DELETE_USER = gql`
-  mutation DeleteUser($id: Int!) {
+  mutation DeleteUser($id: ID!) {
     deleteUser(id: $id) {
       id
     }

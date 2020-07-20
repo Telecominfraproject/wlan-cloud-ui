@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 
 export const GET_ALL_LOCATIONS = gql`
-  query GetAllLocations($customerId: Int!) {
+  query GetAllLocations($customerId: ID!) {
     getAllLocations(customerId: $customerId) {
       id
       name
@@ -13,8 +13,8 @@ export const GET_ALL_LOCATIONS = gql`
 
 export const FILTER_EQUIPMENT = gql`
   query FilterEquipment(
-    $locationIds: [Int]
-    $customerId: Int!
+    $locationIds: [ID]
+    $customerId: ID!
     $equipmentType: String
     $cursor: String
   ) {
@@ -73,8 +73,8 @@ export const FILTER_EQUIPMENT = gql`
 
 export const FILTER_EQUIPMENT_BULK_EDIT_APS = gql`
   query FilterEquipment(
-    $locationIds: [Int]
-    $customerId: Int!
+    $locationIds: [ID]
+    $customerId: ID!
     $equipmentType: String
     $cursor: String
   ) {
@@ -100,7 +100,7 @@ export const FILTER_EQUIPMENT_BULK_EDIT_APS = gql`
 `;
 
 export const GET_LOCATION = gql`
-  query GetLocation($id: Int!) {
+  query GetLocation($id: ID!) {
     getLocation(id: $id) {
       id
       parentId
@@ -112,7 +112,7 @@ export const GET_LOCATION = gql`
 `;
 
 export const FILTER_CLIENT_SESSIONS = gql`
-  query FilterClientSessions($customerId: Int!, $locationIds: [Int], $cursor: String) {
+  query FilterClientSessions($customerId: ID!, $locationIds: [ID], $cursor: String) {
     filterClientSessions(customerId: $customerId, locationIds: $locationIds, cursor: $cursor) {
       items {
         id
@@ -136,7 +136,7 @@ export const FILTER_CLIENT_SESSIONS = gql`
 `;
 
 export const GET_CLIENT_SESSION = gql`
-  query GetClientSession($customerId: Int!, $macAddress: String!) {
+  query GetClientSession($customerId: ID!, $macAddress: String!) {
     getClientSession(customerId: $customerId, macAddress: $macAddress) {
       id
       macAddress
@@ -156,7 +156,7 @@ export const GET_CLIENT_SESSION = gql`
 
 export const FILTER_SERVICE_METRICS = gql`
   query FilterServiceMetrics(
-    $customerId: Int!
+    $customerId: ID!
     $cursor: String
     $fromTime: String!
     $toTime: String!
@@ -189,7 +189,7 @@ export const FILTER_SERVICE_METRICS = gql`
 `;
 
 export const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: Int!, $cursor: String, $type: String) {
+  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String) {
     getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
       items {
         id
@@ -206,7 +206,7 @@ export const GET_ALL_PROFILES = gql`
 `;
 
 export const GET_ALL_STATUS = gql`
-  query GetAllStatus($customerId: Int!, $statusDataTypes: [String]) {
+  query GetAllStatus($customerId: ID!, $statusDataTypes: [String]) {
     getAllStatus(customerId: $customerId, statusDataTypes: $statusDataTypes) {
       items {
         customerId
@@ -225,7 +225,7 @@ export const GET_ALL_STATUS = gql`
 `;
 
 export const GET_ALARM_COUNT = gql`
-  query GetAlarmCount($customerId: Int!) {
+  query GetAlarmCount($customerId: ID!) {
     getAlarmCount(customerId: $customerId)
   }
 `;

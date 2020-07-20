@@ -10,9 +10,9 @@ import { GET_ALL_PROFILES } from 'graphql/queries';
 const CREATE_PROFILE = gql`
   mutation CreateProfile(
     $profileType: String!
-    $customerId: Int!
+    $customerId: ID!
     $name: String!
-    $childProfileIds: [Int]
+    $childProfileIds: [ID]
     $details: JSONObject
   ) {
     createProfile(
