@@ -1,7 +1,12 @@
 import React from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { notification } from 'antd';
-import { GET_ALL_FIRMWARE, GET_TRACK_ASSIGNMENTS, GET_FIRMWARE_TRACK } from 'graphql/queries';
+import {
+  GET_ALL_FIRMWARE,
+  GET_TRACK_ASSIGNMENTS,
+  GET_FIRMWARE_TRACK,
+  GET_ALL_FIRMWARE_MODELS,
+} from 'graphql/queries';
 import {
   UPDATE_TRACK_ASSIGNMENT,
   DELETE_TRACK_ASSIGNMENT,
@@ -13,6 +18,12 @@ import { Firmware as FirmwarePage } from '@tip-wlan/wlan-cloud-ui-library';
 
 const Firmware = () => {
   const { data, error, loading, refetch } = useQuery(GET_ALL_FIRMWARE);
+
+  const [
+    getAllFirmware,
+    { data: firmwareVersionData, loading: firmwareVersionLoading },
+  ] = useLazyQuery(GET_ALL_FIRMWARE);
+
   const {
     data: trackAssignmentData,
     error: trackAssignmentError,
@@ -28,11 +39,21 @@ const Firmware = () => {
     variables: { firmwareTrackName: 'DEFAULT' },
   });
 
+  const {
+    data: firmwareModelData,
+    error: firmwareModelError,
+    loading: firmwareModelLoading,
+  } = useQuery(GET_ALL_FIRMWARE_MODELS);
+
   const [updateTrackAssignment] = useMutation(UPDATE_TRACK_ASSIGNMENT);
   const [deleteTrackAssignment] = useMutation(DELETE_TRACK_ASSIGNMENT);
   const [createFirmware] = useMutation(CREATE_FIRMWARE);
   const [updateFirmware] = useMutation(UPDATE_FIRMWARE);
   const [deleteFirmware] = useMutation(DELETE_FIRMWARE);
+
+  const handleSearchFirmware = modelId => {
+    getAllFirmware({ variables: { modelId } });
+  };
 
   const handleCreateTrackAssignment = (firmwareVersionRecordId, modelId) => {
     updateTrackAssignment({
@@ -221,6 +242,12 @@ const Firmware = () => {
       trackAssignmentLoading={trackAssignmentLoading}
       firmwareTrackLoading={firmwareTrackLoading}
       firmwareTrackError={firmwareTrackError}
+      firmwareModelData={firmwareModelData && firmwareModelData.getAllFirmwareModelId}
+      handleSearchFirmware={handleSearchFirmware}
+      firmwareVersionData={firmwareVersionData && firmwareVersionData.getAllFirmware}
+      firmwareVersionLoading={firmwareVersionLoading}
+      firmwareModelError={firmwareModelError}
+      firmwareModelLoading={firmwareModelLoading}
     />
   );
 };

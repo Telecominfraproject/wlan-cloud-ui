@@ -224,6 +224,12 @@ export const GET_ALL_STATUS = gql`
   }
 `;
 
+export const GET_ALL_FIRMWARE_MODELS = gql`
+  query GetAllFirmwareModelId {
+    getAllFirmwareModelId
+  }
+`;
+
 export const GET_FIRMWARE_TRACK = gql`
   query GetFirmwareTrack($firmwareTrackName: String!) {
     getFirmwareTrack(firmwareTrackName: $firmwareTrackName) {
@@ -236,8 +242,8 @@ export const GET_FIRMWARE_TRACK = gql`
 `;
 
 export const GET_ALL_FIRMWARE = gql`
-  query GetAllFirmware {
-    getAllFirmware {
+  query GetAllFirmware($modelId: String) {
+    getAllFirmware(modelId: $modelId) {
       id
       modelId
       versionName
