@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { useApolloClient, useQuery } from '@apollo/react-hooks';
-import { notification } from 'antd';
 import { AppLayout as Layout } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { GET_ALARM_COUNT } from 'graphql/queries';
@@ -21,12 +20,6 @@ const MasterLayout = ({ children }) => {
 
   const { data } = useQuery(GET_ALARM_COUNT, {
     variables: { customerId },
-    onError: () => {
-      notification.error({
-        message: 'Error',
-        description: 'Failed to load Alarms.',
-      });
-    },
   });
 
   const handleLogout = () => {
