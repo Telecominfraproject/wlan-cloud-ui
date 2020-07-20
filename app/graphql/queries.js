@@ -224,6 +224,17 @@ export const GET_ALL_STATUS = gql`
   }
 `;
 
+export const GET_FIRMWARE_TRACK = gql`
+  query GetFirmwareTrack($firmwareTrackName: String!) {
+    getFirmwareTrack(firmwareTrackName: $firmwareTrackName) {
+      recordId
+      trackName
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;
+
 export const GET_ALL_FIRMWARE = gql`
   query GetAllFirmware {
     getAllFirmware {

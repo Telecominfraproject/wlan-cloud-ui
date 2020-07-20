@@ -100,6 +100,30 @@ export const UPDATE_EQUIPMENT_FIRMWARE = gql`
   }
 `;
 
+export const UPDATE_TRACK_ASSIGNMENT = gql`
+  mutation UpdateFirmwareTrackAssignment(
+    $trackRecordId: ID!
+    $firmwareVersionRecordId: ID!
+    $modelId: String!
+    $createdTimestamp: String
+    $lastModifiedTimestamp: String
+  ) {
+    updateFirmwareTrackAssignment(
+      trackRecordId: $trackRecordId
+      firmwareVersionRecordId: $firmwareVersionRecordId
+      modelId: $modelId
+      createdTimestamp: $createdTimestamp
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      trackRecordId
+      firmwareVersionRecordId
+      modelId
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;
+
 export const DELETE_TRACK_ASSIGNMENT = gql`
   mutation UpdateEquipmentFirmware($firmwareTrackId: ID!, $firmwareVersionId: ID!) {
     deleteFirmwareTrackAssignment(
