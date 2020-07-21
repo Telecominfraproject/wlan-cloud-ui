@@ -11,10 +11,10 @@ import {
 import UserContext from 'contexts/UserContext';
 import { GET_CLIENT_SESSION, FILTER_SERVICE_METRICS } from 'graphql/queries';
 
-const ClientDeviceDetails = () => {
-  const toTime = moment();
-  const fromTime = toTime.subtract(24, 'hours');
+const toTime = moment();
+const fromTime = moment().subtract(24, 'hours');
 
+const ClientDeviceDetails = () => {
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch } = useQuery(GET_CLIENT_SESSION, {

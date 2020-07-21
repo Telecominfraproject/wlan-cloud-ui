@@ -151,9 +151,10 @@ export const GET_ALL_PROFILES = gql`
   }
 `;
 
+const toTime = moment();
+const fromTime = moment().subtract(24, 'hours');
+
 const AccessPointDetails = ({ locations }) => {
-  const toTime = moment();
-  const fromTime = toTime.subtract(24, 'hours');
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
 
