@@ -1,10 +1,11 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
 import { Dashboard as DashboardPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
-import moment from 'moment';
+import { FILTER_SYSTEM_EVENTS, GET_ALL_STATUS } from 'graphql/queries';
+import React, { useContext, useEffect, useState } from 'react';
+
+import { Alert } from 'antd';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_STATUS, FILTER_SYSTEM_EVENTS } from 'graphql/queries';
+import moment from 'moment';
+import { useQuery } from '@apollo/react-hooks';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -59,8 +60,7 @@ const Dashboard = () => {
     'Traffic (24hours)',
   ];
 
-  const [lineChartXAxis] = useState([]);
-  const [lineChartYAxis] = useState({
+  const [lineChartData] = useState({
     inservicesAPs: { name: 'Inservice APs', value: [] },
     clientDevices: {
       is2dot4GHz: { name: '2.4GHz', value: [] },
@@ -88,13 +88,18 @@ const Dashboard = () => {
           },
         },
       }) => {
-        lineChartXAxis.push(eventTimestamp);
-        lineChartYAxis.inservicesAPs.value.push(equipmentInServiceCount);
-        lineChartYAxis.clientDevices.is2dot4GHz.value.push(is2dot4GHz);
-        lineChartYAxis.clientDevices.is5GHzL.value.push(is5GHzL);
-        lineChartYAxis.clientDevices.is5GHzU.value.push(is5GHzU);
-        lineChartYAxis.traffic.trafficBytesDownstream.value.push(trafficBytesDownstream);
-        lineChartYAxis.traffic.trafficBytesUpstream.value.push(trafficBytesUpstream);
+        lineChartData.inservicesAPs.value.push([eventTimestamp, equipmentInServiceCount]);
+        lineChartData.clientDevices.is2dot4GHz.value.push([eventTimestamp, is2dot4GHz]);
+        lineChartData.clientDevices.is5GHzL.value.push([eventTimestamp, is5GHzL]);
+        lineChartData.clientDevices.is5GHzU.value.push([eventTimestamp, is5GHzU]);
+        lineChartData.traffic.trafficBytesDownstream.value.push([
+          eventTimestamp,
+          trafficBytesDownstream,
+        ]);
+        lineChartData.traffic.trafficBytesUpstream.value.push([
+          eventTimestamp,
+          trafficBytesUpstream,
+        ]);
       }
     );
   }, [metricsLoading]);
@@ -157,8 +162,7 @@ const Dashboard = () => {
       pieChartTitle={pieChartTitle}
       statsArr={statsArr}
       pieChartData={pieChartData}
-      lineChartYAxis={lineChartYAxis}
-      lineChartXAxis={lineChartXAxis}
+      lineChartData={lineChartData}
       lineChartTitle={lineChartTitle}
     />
   );
