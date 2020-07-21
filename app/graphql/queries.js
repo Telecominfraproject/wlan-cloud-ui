@@ -158,8 +158,8 @@ export const FILTER_SERVICE_METRICS = gql`
   query FilterServiceMetrics(
     $customerId: Int!
     $cursor: String
-    $fromTime: Int!
-    $toTime: Int!
+    $fromTime: String!
+    $toTime: String!
     $clientMacs: [String]
     $equipmentIds: [ID]
     $dataTypes: [String]
