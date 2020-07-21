@@ -229,3 +229,31 @@ export const GET_ALARM_COUNT = gql`
     getAlarmCount(customerId: $customerId)
   }
 `;
+
+export const FILTER_SYSTEM_EVENTS = gql`
+  query FilterSystemEvents(
+    $customerId: ID!
+    $fromTime: String!
+    $toTime: String!
+    $equipmentIds: [ID]
+    $dataTypes: [String]
+    $cursor: String
+    $limit: Int
+  ) {
+    filterSystemEvents(
+      customerId: $customerId
+      fromTime: $fromTime
+      toTime: $toTime
+      dataTypes: $dataTypes
+      equipmentIds: $equipmentIds
+      cursor: $cursor
+      limit: $limit
+    ) {
+      items
+      context {
+        lastPage
+        cursor
+      }
+    }
+  }
+`;
