@@ -169,7 +169,7 @@ const Dashboard = () => {
     ]
   );
 
-  const pieChartData = useMemo(() => [equipmentCountPerOui, clientCountPerOui], [
+  const pieChartsData = useMemo(() => [equipmentCountPerOui, clientCountPerOui], [
     equipmentCountPerOui,
     clientCountPerOui,
   ]);
@@ -190,12 +190,11 @@ const Dashboard = () => {
 
   return (
     <DashboardPage
-      pieChartTitle={pieChartTitle}
       statsArr={statsArr}
-      pieChartData={pieChartData}
-      lineChartData={lineChartsData}
-      lineChartTitle={lineChartTitle}
+      pieChartDetails={{ pieChartsData, pieChartTitle }}
+      lineChartDetails={{ lineChartsData, lineChartTitle }}
       lineChartLoading={metricsLoading}
+      lineChartError={metricsError}
     />
   );
 };
