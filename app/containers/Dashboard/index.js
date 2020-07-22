@@ -175,7 +175,7 @@ const Dashboard = () => {
     clientCountPerOui,
   ]);
 
-  if (loading || metricsLoading) {
+  if (loading) {
     return <Loading />;
   }
 
