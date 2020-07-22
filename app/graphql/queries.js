@@ -224,6 +224,51 @@ export const GET_ALL_STATUS = gql`
   }
 `;
 
+export const GET_ALL_FIRMWARE_MODELS = gql`
+  query GetAllFirmwareModelId {
+    getAllFirmwareModelId
+  }
+`;
+
+export const GET_FIRMWARE_TRACK = gql`
+  query GetFirmwareTrack($firmwareTrackName: String!) {
+    getFirmwareTrack(firmwareTrackName: $firmwareTrackName) {
+      recordId
+      trackName
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const GET_ALL_FIRMWARE = gql`
+  query GetAllFirmware($modelId: String) {
+    getAllFirmware(modelId: $modelId) {
+      id
+      modelId
+      versionName
+      description
+      filename
+      commit
+      releaseDate
+      validationCode
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const GET_TRACK_ASSIGNMENTS = gql`
+  query GetAllFirmwareTrackAssignment {
+    getAllFirmwareTrackAssignment {
+      modelId
+      firmwareVersionRecordId
+      trackRecordId
+      lastModifiedTimestamp
+    }
+  }
+`;
+
 export const GET_ALARM_COUNT = gql`
   query GetAlarmCount($customerId: Int!) {
     getAlarmCount(customerId: $customerId)
