@@ -158,8 +158,8 @@ export const FILTER_SERVICE_METRICS = gql`
   query FilterServiceMetrics(
     $customerId: Int!
     $cursor: String
-    $fromTime: Int!
-    $toTime: Int!
+    $fromTime: String!
+    $toTime: String!
     $clientMacs: [String]
     $equipmentIds: [ID]
     $dataTypes: [String]
@@ -266,5 +266,11 @@ export const GET_TRACK_ASSIGNMENTS = gql`
       trackRecordId
       lastModifiedTimestamp
     }
+  }
+`;
+
+export const GET_ALARM_COUNT = gql`
+  query GetAlarmCount($customerId: Int!) {
+    getAlarmCount(customerId: $customerId)
   }
 `;

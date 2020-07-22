@@ -215,3 +215,27 @@ export const DELETE_FIRMWARE = gql`
     }
   }
 `;
+
+export const CREATE_EQUIPMENT = gql`
+  mutation CreateEquipment(
+    $customerId: Int!
+    $inventoryId: String!
+    $locationId: Int!
+    $name: String!
+    $profileId: Int!
+  ) {
+    createEquipment(
+      customerId: $customerId
+      inventoryId: $inventoryId
+      locationId: $locationId
+      name: $name
+      profileId: $profileId
+    ) {
+      locationId
+      customerId
+      inventoryId
+      name
+      profileId
+    }
+  }
+`;

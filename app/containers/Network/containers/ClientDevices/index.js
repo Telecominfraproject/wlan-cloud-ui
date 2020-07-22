@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
+import { Alert, notification } from 'antd';
 import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
@@ -55,6 +55,15 @@ const ClientDevices = ({ checkedLocations }) => {
   useEffect(() => {
     filterClientSessions({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
+      errorPolicy: 'all',
+      onError: e => {
+        e.forEach(({ message }) => {
+          notification.error({
+            message: 'Error',
+            description: message,
+          });
+        });
+      },
     });
   }, [checkedLocations]);
 
@@ -62,7 +71,7 @@ const ClientDevices = ({ checkedLocations }) => {
     return <Loading />;
   }
 
-  if (error) {
+  if (error && !(data && data.filterClientSessions && data.filterClientSessions.items)) {
     return (
       <Alert message="Error" description="Failed to load client devices." type="error" showIcon />
     );

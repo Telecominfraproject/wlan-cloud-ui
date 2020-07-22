@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
-import { useApolloClient } from '@apollo/react-hooks';
-
+import { useApolloClient, useQuery } from '@apollo/react-hooks';
 import { AppLayout as Layout } from '@tip-wlan/wlan-cloud-ui-library';
+
+import { GET_ALARM_COUNT } from 'graphql/queries';
 
 import { AUTH_TOKEN } from 'constants/index';
 
@@ -12,10 +13,14 @@ import { removeItem } from 'utils/localStorage';
 import UserContext from 'contexts/UserContext';
 
 const MasterLayout = ({ children }) => {
-  const { role } = useContext(UserContext);
+  const { role, customerId } = useContext(UserContext);
 
   const client = useApolloClient();
   const location = useLocation();
+
+  const { data } = useQuery(GET_ALARM_COUNT, {
+    variables: { customerId },
+  });
 
   const handleLogout = () => {
     removeItem(AUTH_TOKEN);
@@ -39,11 +44,6 @@ const MasterLayout = ({ children }) => {
       text: 'Profiles',
     },
     {
-      key: 'alarms',
-      path: '/alarms',
-      text: 'Alarms',
-    },
-    {
       key: 'system',
       path: '/system',
       text: 'System',
@@ -65,11 +65,6 @@ const MasterLayout = ({ children }) => {
       key: 'profiles',
       path: '/profiles',
       text: 'Profiles',
-    },
-    {
-      key: 'alarms',
-      path: '/alarms',
-      text: 'Alarms',
     },
     {
       key: 'system',
@@ -113,6 +108,7 @@ const MasterLayout = ({ children }) => {
       locationState={location}
       menuItems={menuItems}
       mobileMenuItems={mobileMenuItems}
+      totalAlarms={data && data.getAlarmCount}
     >
       {children}
     </Layout>

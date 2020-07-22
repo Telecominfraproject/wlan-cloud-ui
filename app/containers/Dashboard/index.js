@@ -16,7 +16,7 @@ function formatBytes(bytes, decimals = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   // eslint-disable-next-line no-restricted-properties
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i] || ''}`;
 }
 
 const Dashboard = () => {
@@ -35,6 +35,11 @@ const Dashboard = () => {
     return <Alert message="Error" description="Failed to load Dashboard" type="error" showIcon />;
   }
 
+  const status =
+    data.getAllStatus.items.length > 0
+      ? data.getAllStatus.items[0]
+      : { details: {}, detailsJSON: {} };
+
   const {
     associatedClientsCountPerRadio,
     totalProvisionedEquipment,
@@ -42,21 +47,21 @@ const Dashboard = () => {
     equipmentWithClientsCount,
     trafficBytesDownstream,
     trafficBytesUpstream,
-  } = data.getAllStatus.items[0].detailsJSON;
-  const { clientCountPerOui, equipmentCountPerOui } = data.getAllStatus.items[0].details;
+  } = status.detailsJSON;
+  const { clientCountPerOui, equipmentCountPerOui } = status.details;
 
   let totalAssociated = 0;
-  Object.keys(associatedClientsCountPerRadio).forEach(i => {
-    totalAssociated += associatedClientsCountPerRadio[i];
-  });
+  if (associatedClientsCountPerRadio) {
+    Object.keys(associatedClientsCountPerRadio).forEach(i => {
+      totalAssociated += associatedClientsCountPerRadio[i];
+    });
+  }
 
-  const { is2dot4GHz, is5GHz, is5GHzL, is5GHzU } = associatedClientsCountPerRadio;
+  const { is2dot4GHz, is5GHzL, is5GHzU } = associatedClientsCountPerRadio || {};
 
   const frequencies = {
     '2.4GHz': is2dot4GHz || 0,
-    '5GHz': is5GHz || 0,
-    '5GHz (L)': is5GHzL || 0,
-    '5GHz (U)': is5GHzU || 0,
+    '5GHz': parseInt((is5GHzL || 0) + (is5GHzU || 0), 10),
   };
 
   const statsArr = [

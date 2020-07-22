@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
+import { Alert, notification } from 'antd';
 import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
@@ -119,6 +119,15 @@ const AccessPoints = ({ checkedLocations }) => {
   const fetchFilterEquipment = async () => {
     filterEquipment({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
+      errorPolicy: 'all',
+      onError: e => {
+        e.forEach(({ message }) => {
+          notification.error({
+            message: 'Error',
+            description: message,
+          });
+        });
+      },
     });
   };
 
@@ -130,7 +139,7 @@ const AccessPoints = ({ checkedLocations }) => {
     return <Loading />;
   }
 
-  if (error) {
+  if (error && !(equipData && equipData.filterEquipment && equipData.filterEquipment.items)) {
     return <Alert message="Error" description="Failed to load equipment." type="error" showIcon />;
   }
 
