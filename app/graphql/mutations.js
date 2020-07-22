@@ -13,8 +13,8 @@ export const REFRESH_TOKEN = gql`
 export const CREATE_LOCATION = gql`
   mutation CreateLocation(
     $locationType: String!
-    $customerId: Int!
-    $parentId: Int!
+    $customerId: ID!
+    $parentId: ID!
     $name: String!
   ) {
     createLocation(
@@ -33,10 +33,10 @@ export const CREATE_LOCATION = gql`
 
 export const UPDATE_LOCATION = gql`
   mutation UpdateLocation(
-    $id: Int!
+    $id: ID!
     $locationType: String!
-    $customerId: Int!
-    $parentId: Int!
+    $customerId: ID!
+    $parentId: ID!
     $name: String!
     $lastModifiedTimestamp: String
   ) {
@@ -59,7 +59,7 @@ export const UPDATE_LOCATION = gql`
 `;
 
 export const DELETE_LOCATION = gql`
-  mutation DeleteLocation($id: Int!) {
+  mutation DeleteLocation($id: ID!) {
     deleteLocation(id: $id) {
       id
     }
@@ -218,11 +218,11 @@ export const DELETE_FIRMWARE = gql`
 
 export const CREATE_EQUIPMENT = gql`
   mutation CreateEquipment(
-    $customerId: Int!
+    $customerId: ID!
     $inventoryId: String!
-    $locationId: Int!
+    $locationId: ID!
     $name: String!
-    $profileId: Int!
+    $profileId: ID!
   ) {
     createEquipment(
       customerId: $customerId
