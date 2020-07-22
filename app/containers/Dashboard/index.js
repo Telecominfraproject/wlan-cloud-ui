@@ -19,8 +19,9 @@ function formatBytes(bytes, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i] || ''}`;
 }
 
-const pieChartTitle = ['Access Points', 'Client Devices', 'Usage Information'];
+const statsCardTitle = ['Access Points', 'Client Devices', 'Usage Information'];
 const lineChartTitle = ['Inservice APs (24hours)', 'Client Devices (24hours)', 'Traffic (24hours)'];
+const pieChartTitle = ['AP Vendors', 'Client Vendors'];
 
 const Dashboard = () => {
   const { customerId } = useContext(UserContext);
@@ -190,7 +191,7 @@ const Dashboard = () => {
 
   return (
     <DashboardPage
-      statsArr={statsArr}
+      statsCardDetails={{ statsArr, statsCardTitle }}
       pieChartDetails={{ pieChartsData, pieChartTitle }}
       lineChartDetails={{ lineChartsData, lineChartTitle }}
       lineChartLoading={metricsLoading}
