@@ -19,10 +19,25 @@ function formatBytes(bytes, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i] || ''}`;
 }
 
+function trafficLabelFormatter() {
+  return formatBytes(this.value);
+}
+
+function trafficTooltipFormatter() {
+  return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${formatBytes(
+    this.y
+  )}</b><br/>`;
+}
+
+const USER_FRIENDLY_RADIOS = {
+  is2dot4GHz: '2.4GHz',
+  is5GHzL: '5GHz (L)',
+  is5GHzU: '5GHz (U)',
+  is5GHz: '5GHz',
+};
+
 const Dashboard = () => {
   const { customerId } = useContext(UserContext);
-  const [clientCountPerOui, setClientCountPerOui] = useState([]);
-  const [equipmentCountPerOui, setEquipmentCountPerOui] = useState([]);
   const { loading, error, data } = useQuery(GET_ALL_STATUS, {
     variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
   });
@@ -56,16 +71,22 @@ const Dashboard = () => {
 
   const formatLineChartData = (list = []) => {
     const lineChartData = {
-      inservicesAPs: { title: 'Inservice APs (24hours)', key: 'Inservice APs', value: [] },
-      clientDevices: { title: 'Client Devices (24hours)' },
+      inservicesAPs: {
+        title: 'Inservice APs (24 hours)',
+        data: { key: 'Inservice APs', value: [] },
+      },
+      clientDevices: { title: 'Client Devices (24 hours)' },
       traffic: {
-        title: 'Traffic (24hours)',
-        trafficBytesDownstream: { key: 'Down Stream', value: [] },
-        trafficBytesUpstream: { key: 'Up Stream', value: [] },
+        title: 'Traffic (24 hours)',
+        formatter: trafficLabelFormatter,
+        tooltipFormatter: trafficTooltipFormatter,
+        data: {
+          trafficBytesDownstream: { key: 'Down Stream', value: [] },
+          trafficBytesUpstream: { key: 'Up Stream', value: [] },
+        },
       },
     };
-    const clientDevicesData = [];
-    const clientDevicesKeyMap = { is2dot4GHz: '2.4GHz', is5GHzL: '5GHz (L)', is5GHzU: '5GHz (U)' };
+    const clientDevicesData = {};
 
     list.forEach(
       ({
@@ -81,31 +102,31 @@ const Dashboard = () => {
           },
         },
       }) => {
-        lineChartData.inservicesAPs.value.push([eventTimestamp, equipmentInServiceCount]);
+        lineChartData.inservicesAPs.data.value.push([eventTimestamp, equipmentInServiceCount]);
         Object.keys(radios).forEach(key => {
-          if (clientDevicesData[key]) {
-            clientDevicesData[key].value.push([eventTimestamp, radios[key]]);
-            return;
+          if (!clientDevicesData[key]) {
+            clientDevicesData[key] = {
+              key: USER_FRIENDLY_RADIOS[key] || key,
+              value: [],
+            };
           }
-          clientDevicesData[key] = {
-            key: clientDevicesKeyMap[key] || key,
-            value: [[eventTimestamp, radios[key]]],
-          };
+          clientDevicesData[key].value.push([eventTimestamp, radios[key]]);
         });
 
-        lineChartData.traffic.trafficBytesDownstream.value.push([
+        lineChartData.traffic.data.trafficBytesDownstream.value.push([
           eventTimestamp,
           trafficBytesDownstream,
         ]);
-        lineChartData.traffic.trafficBytesUpstream.value.push([
+        lineChartData.traffic.data.trafficBytesUpstream.value.push([
           eventTimestamp,
           trafficBytesUpstream,
         ]);
       }
     );
+
     return {
       ...lineChartData,
-      clientDevices: { ...lineChartData.clientDevices, ...clientDevicesData },
+      clientDevices: { ...lineChartData.clientDevices, data: { ...clientDevicesData } },
     };
   };
 
@@ -115,10 +136,7 @@ const Dashboard = () => {
   );
 
   const statsArr = useMemo(() => {
-    const status =
-      data?.getAllStatus.items.length > 0
-        ? data.getAllStatus.items[0]
-        : { details: {}, detailsJSON: {} };
+    const status = data?.getAllStatus?.items[0]?.detailsJSON || {};
 
     const {
       associatedClientsCountPerRadio,
@@ -127,29 +145,24 @@ const Dashboard = () => {
       equipmentWithClientsCount,
       trafficBytesDownstream,
       trafficBytesUpstream,
-    } = status.detailsJSON;
+    } = status;
 
-    const {
-      clientCountPerOui: clientPerOui,
-      equipmentCountPerOui: equipmentPerOui,
-    } = status.details;
-
-    setClientCountPerOui({ title: 'Client Vendors', ...clientPerOui });
-    setEquipmentCountPerOui({ title: 'AP Vendors', ...equipmentPerOui });
-
+    const clientRadios = {};
     let totalAssociated = 0;
     if (associatedClientsCountPerRadio) {
       Object.keys(associatedClientsCountPerRadio).forEach(i => {
+        if (i.includes('5GHz')) {
+          if (!clientRadios['5GHz']) {
+            clientRadios['5GHz'] = 0;
+          }
+          clientRadios['5GHz'] += associatedClientsCountPerRadio[i];
+        } else {
+          const key = USER_FRIENDLY_RADIOS[i] || i;
+          clientRadios[key] = associatedClientsCountPerRadio[i];
+        }
         totalAssociated += associatedClientsCountPerRadio[i];
       });
     }
-
-    const { is2dot4GHz, is5GHzL, is5GHzU } = associatedClientsCountPerRadio || {};
-
-    const frequencies = {
-      '2.4GHz': is2dot4GHz || 0,
-      '5GHz': parseInt((is5GHzL || 0) + (is5GHzU || 0), 10),
-    };
 
     return [
       {
@@ -161,7 +174,7 @@ const Dashboard = () => {
       {
         title: 'Client Devices',
         'Total Associated': totalAssociated,
-        ...frequencies,
+        ...clientRadios,
       },
       {
         title: 'Usage Information',
@@ -171,10 +184,14 @@ const Dashboard = () => {
     ];
   }, [data]);
 
-  const pieChartsData = useMemo(() => [equipmentCountPerOui, clientCountPerOui], [
-    equipmentCountPerOui,
-    clientCountPerOui,
-  ]);
+  const pieChartsData = useMemo(() => {
+    const { clientCountPerOui, equipmentCountPerOui } = data?.getAllStatus?.items[0]?.details || {};
+
+    return [
+      { title: 'AP Vendors', ...equipmentCountPerOui },
+      { title: 'Client Vendors', ...clientCountPerOui },
+    ];
+  }, [data]);
 
   if (loading) {
     return <Loading />;
