@@ -10,7 +10,7 @@ import { GET_ALL_PROFILES } from 'graphql/queries';
 import { FILE_UPLOAD } from 'graphql/mutations';
 
 const GET_PROFILE = gql`
-  query GetProfile($id: Int!) {
+  query GetProfile($id: ID!) {
     getProfile(id: $id) {
       id
       profileType
@@ -32,11 +32,11 @@ const GET_PROFILE = gql`
 
 const UPDATE_PROFILE = gql`
   mutation UpdateProfile(
-    $id: Int!
+    $id: ID!
     $profileType: String!
-    $customerId: Int!
+    $customerId: ID!
     $name: String!
-    $childProfileIds: [Int]
+    $childProfileIds: [ID]
     $lastModifiedTimestamp: String
     $details: JSONObject
   ) {
@@ -61,7 +61,7 @@ const UPDATE_PROFILE = gql`
 `;
 
 const DELETE_PROFILE = gql`
-  mutation DeleteProfile($id: Int!) {
+  mutation DeleteProfile($id: ID!) {
     deleteProfile(id: $id) {
       id
     }
@@ -75,7 +75,7 @@ const ProfileDetails = () => {
   const [redirect, setRedirect] = useState(false);
 
   const { loading, error, data } = useQuery(GET_PROFILE, {
-    variables: { id: parseInt(id, 10) },
+    variables: { id },
   });
   const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES, {
     variables: { customerId, type: 'ssid' },
@@ -86,7 +86,7 @@ const ProfileDetails = () => {
   const [fileUpload] = useMutation(FILE_UPLOAD);
 
   const handleDeleteProfile = () => {
-    deleteProfile({ variables: { id: parseInt(id, 10) } })
+    deleteProfile({ variables: { id } })
       .then(() => {
         notification.success({
           message: 'Success',

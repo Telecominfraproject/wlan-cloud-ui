@@ -143,7 +143,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
   const locationIds = useMemo(() => {
-    const locationPath = getLocationPath(parseInt(id, 10), locations);
+    const locationPath = getLocationPath(id, locations);
     return locationPath.filter(f => checkedLocations.includes(f));
   }, [id, locations, checkedLocations]);
 
@@ -369,7 +369,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
         equipData.filterEquipment.context.lastPage
       }
       onSaveChanges={handleSaveChanges}
-      breadcrumbPath={getBreadcrumbPath(parseInt(id, 10), locations)}
+      breadcrumbPath={getBreadcrumbPath(id, locations)}
     />
   );
 };
