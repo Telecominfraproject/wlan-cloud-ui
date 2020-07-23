@@ -12,7 +12,7 @@ import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 
 const GET_EQUIPMENT = gql`
-  query GetEquipment($id: Int!) {
+  query GetEquipment($id: ID!) {
     getEquipment(id: $id) {
       id
       equipmentType
@@ -86,12 +86,12 @@ export const GET_ALL_FIRMWARE = gql`
 
 const UPDATE_EQUIPMENT = gql`
   mutation UpdateEquipment(
-    $id: Int!
+    $id: ID!
     $equipmentType: String!
     $inventoryId: String!
-    $customerId: Int!
-    $profileId: Int!
-    $locationId: Int!
+    $customerId: ID!
+    $profileId: ID!
+    $locationId: ID!
     $name: String!
     $latitude: String
     $longitude: String
@@ -130,7 +130,7 @@ const UPDATE_EQUIPMENT = gql`
 `;
 
 export const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: Int!, $cursor: String, $type: String) {
+  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String) {
     getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
       items {
         id
@@ -151,14 +151,15 @@ export const GET_ALL_PROFILES = gql`
   }
 `;
 
+const toTime = moment();
+const fromTime = moment().subtract(24, 'hours');
+
 const AccessPointDetails = ({ locations }) => {
-  const toTime = moment();
-  const fromTime = toTime.subtract(24, 'hours');
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
 
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
-    variables: { id: parseInt(id, 10) },
+    variables: { id },
   });
   const { data: dataProfiles, error: errorProfiles, loading: landingProfiles } = useQuery(
     GET_ALL_PROFILES,
@@ -174,9 +175,9 @@ const AccessPointDetails = ({ locations }) => {
   } = useQuery(FILTER_SERVICE_METRICS, {
     variables: {
       customerId,
-      fromTime: fromTime.unix(),
-      toTime: toTime.unix(),
-      equipmentIds: [parseInt(id, 10)],
+      fromTime: fromTime.valueOf().toString(),
+      toTime: toTime.valueOf().toString(),
+      equipmentIds: [id],
       dataTypes: ['ApNode'],
     },
   });

@@ -60,7 +60,7 @@ const Network = () => {
 
     function unflatten(array, p, t) {
       let tree = typeof t !== 'undefined' ? t : [];
-      const parent = typeof p !== 'undefined' ? p : { id: 0 };
+      const parent = typeof p !== 'undefined' ? p : { id: '0' };
       let children = _.filter(array, child => child.parentId === parent.id);
       children = children.map(c => ({
         title: (
@@ -80,7 +80,7 @@ const Network = () => {
         ...c,
       }));
       if (!_.isEmpty(children)) {
-        if (parent.id === 0) {
+        if (parent.id === '0') {
           tree = children;
         } else {
           parent.children = children;
@@ -96,9 +96,9 @@ const Network = () => {
             Network
           </PopoverMenu>
         ),
-        id: 0,
+        id: '0',
         value: '0',
-        key: 0,
+        key: '0',
         children: unflatten(list),
       },
     ];
