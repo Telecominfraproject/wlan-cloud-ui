@@ -104,6 +104,30 @@ const Network = () => {
     ];
   };
 
+  const handleAddRootLocation = (name, parentId, locationType) => {
+    createLocation({
+      variables: {
+        locationType,
+        customerId,
+        parentId,
+        name,
+      },
+    })
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Location successfully added.',
+        });
+        refetch();
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Location could not be added.',
+        })
+      );
+  };
+
   const handleAddLocation = (name, parentId, locationType) => {
     setAddModal(false);
     createLocation({
@@ -230,6 +254,7 @@ const Network = () => {
       setEditModal={setEditModal}
       setDeleteModal={setDeleteModal}
       setApModal={setApModal}
+      onAddRootLocation={handleAddRootLocation}
       onAddLocation={handleAddLocation}
       onEditLocation={handleEditLocation}
       onDeleteLocation={handleDeleteLocation}
