@@ -8,7 +8,7 @@ import { Profile as ProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: Int!, $cursor: String) {
+  query GetAllProfiles($customerId: ID!, $cursor: String) {
     getAllProfiles(customerId: $customerId, cursor: $cursor) {
       items {
         id
@@ -25,7 +25,7 @@ const GET_ALL_PROFILES = gql`
 `;
 
 const DELETE_PROFILE = gql`
-  mutation DeleteProfile($id: Int!) {
+  mutation DeleteProfile($id: ID!) {
     deleteProfile(id: $id) {
       id
     }
