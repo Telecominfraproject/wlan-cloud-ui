@@ -48,7 +48,7 @@ const Dashboard = () => {
   );
   const [fromTime] = useState(
     moment()
-      .subtract(24, 'days')
+      .subtract(24, 'hours')
       .valueOf()
       .toString()
   );
