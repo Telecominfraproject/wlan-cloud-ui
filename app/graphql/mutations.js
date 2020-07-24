@@ -239,3 +239,30 @@ export const CREATE_EQUIPMENT = gql`
     }
   }
 `;
+
+export const UPDATE_CUSTOMER = gql`
+  mutation UpdateCustomer(
+    $id: ID!
+    $email: String!
+    $name: String!
+    $details: JSONObject
+    $createdTimestamp: String
+    $lastModifiedTimestamp: String
+  ) {
+    updateCustomer(
+      id: $id
+      email: $email
+      name: $name
+      details: $details
+      createdTimestamp: $createdTimestamp
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      id
+      email
+      name
+      details
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;

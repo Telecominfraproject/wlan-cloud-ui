@@ -274,3 +274,16 @@ export const GET_ALARM_COUNT = gql`
     getAlarmCount(customerId: $customerId)
   }
 `;
+
+export const GET_CUSTOMER = gql`
+  query GetCustomer($id: ID!) {
+    getCustomer(id: $id) {
+      id
+      name
+      email
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
