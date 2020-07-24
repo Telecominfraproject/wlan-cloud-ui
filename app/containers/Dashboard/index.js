@@ -99,7 +99,9 @@ const Dashboard = () => {
 
   const formatLineChartData = (list = []) => {
     const clientDevicesData = lineChartData.clientDevices?.data || {};
-
+    const inservicesAPs = lineChartData.inservicesAPs.data.value;
+    const trafficBytesDownstreamData = lineChartData.traffic.data.trafficBytesDownstream.value;
+    const trafficBytesUpstreamData = lineChartData.traffic.data.trafficBytesUpstream.value;
     list.forEach(
       ({
         eventTimestamp,
@@ -114,7 +116,7 @@ const Dashboard = () => {
           },
         },
       }) => {
-        lineChartData.inservicesAPs.data.value.push([eventTimestamp, equipmentInServiceCount]);
+        inservicesAPs.push([eventTimestamp, equipmentInServiceCount]);
         Object.keys(radios).forEach(key => {
           if (!clientDevicesData[key]) {
             clientDevicesData[key] = {
@@ -125,32 +127,36 @@ const Dashboard = () => {
           clientDevicesData[key].value.push([eventTimestamp, radios[key]]);
         });
 
-        lineChartData.traffic.data.trafficBytesDownstream.value.push([
-          eventTimestamp,
-          trafficBytesDownstream,
-        ]);
-        lineChartData.traffic.data.trafficBytesUpstream.value.push([
-          eventTimestamp,
-          trafficBytesUpstream,
-        ]);
+        trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
+        trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
       }
     );
-
-    setLineChartData({
+    const result = {
       ...lineChartData,
+      inservicesAPs: {
+        ...lineChartData.inservicesAPs,
+        data: { ...lineChartData.inservicesAPs.data, value: inservicesAPs },
+      },
       clientDevices: { ...lineChartData.clientDevices, data: { ...clientDevicesData } },
-    });
-
-    return {
-      ...lineChartData,
-      clientDevices: { ...lineChartData.clientDevices, data: { ...clientDevicesData } },
+      traffic: {
+        ...lineChartData.traffic,
+        data: {
+          ...lineChartData.traffic.data,
+          trafficBytesDownstream: {
+            ...lineChartData.traffic.data.trafficBytesDownstream,
+            value: trafficBytesDownstreamData,
+          },
+          trafficBytesUpstream: {
+            ...lineChartData.traffic.data.trafficBytesUpstream,
+            value: trafficBytesUpstreamData,
+          },
+        },
+      },
     };
+    setLineChartData(result);
   };
 
-  const lineChartsData = useMemo(
-    () => formatLineChartData(metricsData?.filterSystemEvents?.items),
-    [metricsData]
-  );
+  useEffect(() => formatLineChartData(metricsData?.filterSystemEvents?.items), [metricsData]);
 
   const statsArr = useMemo(() => {
     const status = data?.getAllStatus?.items[0]?.detailsJSON || {};
@@ -222,7 +228,7 @@ const Dashboard = () => {
     <DashboardPage
       statsCardDetails={statsArr}
       pieChartDetails={pieChartsData}
-      lineChartDetails={lineChartsData}
+      lineChartDetails={lineChartData}
       lineChartLoading={metricsLoading}
       lineChartError={metricsError}
     />
