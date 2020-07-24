@@ -43,6 +43,7 @@ const Firmware = () => {
     data: firmwareModelData,
     error: firmwareModelError,
     loading: firmwareModelLoading,
+    refetch: refetchFirmwareModels,
   } = useQuery(GET_ALL_FIRMWARE_MODELS);
 
   const [updateTrackAssignment] = useMutation(UPDATE_TRACK_ASSIGNMENT);
@@ -67,13 +68,13 @@ const Firmware = () => {
         refetchAssignmentData();
         notification.success({
           message: 'Success',
-          description: 'Track Assignment successfully created.',
+          description: 'Model Target Version successfully created.',
         });
       })
       .catch(() =>
         notification.error({
           message: 'Error',
-          description: 'Track Assignment could not be created.',
+          description: 'Model Target Version could not be created.',
         })
       );
   };
@@ -97,13 +98,13 @@ const Firmware = () => {
         refetchAssignmentData();
         notification.success({
           message: 'Success',
-          description: 'Track Assignment successfully updated.',
+          description: 'Model Target Version successfully updated.',
         });
       })
       .catch(() =>
         notification.error({
           message: 'Error',
-          description: 'Track Assignment could not be updated.',
+          description: 'Model Target Version could not be updated.',
         })
       );
   };
@@ -119,13 +120,13 @@ const Firmware = () => {
         refetchAssignmentData();
         notification.success({
           message: 'Success',
-          description: 'Track Assignment successfully deleted.',
+          description: 'Model Target Version successfully deleted.',
         });
       })
       .catch(() =>
         notification.error({
           message: 'Error',
-          description: 'Track Assignment could not be deleted.',
+          description: 'Model Target Version could not be deleted.',
         })
       );
   };
@@ -151,6 +152,7 @@ const Firmware = () => {
     })
       .then(() => {
         refetch();
+        refetchFirmwareModels();
         notification.success({
           message: 'Success',
           description: 'Firmware version successfully created.',
@@ -192,6 +194,7 @@ const Firmware = () => {
     })
       .then(() => {
         refetch();
+        refetchFirmwareModels();
         notification.success({
           message: 'Success',
           description: 'Firmware version successfully updated.',
@@ -213,6 +216,7 @@ const Firmware = () => {
     })
       .then(() => {
         refetch();
+        refetchFirmwareModels();
         notification.success({
           message: 'Success',
           description: 'Firmware version successfully deleted.',
