@@ -198,7 +198,7 @@ const Network = () => {
   };
 
   const onCheck = checkedKeys => {
-    setCheckedLocations(checkedKeys);
+    setCheckedLocations(checkedKeys.checked);
   };
 
   const locationsTree = useMemo(
