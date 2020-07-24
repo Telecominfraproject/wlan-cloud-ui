@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'antd';
 import moment from 'moment';
 import { useQuery } from '@apollo/react-hooks';
@@ -41,52 +41,64 @@ const Dashboard = () => {
   const { loading, error, data } = useQuery(GET_ALL_STATUS, {
     variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
   });
-  const [toTime] = useState(
-    moment()
-      .valueOf()
-      .toString()
-  );
-  const [fromTime] = useState(
-    moment()
-      .subtract(24, 'hours')
-      .valueOf()
-      .toString()
-  );
 
-  const {
-    loading: metricsLoading,
-    error: metricsError,
-    data: metricsData,
-    // refetch: metricsRefetch,
-  } = useQuery(FILTER_SYSTEM_EVENTS, {
-    variables: {
-      customerId,
-      fromTime,
-      toTime,
-      equipmentIds: [0],
-      dataTypes: ['StatusChangedEvent'],
-      limit: 100,
+  const [lineChartData, setLineChartData] = useState({
+    inservicesAPs: {
+      title: 'Inservice APs (24 hours)',
+      data: { key: 'Inservice APs', value: [] },
+    },
+    clientDevices: { title: 'Client Devices (24 hours)' },
+    traffic: {
+      title: 'Traffic (24 hours)',
+      formatter: trafficLabelFormatter,
+      tooltipFormatter: trafficTooltipFormatter,
+      data: {
+        trafficBytesDownstream: { key: 'Down Stream', value: [] },
+        trafficBytesUpstream: { key: 'Up Stream', value: [] },
+      },
     },
   });
 
+  const [graphTime, setGraphTime] = useState({
+    toTime: moment()
+      .valueOf()
+      .toString(),
+    fromTime: moment()
+      .subtract(24, 'hours')
+      .valueOf()
+      .toString(),
+  });
+
+  const { loading: metricsLoading, error: metricsError, data: metricsData } = useQuery(
+    FILTER_SYSTEM_EVENTS,
+    {
+      variables: {
+        customerId,
+        fromTime: graphTime.fromTime,
+        toTime: graphTime.toTime,
+        equipmentIds: [0],
+        dataTypes: ['StatusChangedEvent'],
+        limit: 100,
+      },
+    }
+  );
+
+  useEffect(() => {
+    setInterval(async () => {
+      setGraphTime({
+        toTime: moment()
+          .valueOf()
+          .toString(),
+        fromTime: moment()
+          .subtract(5, 'minutes')
+          .valueOf()
+          .toString(),
+      });
+    }, 300000);
+  }, []);
+
   const formatLineChartData = (list = []) => {
-    const lineChartData = {
-      inservicesAPs: {
-        title: 'Inservice APs (24 hours)',
-        data: { key: 'Inservice APs', value: [] },
-      },
-      clientDevices: { title: 'Client Devices (24 hours)' },
-      traffic: {
-        title: 'Traffic (24 hours)',
-        formatter: trafficLabelFormatter,
-        tooltipFormatter: trafficTooltipFormatter,
-        data: {
-          trafficBytesDownstream: { key: 'Down Stream', value: [] },
-          trafficBytesUpstream: { key: 'Up Stream', value: [] },
-        },
-      },
-    };
-    const clientDevicesData = {};
+    const clientDevicesData = lineChartData.clientDevices?.data || {};
 
     list.forEach(
       ({
@@ -123,6 +135,11 @@ const Dashboard = () => {
         ]);
       }
     );
+
+    setLineChartData({
+      ...lineChartData,
+      clientDevices: { ...lineChartData.clientDevices, data: { ...clientDevicesData } },
+    });
 
     return {
       ...lineChartData,
