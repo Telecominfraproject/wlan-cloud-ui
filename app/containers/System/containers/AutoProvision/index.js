@@ -27,7 +27,7 @@ const AutoProvision = () => {
     }
   );
 
-  const handleUpdateEquipment = (
+  const handleUpdateCustomer = (
     id,
     email,
     name,
@@ -79,7 +79,7 @@ const AutoProvision = () => {
       loadingProfile={loadingProfile}
       errorLocation={errorLocation}
       errorProfile={errorProfile}
-      onUpdateEquipment={handleUpdateEquipment}
+      onUpdateCustomer={handleUpdateCustomer}
     />
   );
 };
