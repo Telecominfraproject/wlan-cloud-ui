@@ -43,6 +43,7 @@ const Firmware = () => {
     data: firmwareModelData,
     error: firmwareModelError,
     loading: firmwareModelLoading,
+    refetch: refetchFirmwareModels,
   } = useQuery(GET_ALL_FIRMWARE_MODELS);
 
   const [updateTrackAssignment] = useMutation(UPDATE_TRACK_ASSIGNMENT);
@@ -151,6 +152,7 @@ const Firmware = () => {
     })
       .then(() => {
         refetch();
+        refetchFirmwareModels();
         notification.success({
           message: 'Success',
           description: 'Firmware version successfully created.',
@@ -192,6 +194,7 @@ const Firmware = () => {
     })
       .then(() => {
         refetch();
+        refetchFirmwareModels();
         notification.success({
           message: 'Success',
           description: 'Firmware version successfully updated.',
@@ -213,6 +216,7 @@ const Firmware = () => {
     })
       .then(() => {
         refetch();
+        refetchFirmwareModels();
         notification.success({
           message: 'Success',
           description: 'Firmware version successfully deleted.',
