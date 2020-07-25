@@ -65,7 +65,7 @@ const Dashboard = () => {
       toTime,
       equipmentIds: [0],
       dataTypes: ['StatusChangedEvent'],
-      limit: 100,
+      limit: 1000,
     },
   });
 
