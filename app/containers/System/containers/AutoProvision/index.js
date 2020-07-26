@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
-import { GET_CUSTOMER, GET_ALL_LOCATIONS, GET_ALL_PROFILES } from 'graphql/queries';
-import { UPDATE_CUSTOMER } from 'graphql/mutations';
+import { AutoProvision as AutoProvisionPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
-import { AutoProvision as AutoProvisionPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { GET_CUSTOMER, GET_ALL_LOCATIONS, GET_ALL_PROFILES } from 'graphql/queries';
+import { UPDATE_CUSTOMER } from 'graphql/mutations';
 
 const AutoProvision = () => {
   const { customerId } = useContext(UserContext);
