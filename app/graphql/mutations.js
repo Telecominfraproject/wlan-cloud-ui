@@ -86,8 +86,7 @@ export const FILE_UPLOAD = gql`
 export const OUI_UPLOAD = gql`
   mutation OuiUpload($fileName: String, $file: Upload) {
     ouiUpload(fileName: $fileName, file: $file) {
-      fileName
-      baseUrl
+      success
     }
   }
 `;

@@ -152,7 +152,7 @@ export const GET_ALL_PROFILES = gql`
 `;
 
 const toTime = moment();
-const fromTime = moment().subtract(24, 'hours');
+const fromTime = moment().subtract(1, 'hour');
 
 const AccessPointDetails = ({ locations }) => {
   const { id } = useParams();
@@ -179,6 +179,7 @@ const AccessPointDetails = ({ locations }) => {
       toTime: toTime.valueOf().toString(),
       equipmentIds: [id],
       dataTypes: ['ApNode'],
+      limit: 100,
     },
   });
 

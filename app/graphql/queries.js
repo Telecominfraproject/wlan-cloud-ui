@@ -163,6 +163,7 @@ export const FILTER_SERVICE_METRICS = gql`
     $clientMacs: [String]
     $equipmentIds: [ID]
     $dataTypes: [String]
+    $limit: Int
   ) {
     filterServiceMetrics(
       customerId: $customerId
@@ -172,6 +173,7 @@ export const FILTER_SERVICE_METRICS = gql`
       clientMacs: $clientMacs
       equipmentIds: $equipmentIds
       dataTypes: $dataTypes
+      limit: $limit
     ) {
       items {
         dataType
