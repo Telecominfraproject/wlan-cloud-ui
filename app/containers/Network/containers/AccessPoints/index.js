@@ -105,13 +105,13 @@ const AccessPoints = forwardRef(({ checkedLocations }, ref) => {
         .then(() => {
           notification.success({
             message: 'Success',
-            description: 'Equipments reloaded.',
+            description: 'Access points reloaded.',
           });
         })
         .catch(() =>
           notification.error({
             message: 'Error',
-            description: 'Equipments could not be reloaded.',
+            description: 'Access points could not be reloaded.',
           })
         );
     },
