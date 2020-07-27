@@ -1,7 +1,7 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
+import { Alert, notification } from 'antd';
 import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
@@ -90,14 +90,32 @@ const accessPointsTableColumns = [
   },
 ];
 
-const AccessPoints = ({ checkedLocations }) => {
+const AccessPoints = forwardRef(({ checkedLocations }, ref) => {
   const { customerId } = useContext(UserContext);
-  const [filterEquipment, { loading, error, data: equipData, fetchMore }] = useLazyQuery(
+  const [filterEquipment, { loading, error, data: equipData, refetch, fetchMore }] = useLazyQuery(
     FILTER_EQUIPMENT,
     {
       errorPolicy: 'all',
     }
   );
+
+  useImperativeHandle(ref, () => ({
+    reloadTable() {
+      refetch()
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Equipments reloaded.',
+          });
+        })
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Equipments could not be reloaded.',
+          })
+        );
+    },
+  }));
 
   const handleLoadMore = () => {
     if (!equipData.filterEquipment.context.lastPage) {
@@ -147,7 +165,7 @@ const AccessPoints = ({ checkedLocations }) => {
       }
     />
   );
-};
+});
 
 AccessPoints.propTypes = {
   checkedLocations: PropTypes.instanceOf(Array).isRequired,

@@ -1,7 +1,7 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
+import { Alert, notification } from 'antd';
 import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
@@ -26,14 +26,32 @@ const clientDevicesTableColumns = [
   { title: 'STATUS', dataIndex: 'status' },
 ];
 
-const ClientDevices = ({ checkedLocations }) => {
+const ClientDevices = forwardRef(({ checkedLocations }, ref) => {
   const { customerId } = useContext(UserContext);
-  const [filterClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
+  const [filterClientSessions, { loading, error, data, refetch, fetchMore }] = useLazyQuery(
     FILTER_CLIENT_SESSIONS,
     {
       errorPolicy: 'all',
     }
   );
+
+  useImperativeHandle(ref, () => ({
+    reloadTable() {
+      refetch()
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Client devices reloaded.',
+          });
+        })
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Client devices could not be reloaded.',
+          })
+        );
+    },
+  }));
 
   const handleLoadMore = () => {
     if (!data.filterClientSessions.context.lastPage) {
@@ -83,7 +101,7 @@ const ClientDevices = ({ checkedLocations }) => {
       isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
     />
   );
-};
+});
 
 ClientDevices.propTypes = {
   checkedLocations: PropTypes.instanceOf(Array).isRequired,
