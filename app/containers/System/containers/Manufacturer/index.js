@@ -68,11 +68,18 @@ const System = () => {
 
   const handleFileUpload = (fileName, file) =>
     fileUpload({ variables: { fileName, file } })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'File successfully uploaded.',
-        });
+      .then(resp => {
+        if (resp?.ouiUpload?.success) {
+          notification.success({
+            message: 'Success',
+            description: 'File successfully uploaded.',
+          });
+        } else {
+          notification.error({
+            message: 'Error',
+            description: 'File could not be uploaded.',
+          });
+        }
       })
       .catch(() =>
         notification.error({

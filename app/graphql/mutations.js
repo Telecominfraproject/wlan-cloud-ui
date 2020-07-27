@@ -86,8 +86,7 @@ export const FILE_UPLOAD = gql`
 export const OUI_UPLOAD = gql`
   mutation OuiUpload($fileName: String, $file: Upload) {
     ouiUpload(fileName: $fileName, file: $file) {
-      fileName
-      baseUrl
+      success
     }
   }
 `;
@@ -236,6 +235,33 @@ export const CREATE_EQUIPMENT = gql`
       inventoryId
       name
       profileId
+    }
+  }
+`;
+
+export const UPDATE_CUSTOMER = gql`
+  mutation UpdateCustomer(
+    $id: ID!
+    $email: String!
+    $name: String!
+    $details: JSONObject
+    $createdTimestamp: String
+    $lastModifiedTimestamp: String
+  ) {
+    updateCustomer(
+      id: $id
+      email: $email
+      name: $name
+      details: $details
+      createdTimestamp: $createdTimestamp
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      id
+      email
+      name
+      details
+      createdTimestamp
+      lastModifiedTimestamp
     }
   }
 `;
