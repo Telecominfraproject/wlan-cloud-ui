@@ -277,6 +277,19 @@ export const GET_ALARM_COUNT = gql`
   }
 `;
 
+export const GET_CUSTOMER = gql`
+  query GetCustomer($id: ID!) {
+    getCustomer(id: $id) {
+      id
+      name
+      email
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
 export const FILTER_SYSTEM_EVENTS = gql`
   query FilterSystemEvents(
     $customerId: ID!
