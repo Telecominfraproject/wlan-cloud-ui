@@ -265,3 +265,27 @@ export const UPDATE_CUSTOMER = gql`
     }
   }
 `;
+
+export const UPDATE_CLIENT = gql`
+  mutation UpdateClient(
+    $customerId: ID!
+    $macAddress: String
+    $details: JSONObject
+    $createdTimestamp: String
+    $lastModifiedTimestamp: String
+  ) {
+    updateClient(
+      customerId: $customerId
+      macAddress: $macAddress
+      details: $details
+      createdTimestamp: $createdTimestamp
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      customerId
+      macAddress
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
