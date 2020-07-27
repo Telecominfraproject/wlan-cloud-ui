@@ -12,13 +12,14 @@ import UserContext from 'contexts/UserContext';
 import { GET_CLIENT_SESSION, FILTER_SERVICE_METRICS } from 'graphql/queries';
 
 const toTime = moment();
-const fromTime = moment().subtract(24, 'hours');
+const fromTime = moment().subtract(1, 'hour');
 
 const ClientDeviceDetails = () => {
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch } = useQuery(GET_CLIENT_SESSION, {
     variables: { customerId, macAddress: id },
+    errorPolicy: 'all',
   });
   const {
     loading: metricsLoading,
@@ -32,6 +33,7 @@ const ClientDeviceDetails = () => {
       toTime: toTime.valueOf().toString(),
       clientMacs: [id],
       dataTypes: ['Client'],
+      limit: 100,
     },
   });
 
@@ -56,7 +58,7 @@ const ClientDeviceDetails = () => {
     return <Loading />;
   }
 
-  if (error) {
+  if (error && !data?.getClientSession) {
     return (
       <Alert message="Error" description="Failed to load Client Device." type="error" showIcon />
     );

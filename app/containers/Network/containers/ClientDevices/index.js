@@ -1,7 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert, notification } from 'antd';
+import { Alert } from 'antd';
 import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
@@ -29,7 +29,10 @@ const clientDevicesTableColumns = [
 const ClientDevices = ({ checkedLocations }) => {
   const { customerId } = useContext(UserContext);
   const [filterClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
-    FILTER_CLIENT_SESSIONS
+    FILTER_CLIENT_SESSIONS,
+    {
+      errorPolicy: 'all',
+    }
   );
 
   const handleLoadMore = () => {
@@ -52,26 +55,21 @@ const ClientDevices = ({ checkedLocations }) => {
     }
   };
 
-  useEffect(() => {
+  const fetchFilterClientSessions = async () => {
     filterClientSessions({
       variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
-      errorPolicy: 'all',
-      onError: e => {
-        e.forEach(({ message }) => {
-          notification.error({
-            message: 'Error',
-            description: message,
-          });
-        });
-      },
     });
+  };
+
+  useEffect(() => {
+    fetchFilterClientSessions();
   }, [checkedLocations]);
 
   if (loading) {
     return <Loading />;
   }
 
-  if (error && !(data && data.filterClientSessions && data.filterClientSessions.items)) {
+  if (error && !data?.filterClientSessions?.items) {
     return (
       <Alert message="Error" description="Failed to load client devices." type="error" showIcon />
     );

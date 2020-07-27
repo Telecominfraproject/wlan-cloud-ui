@@ -163,6 +163,7 @@ export const FILTER_SERVICE_METRICS = gql`
     $clientMacs: [String]
     $equipmentIds: [ID]
     $dataTypes: [String]
+    $limit: Int
   ) {
     filterServiceMetrics(
       customerId: $customerId
@@ -172,6 +173,7 @@ export const FILTER_SERVICE_METRICS = gql`
       clientMacs: $clientMacs
       equipmentIds: $equipmentIds
       dataTypes: $dataTypes
+      limit: $limit
     ) {
       items {
         dataType
@@ -272,6 +274,19 @@ export const GET_TRACK_ASSIGNMENTS = gql`
 export const GET_ALARM_COUNT = gql`
   query GetAlarmCount($customerId: ID!) {
     getAlarmCount(customerId: $customerId)
+  }
+`;
+
+export const GET_CUSTOMER = gql`
+  query GetCustomer($id: ID!) {
+    getCustomer(id: $id) {
+      id
+      name
+      email
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
   }
 `;
 
