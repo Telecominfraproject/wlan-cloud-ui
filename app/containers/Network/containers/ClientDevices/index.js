@@ -1,11 +1,15 @@
-import React, { useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
-import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { ReloadOutlined } from '@ant-design/icons';
+
+import { Button, ToggleButton, NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_CLIENT_SESSIONS } from 'graphql/queries';
+
+import styles from './index.module.scss';
 
 const clientDevicesTableColumns = [
   {
@@ -26,7 +30,7 @@ const clientDevicesTableColumns = [
   { title: 'STATUS', dataIndex: 'status' },
 ];
 
-const ClientDevices = forwardRef(({ checkedLocations }, ref) => {
+const ClientDevices = ({ checkedLocations }) => {
   const { customerId } = useContext(UserContext);
   const [filterClientSessions, { loading, error, data, refetch, fetchMore }] = useLazyQuery(
     FILTER_CLIENT_SESSIONS,
@@ -34,24 +38,6 @@ const ClientDevices = forwardRef(({ checkedLocations }, ref) => {
       errorPolicy: 'all',
     }
   );
-
-  useImperativeHandle(ref, () => ({
-    reloadTable() {
-      refetch()
-        .then(() => {
-          notification.success({
-            message: 'Success',
-            description: 'Client devices reloaded.',
-          });
-        })
-        .catch(() =>
-          notification.error({
-            message: 'Error',
-            description: 'Client devices could not be reloaded.',
-          })
-        );
-    },
-  }));
 
   const handleLoadMore = () => {
     if (!data.filterClientSessions.context.lastPage) {
@@ -79,6 +65,22 @@ const ClientDevices = forwardRef(({ checkedLocations }, ref) => {
     });
   };
 
+  const reloadTable = () => {
+    refetch()
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Client devices reloaded.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Client devices could not be reloaded.',
+        })
+      );
+  };
+
   useEffect(() => {
     fetchFilterClientSessions();
   }, [checkedLocations]);
@@ -94,14 +96,20 @@ const ClientDevices = forwardRef(({ checkedLocations }, ref) => {
   }
 
   return (
-    <NetworkTable
-      tableColumns={clientDevicesTableColumns}
-      tableData={data && data.filterClientSessions && data.filterClientSessions.items}
-      onLoadMore={handleLoadMore}
-      isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
-    />
+    <>
+      <div className={styles.headerBtnContent}>
+        <ToggleButton activeTab="/network/client-devices" />
+        <Button onClick={reloadTable} title="reload" icon={<ReloadOutlined />} />
+      </div>
+      <NetworkTable
+        tableColumns={clientDevicesTableColumns}
+        tableData={data && data.filterClientSessions && data.filterClientSessions.items}
+        onLoadMore={handleLoadMore}
+        isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
+      />
+    </>
   );
-});
+};
 
 ClientDevices.propTypes = {
   checkedLocations: PropTypes.instanceOf(Array).isRequired,

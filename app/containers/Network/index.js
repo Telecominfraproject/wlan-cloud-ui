@@ -1,5 +1,5 @@
-import React, { useMemo, useContext, useState, useRef } from 'react';
-import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
+import React, { useMemo, useContext, useState } from 'react';
+import { Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import _ from 'lodash';
@@ -23,7 +23,6 @@ import {
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
-  const location = useLocation();
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
@@ -44,9 +43,6 @@ const Network = () => {
   const [editModal, setEditModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
   const [apModal, setApModal] = useState(false);
-
-  let accessPointsRef = useRef(null);
-  let clientDevicesRef = useRef(null);
 
   const handleGetSingleLocation = id => {
     getLocation({
@@ -209,14 +205,6 @@ const Network = () => {
     [data]
   );
 
-  const reloadData = loc => {
-    if (loc === '/network/access-points') {
-      accessPointsRef.reloadTable();
-    } else {
-      clientDevicesRef.reloadTable();
-    }
-  };
-
   if (loading) {
     return <Loading />;
   }
@@ -231,7 +219,6 @@ const Network = () => {
       onCheck={onCheck}
       checkedLocations={checkedLocations}
       locations={locationsTree}
-      activeTab={location.pathname}
       selectedLocation={selectedLocation && selectedLocation.getLocation}
       addModal={addModal}
       editModal={editModal}
@@ -248,7 +235,6 @@ const Network = () => {
       profiles={(apProfiles && apProfiles.getAllProfiles && apProfiles.getAllProfiles.items) || []}
       loadingProfile={loadingProfile}
       errorProfile={errorProfile}
-      onReload={reloadData}
     >
       <Switch>
         <Route
@@ -265,15 +251,7 @@ const Network = () => {
         <Route
           exact
           path={`${path}/access-points`}
-          render={props => (
-            <AccessPoints
-              ref={ref => {
-                accessPointsRef = ref;
-              }}
-              checkedLocations={checkedLocations}
-              {...props}
-            />
-          )}
+          render={props => <AccessPoints checkedLocations={checkedLocations} {...props} />}
         />
         <Route
           exact
@@ -283,15 +261,7 @@ const Network = () => {
         <Route
           exact
           path={`${path}/client-devices`}
-          render={props => (
-            <ClientDevices
-              ref={ref => {
-                clientDevicesRef = ref;
-              }}
-              checkedLocations={checkedLocations}
-              {...props}
-            />
-          )}
+          render={props => <ClientDevices checkedLocations={checkedLocations} {...props} />}
         />
         <Route exact path={`${path}/client-devices/:id`} component={ClientDeviceDetails} />
         <Redirect from={path} to={`${path}/access-points`} />

@@ -1,8 +1,10 @@
-import React, { useEffect, useContext, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
-import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { ReloadOutlined } from '@ant-design/icons';
+
+import { Button, ToggleButton, NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_EQUIPMENT } from 'graphql/queries';
@@ -90,7 +92,7 @@ const accessPointsTableColumns = [
   },
 ];
 
-const AccessPoints = forwardRef(({ checkedLocations }, ref) => {
+const AccessPoints = ({ checkedLocations }) => {
   const { customerId } = useContext(UserContext);
   const [filterEquipment, { loading, error, data: equipData, refetch, fetchMore }] = useLazyQuery(
     FILTER_EQUIPMENT,
@@ -99,23 +101,21 @@ const AccessPoints = forwardRef(({ checkedLocations }, ref) => {
     }
   );
 
-  useImperativeHandle(ref, () => ({
-    reloadTable() {
-      refetch()
-        .then(() => {
-          notification.success({
-            message: 'Success',
-            description: 'Access points reloaded.',
-          });
+  const reloadTable = () => {
+    refetch()
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Access points reloaded.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Access points could not be reloaded.',
         })
-        .catch(() =>
-          notification.error({
-            message: 'Error',
-            description: 'Access points could not be reloaded.',
-          })
-        );
-    },
-  }));
+      );
+  };
 
   const handleLoadMore = () => {
     if (!equipData.filterEquipment.context.lastPage) {
@@ -156,16 +156,22 @@ const AccessPoints = forwardRef(({ checkedLocations }, ref) => {
   }
 
   return (
-    <NetworkTable
-      tableColumns={accessPointsTableColumns}
-      tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}
-      onLoadMore={handleLoadMore}
-      isLastPage={
-        equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
-      }
-    />
+    <>
+      <div className={styles.headerBtnContent}>
+        <ToggleButton activeTab="/network/access-points" />
+        <Button onClick={reloadTable} title="reload" icon={<ReloadOutlined />} />
+      </div>
+      <NetworkTable
+        tableColumns={accessPointsTableColumns}
+        tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}
+        onLoadMore={handleLoadMore}
+        isLastPage={
+          equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
+        }
+      />
+    </>
   );
-});
+};
 
 AccessPoints.propTypes = {
   checkedLocations: PropTypes.instanceOf(Array).isRequired,
