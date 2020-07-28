@@ -329,3 +329,15 @@ export const GET_BLOCKED_CLIENTS = gql`
     }
   }
 `;
+
+export const GET_CLIENTS = gql`
+  query GetClients($customerId: ID!, $macAddress: [String]) {
+    getClients(customerId: $customerId, macAddress: $macAddress) {
+      customerId
+      macAddress
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
