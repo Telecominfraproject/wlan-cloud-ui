@@ -1,11 +1,14 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { Alert } from 'antd';
+import { floor, padStart } from 'lodash';
 import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_EQUIPMENT } from 'graphql/queries';
+
 import styles from './index.module.scss';
 
 const renderTableCell = tabCell => {
@@ -21,6 +24,13 @@ const renderTableCell = tabCell => {
   }
   return tabCell;
 };
+
+const durationToString = duration =>
+  `${floor(duration.asDays())}d ${floor(duration.hours())}h ${padStart(
+    duration.minutes(),
+    2,
+    0
+  )}m ${padStart(duration.seconds(), 2, 0)}s`;
 
 const accessPointsTableColumns = [
   {
@@ -61,7 +71,7 @@ const accessPointsTableColumns = [
   {
     title: 'UP TIME',
     dataIndex: ['status', 'osPerformance', 'details', 'uptimeInSeconds'],
-    render: renderTableCell,
+    render: upTimeInSeconds => durationToString(moment.duration(upTimeInSeconds, 'seconds')),
   },
   {
     title: 'PROFILE',
