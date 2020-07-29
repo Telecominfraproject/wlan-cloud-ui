@@ -74,8 +74,8 @@ const Dashboard = () => {
     loading: metricsLoading,
     error: metricsError,
     data: metricsData,
-    refetch: metricsRefetch,
     networkStatus,
+    fetchMore,
   } = useQuery(FILTER_SYSTEM_EVENTS, {
     variables: {
       customerId,
@@ -89,14 +89,14 @@ const Dashboard = () => {
 
   useEffect(() => {
     setInterval(() => {
-      const fromTime = moment()
+      const toTime = moment()
         .valueOf()
         .toString();
-      const toTime = moment()
+      const fromTime = moment()
         .subtract(5, 'minutes')
         .valueOf()
         .toString();
-      metricsRefetch({
+      fetchMore({
         variables: {
           customerId,
           fromTime,
@@ -104,6 +104,81 @@ const Dashboard = () => {
           equipmentIds: [0],
           dataTypes: ['StatusChangedEvent'],
           limit: 100,
+        },
+        updateQuery: (
+          _,
+          {
+            fetchMoreResult: {
+              filterSystemEvents: { items },
+            },
+          }
+        ) => {
+          if (items.length) {
+            const clientDevicesData = lineChartData.clientDevices?.data || {};
+            const inservicesAPs = [];
+            const trafficBytesDownstreamData = [];
+            const trafficBytesUpstreamData = [];
+
+            items.forEach(
+              ({
+                eventTimestamp,
+                details: {
+                  payload: {
+                    details: {
+                      equipmentInServiceCount,
+                      associatedClientsCountPerRadio: radios,
+                      trafficBytesDownstream,
+                      trafficBytesUpstream,
+                    },
+                  },
+                },
+              }) => {
+                inservicesAPs.push([eventTimestamp, equipmentInServiceCount]);
+
+                Object.keys(radios).forEach(key => {
+                  if (!clientDevicesData[key]) {
+                    clientDevicesData[key] = {
+                      key: USER_FRIENDLY_RADIOS[key] || key,
+                      more: [],
+                    };
+                  }
+                  clientDevicesData[key].more.push([eventTimestamp, radios[key]]);
+                });
+
+                trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
+                trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
+              }
+            );
+            const result = {
+              ...lineChartData,
+              inservicesAPs: {
+                ...lineChartData.inservicesAPs,
+                data: {
+                  ...lineChartData.inservicesAPs.data,
+                  more: inservicesAPs,
+                },
+              },
+              clientDevices: {
+                ...lineChartData.clientDevices,
+                data: { ...clientDevicesData },
+              },
+              traffic: {
+                ...lineChartData.traffic,
+                data: {
+                  ...lineChartData.traffic.data,
+                  trafficBytesDownstream: {
+                    ...lineChartData.traffic.data.trafficBytesDownstream,
+                    more: trafficBytesDownstreamData,
+                  },
+                  trafficBytesUpstream: {
+                    ...lineChartData.traffic.data.trafficBytesUpstream,
+                    more: trafficBytesUpstreamData,
+                  },
+                },
+              },
+            };
+            setLineChartData(result);
+          }
         },
       });
     }, 300000);
@@ -115,6 +190,7 @@ const Dashboard = () => {
       const inservicesAPs = lineChartData.inservicesAPs.data.value;
       const trafficBytesDownstreamData = lineChartData.traffic.data.trafficBytesDownstream.value;
       const trafficBytesUpstreamData = lineChartData.traffic.data.trafficBytesUpstream.value;
+
       list.forEach(
         ({
           eventTimestamp,
