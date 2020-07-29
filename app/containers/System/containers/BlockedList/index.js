@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import { BlockedList as BlockedListPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
-import { GET_BLOCKED_CLIENTS, GET_CLIENTS } from 'graphql/queries';
-import { UPDATE_CLIENT } from 'graphql/mutations';
+import { GET_BLOCKED_CLIENTS } from 'graphql/queries';
+import { UPDATE_CLIENT, ADD_BLOCKED_CLIENT } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 
 const BlockedList = () => {
@@ -12,6 +12,7 @@ const BlockedList = () => {
     variables: { customerId },
   });
   const [updateClient] = useMutation(UPDATE_CLIENT);
+  const [addClient] = useMutation(ADD_BLOCKED_CLIENT);
 
   const handleUpdateClient = (macAddress, details) => {
     updateClient({
@@ -25,48 +26,37 @@ const BlockedList = () => {
         refetch();
         notification.success({
           message: 'Success',
-          description: 'Client Blocked List settings successfully updated.',
+          description: 'Client successfully removed from Blocked List',
         });
       })
       .catch(() =>
         notification.error({
           message: 'Error',
-          description: 'Client Blocked List settings could not be updated.',
+          description: 'Client could not be removed from Blocked List',
         })
       );
   };
 
-  const [getClients, { variables }] = useLazyQuery(GET_CLIENTS, {
-    onCompleted: resp => {
-      if (resp.getClients.length) {
-        const client = { ...resp.getClients[0] };
-
-        const hasDetailsProperty = Object.prototype.hasOwnProperty.call(
-          client.details,
-          'blocklistDetails'
-        );
-
-        if (hasDetailsProperty) {
-          client.details.blocklistDetails.enabled = true;
-          handleUpdateClient(client.macAddress, client.details);
-        }
-      } else {
-        const details = {
-          blocklistDetails: { enabled: true },
-          model_type: 'ClientInfoDetails',
-        };
-        handleUpdateClient(variables.macAddress[0], details);
-      }
-    },
-  });
-
   const handleAddClient = macAddress => {
-    getClients({
+    addClient({
       variables: {
         customerId,
-        macAddress: [macAddress],
+        macAddress,
       },
-    });
+    })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Client successfully added to Blocked List',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Client could not be added to Blocked List',
+        })
+      );
   };
 
   if (loading) return <Loading />;

@@ -289,3 +289,15 @@ export const UPDATE_CLIENT = gql`
     }
   }
 `;
+
+export const ADD_BLOCKED_CLIENT = gql`
+  mutation AddBlockedClient($customerId: ID!, $macAddress: String) {
+    addBlockedClient(customerId: $customerId, macAddress: $macAddress) {
+      customerId
+      macAddress
+      details
+      lastModifiedTimestamp
+      createdTimestamp
+    }
+  }
+`;
