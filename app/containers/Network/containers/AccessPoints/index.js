@@ -5,8 +5,10 @@ import { useLazyQuery } from '@apollo/react-hooks';
 import { Alert } from 'antd';
 import { floor, padStart } from 'lodash';
 import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+
 import UserContext from 'contexts/UserContext';
 import { FILTER_EQUIPMENT } from 'graphql/queries';
+
 import styles from './index.module.scss';
 
 const renderTableCell = tabCell => {
@@ -24,11 +26,11 @@ const renderTableCell = tabCell => {
 };
 
 const durationToString = duration =>
-  `${floor(duration.asHours())}h ${padStart(duration.minutes(), 2, 0)}m ${padStart(
-    duration.seconds(),
+  `${floor(duration.asDays())}d ${floor(duration.hours())}h ${padStart(
+    duration.minutes(),
     2,
     0
-  )}s`;
+  )}m ${padStart(duration.seconds(), 2, 0)}s`;
 
 const accessPointsTableColumns = [
   {
