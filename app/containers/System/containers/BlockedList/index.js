@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import { BlockedList as BlockedListPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
@@ -8,7 +8,6 @@ import UserContext from 'contexts/UserContext';
 
 const BlockedList = () => {
   const { customerId } = useContext(UserContext);
-  const [mac, setMac] = useState('');
   const { data, error, loading, refetch } = useQuery(GET_BLOCKED_CLIENTS, {
     variables: { customerId },
   });
@@ -37,30 +36,37 @@ const BlockedList = () => {
       );
   };
 
-  const [getClients] = useLazyQuery(GET_CLIENTS, {
-    onCompleted: value => {
-      if (value.getClients.length) {
-        const client = { ...value.getClients[0] };
-        client.details.blocklistDetails.enabled = true;
-        handleUpdateClient(client.macAddress, client.details);
+  const [getClients, { variables }] = useLazyQuery(GET_CLIENTS, {
+    onCompleted: resp => {
+      if (resp.getClients.length) {
+        const client = { ...resp.getClients[0] };
+
+        const hasDetailsProperty = Object.prototype.hasOwnProperty.call(
+          client.details,
+          'blocklistDetails'
+        );
+
+        if (hasDetailsProperty) {
+          client.details.blocklistDetails.enabled = true;
+          handleUpdateClient(client.macAddress, client.details);
+        }
       } else {
         const details = {
           blocklistDetails: { enabled: true },
           model_type: 'ClientInfoDetails',
         };
-        handleUpdateClient(mac, details);
+        handleUpdateClient(variables.macAddress[0], details);
       }
     },
   });
 
-  const handleGetClients = macAddress => {
+  const handleAddClient = macAddress => {
     getClients({
       variables: {
         customerId,
         macAddress: [macAddress],
       },
     });
-    setMac(macAddress);
   };
 
   if (loading) return <Loading />;
@@ -74,7 +80,7 @@ const BlockedList = () => {
     <BlockedListPage
       data={data && data.getBlockedClients}
       onUpdateClient={handleUpdateClient}
-      onGetClients={handleGetClients}
+      onAddClient={handleAddClient}
     />
   );
 };
