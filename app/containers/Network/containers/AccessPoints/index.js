@@ -2,9 +2,8 @@ import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
 
-import { Button, ToggleButton, NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { NetworkTableContainer, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_EQUIPMENT } from 'graphql/queries';
@@ -156,20 +155,16 @@ const AccessPoints = ({ checkedLocations }) => {
   }
 
   return (
-    <>
-      <div className={styles.headerBtnContent}>
-        <ToggleButton activeTab="/network/access-points" />
-        <Button onClick={reloadTable} title="reload" icon={<ReloadOutlined />} />
-      </div>
-      <NetworkTable
-        tableColumns={accessPointsTableColumns}
-        tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}
-        onLoadMore={handleLoadMore}
-        isLastPage={
-          equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
-        }
-      />
-    </>
+    <NetworkTableContainer
+      activeTab="/network/access-points"
+      reloadTable={reloadTable}
+      tableColumns={accessPointsTableColumns}
+      tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}
+      onLoadMore={handleLoadMore}
+      isLastPage={
+        equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
+      }
+    />
   );
 };
 

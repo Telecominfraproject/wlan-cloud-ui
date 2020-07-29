@@ -2,14 +2,11 @@ import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
 
-import { Button, ToggleButton, NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { NetworkTableContainer, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_CLIENT_SESSIONS } from 'graphql/queries';
-
-import styles from './index.module.scss';
 
 const clientDevicesTableColumns = [
   {
@@ -96,18 +93,14 @@ const ClientDevices = ({ checkedLocations }) => {
   }
 
   return (
-    <>
-      <div className={styles.headerBtnContent}>
-        <ToggleButton activeTab="/network/client-devices" />
-        <Button onClick={reloadTable} title="reload" icon={<ReloadOutlined />} />
-      </div>
-      <NetworkTable
-        tableColumns={clientDevicesTableColumns}
-        tableData={data && data.filterClientSessions && data.filterClientSessions.items}
-        onLoadMore={handleLoadMore}
-        isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
-      />
-    </>
+    <NetworkTableContainer
+      activeTab="/network/client-devices"
+      reloadTable={reloadTable}
+      tableColumns={clientDevicesTableColumns}
+      tableData={data && data.filterClientSessions && data.filterClientSessions.items}
+      onLoadMore={handleLoadMore}
+      isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
+    />
   );
 };
 
