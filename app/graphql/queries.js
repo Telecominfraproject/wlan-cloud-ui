@@ -317,3 +317,15 @@ export const FILTER_SYSTEM_EVENTS = gql`
     }
   }
 `;
+
+export const GET_BLOCKED_CLIENTS = gql`
+  query GetBlockedClients($customerId: ID!) {
+    getBlockedClients(customerId: $customerId) {
+      customerId
+      macAddress
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
