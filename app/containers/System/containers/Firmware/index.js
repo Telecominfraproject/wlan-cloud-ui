@@ -237,7 +237,7 @@ const Firmware = () => {
       onCreateTrackAssignment={handleCreateTrackAssignment}
       onUpdateTrackAssignment={handleUpdateTrackAssignment}
       onDeleteTrackAssignment={handleDeleteTrackAssignment}
-      onCreateFirnware={handleCreateFirmware}
+      onCreateFirmware={handleCreateFirmware}
       onUpdateFirmware={handleUpdateFirmware}
       onDeleteFirmware={handleDeleteFirmware}
       firmwareError={error}
