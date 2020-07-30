@@ -11,8 +11,30 @@ const BlockedList = () => {
   const { data, error, loading, refetch } = useQuery(GET_BLOCKED_CLIENTS, {
     variables: { customerId },
   });
-  const [updateClient] = useMutation(UPDATE_CLIENT);
   const [addClient] = useMutation(ADD_BLOCKED_CLIENT);
+  const [updateClient] = useMutation(UPDATE_CLIENT);
+
+  const handleAddClient = macAddress => {
+    addClient({
+      variables: {
+        customerId,
+        macAddress,
+      },
+    })
+      .then(() => {
+        refetch();
+        notification.success({
+          message: 'Success',
+          description: 'Client successfully added to Blocked List',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Client could not be added to Blocked List',
+        })
+      );
+  };
 
   const handleUpdateClient = (macAddress, details) => {
     updateClient({
@@ -33,28 +55,6 @@ const BlockedList = () => {
         notification.error({
           message: 'Error',
           description: 'Client could not be removed from Blocked List',
-        })
-      );
-  };
-
-  const handleAddClient = macAddress => {
-    addClient({
-      variables: {
-        customerId,
-        macAddress,
-      },
-    })
-      .then(() => {
-        refetch();
-        notification.success({
-          message: 'Success',
-          description: 'Client successfully added to Blocked List',
-        });
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Client could not be added to Blocked List',
         })
       );
   };
