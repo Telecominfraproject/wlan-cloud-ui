@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
 import { Alert } from 'antd';
 import moment from 'moment';
-import { NetworkStatus } from 'apollo-client';
 import { useQuery } from '@apollo/react-hooks';
 import { Dashboard as DashboardPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
@@ -37,30 +36,18 @@ const USER_FRIENDLY_RADIOS = {
   is5GHz: '5GHz',
 };
 
+const lineChartConfig = [
+  { key: 'inservicesAPs', title: 'Inservice APs (24 hours)' },
+  { key: 'clientDevices', title: 'Client Devices (24 hours)' },
+  {
+    key: 'traffic',
+    title: 'Traffic (24 hours)',
+    options: { formatter: trafficLabelFormatter, tooltipFormatter: trafficTooltipFormatter },
+  },
+];
+
 const Dashboard = () => {
-  const { customerId } = useContext(UserContext);
-  const { loading, error, data } = useQuery(GET_ALL_STATUS, {
-    variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
-  });
-
-  const [lineChartData, setLineChartData] = useState({
-    inservicesAPs: {
-      title: 'Inservice APs (24 hours)',
-      data: { key: 'Inservice APs', value: [] },
-    },
-    clientDevices: { title: 'Client Devices (24 hours)' },
-    traffic: {
-      title: 'Traffic (24 hours)',
-      formatter: trafficLabelFormatter,
-      tooltipFormatter: trafficTooltipFormatter,
-      data: {
-        trafficBytesDownstream: { key: 'Down Stream', value: [] },
-        trafficBytesUpstream: { key: 'Up Stream', value: [] },
-      },
-    },
-  });
-
-  const [graphTime] = useState({
+  const initialGraphTime = useRef({
     toTime: moment()
       .valueOf()
       .toString(),
@@ -69,26 +56,120 @@ const Dashboard = () => {
       .valueOf()
       .toString(),
   });
+  const { customerId } = useContext(UserContext);
+  const { loading, error, data } = useQuery(GET_ALL_STATUS, {
+    variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
+  });
 
-  const {
-    loading: metricsLoading,
-    error: metricsError,
-    data: metricsData,
-    networkStatus,
-    fetchMore,
-  } = useQuery(FILTER_SYSTEM_EVENTS, {
-    variables: {
-      customerId,
-      fromTime: graphTime.fromTime,
-      toTime: graphTime.toTime,
-      equipmentIds: [0],
-      dataTypes: ['StatusChangedEvent'],
-      limit: 100,
+  const [lineChartData, setLineChartData] = useState({
+    inservicesAPs: {
+      key: 'Inservice APs',
+      value: [],
+    },
+    clientDevices: {
+      is2dot4GHz: {
+        key: USER_FRIENDLY_RADIOS.is2dot4GHz,
+        value: [],
+      },
+      is5GHz: {
+        key: USER_FRIENDLY_RADIOS.is5GHz,
+        value: [],
+      },
+    },
+    traffic: {
+      trafficBytesDownstream: {
+        key: 'Down Stream',
+        value: [],
+      },
+      trafficBytesUpstream: {
+        key: 'Up Stream',
+        value: [],
+      },
     },
   });
 
+  const { loading: metricsLoading, error: metricsError, data: metricsData, fetchMore } = useQuery(
+    FILTER_SYSTEM_EVENTS,
+    {
+      variables: {
+        customerId,
+        fromTime: initialGraphTime.current.fromTime,
+        toTime: initialGraphTime.current.toTime,
+        equipmentIds: [0],
+        dataTypes: ['StatusChangedEvent'],
+        limit: 3000, // TODO: make get all in GraphQL
+      },
+    }
+  );
+
+  const formatLineChartData = (list = []) => {
+    if (list.length) {
+      setLineChartData(prev => {
+        const inservicesAPs = [];
+        const clientDevices2dot4GHz = [];
+        const clientDevices5GHz = [];
+        const trafficBytesDownstreamData = [];
+        const trafficBytesUpstreamData = [];
+
+        list.forEach(
+          ({
+            eventTimestamp,
+            details: {
+              payload: {
+                details: {
+                  equipmentInServiceCount,
+                  associatedClientsCountPerRadio: radios,
+                  trafficBytesDownstream,
+                  trafficBytesUpstream,
+                },
+              },
+            },
+          }) => {
+            inservicesAPs.push([eventTimestamp, equipmentInServiceCount]);
+
+            let total5GHz = 0;
+            total5GHz += radios?.is5GHz || 0 + radios?.is5GHzL || 0 + radios?.is5GHzU || 0; // combine all 5GHz radios
+
+            clientDevices2dot4GHz.push([eventTimestamp, radios.is2dot4GHz || 0]);
+            clientDevices5GHz.push([eventTimestamp, total5GHz]);
+
+            trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
+            trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
+          }
+        );
+
+        return {
+          inservicesAPs: {
+            ...prev.inservicesAPs,
+            value: [...prev.inservicesAPs.value, ...inservicesAPs],
+          },
+          clientDevices: {
+            is2dot4GHz: {
+              ...prev.clientDevices.is2dot4GHz,
+              value: [...prev.clientDevices.is2dot4GHz.value, ...clientDevices2dot4GHz],
+            },
+            is5GHz: {
+              ...prev.clientDevices.is5GHz,
+              value: [...prev.clientDevices.is5GHz.value, ...clientDevices5GHz],
+            },
+          },
+          traffic: {
+            trafficBytesDownstream: {
+              ...prev.traffic.trafficBytesDownstream,
+              value: [...prev.traffic.trafficBytesDownstream.value, ...trafficBytesDownstreamData],
+            },
+            trafficBytesUpstream: {
+              ...prev.traffic.trafficBytesUpstream,
+              value: [...prev.traffic.trafficBytesUpstream.value, ...trafficBytesUpstreamData],
+            },
+          },
+        };
+      });
+    }
+  };
+
   useEffect(() => {
-    setInterval(() => {
+    const interval = setInterval(() => {
       const toTime = moment()
         .valueOf()
         .toString();
@@ -98,158 +179,21 @@ const Dashboard = () => {
         .toString();
       fetchMore({
         variables: {
-          customerId,
           fromTime,
           toTime,
-          equipmentIds: [0],
-          dataTypes: ['StatusChangedEvent'],
-          limit: 100,
         },
-        updateQuery: (
-          _,
-          {
-            fetchMoreResult: {
-              filterSystemEvents: { items },
-            },
-          }
-        ) => {
-          if (items.length) {
-            const clientDevicesData = lineChartData.clientDevices?.data || {};
-            const inservicesAPs = [];
-            const trafficBytesDownstreamData = [];
-            const trafficBytesUpstreamData = [];
-
-            items.forEach(
-              ({
-                eventTimestamp,
-                details: {
-                  payload: {
-                    details: {
-                      equipmentInServiceCount,
-                      associatedClientsCountPerRadio: radios,
-                      trafficBytesDownstream,
-                      trafficBytesUpstream,
-                    },
-                  },
-                },
-              }) => {
-                inservicesAPs.push([eventTimestamp, equipmentInServiceCount]);
-
-                Object.keys(radios).forEach(key => {
-                  if (!clientDevicesData[key]) {
-                    clientDevicesData[key] = {
-                      key: USER_FRIENDLY_RADIOS[key] || key,
-                      more: [],
-                    };
-                  }
-                  clientDevicesData[key].more.push([eventTimestamp, radios[key]]);
-                });
-
-                trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
-                trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
-              }
-            );
-            const result = {
-              ...lineChartData,
-              inservicesAPs: {
-                ...lineChartData.inservicesAPs,
-                data: {
-                  ...lineChartData.inservicesAPs.data,
-                  more: inservicesAPs,
-                },
-              },
-              clientDevices: {
-                ...lineChartData.clientDevices,
-                data: { ...clientDevicesData },
-              },
-              traffic: {
-                ...lineChartData.traffic,
-                data: {
-                  ...lineChartData.traffic.data,
-                  trafficBytesDownstream: {
-                    ...lineChartData.traffic.data.trafficBytesDownstream,
-                    more: trafficBytesDownstreamData,
-                  },
-                  trafficBytesUpstream: {
-                    ...lineChartData.traffic.data.trafficBytesUpstream,
-                    more: trafficBytesUpstreamData,
-                  },
-                },
-              },
-            };
-            setLineChartData(result);
-          }
+        updateQuery: (_, { fetchMoreResult }) => {
+          formatLineChartData(fetchMoreResult?.filterSystemEvents?.items);
         },
       });
     }, 300000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const formatLineChartData = (list = []) => {
-    if (list.length) {
-      const clientDevicesData = lineChartData.clientDevices?.data || {};
-      const inservicesAPs = lineChartData.inservicesAPs.data.value;
-      const trafficBytesDownstreamData = lineChartData.traffic.data.trafficBytesDownstream.value;
-      const trafficBytesUpstreamData = lineChartData.traffic.data.trafficBytesUpstream.value;
-
-      list.forEach(
-        ({
-          eventTimestamp,
-          details: {
-            payload: {
-              details: {
-                equipmentInServiceCount,
-                associatedClientsCountPerRadio: radios,
-                trafficBytesDownstream,
-                trafficBytesUpstream,
-              },
-            },
-          },
-        }) => {
-          inservicesAPs.push([eventTimestamp, equipmentInServiceCount]);
-          Object.keys(radios).forEach(key => {
-            if (!clientDevicesData[key]) {
-              clientDevicesData[key] = {
-                key: USER_FRIENDLY_RADIOS[key] || key,
-                value: [],
-              };
-            }
-            clientDevicesData[key].value.push([eventTimestamp, radios[key]]);
-          });
-
-          trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
-          trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
-        }
-      );
-      const result = {
-        ...lineChartData,
-        inservicesAPs: {
-          ...lineChartData.inservicesAPs,
-          data: { ...lineChartData.inservicesAPs.data, value: inservicesAPs },
-        },
-        clientDevices: {
-          ...lineChartData.clientDevices,
-          data: { ...clientDevicesData },
-        },
-        traffic: {
-          ...lineChartData.traffic,
-          data: {
-            ...lineChartData.traffic.data,
-            trafficBytesDownstream: {
-              ...lineChartData.traffic.data.trafficBytesDownstream,
-              value: trafficBytesDownstreamData,
-            },
-            trafficBytesUpstream: {
-              ...lineChartData.traffic.data.trafficBytesUpstream,
-              value: trafficBytesUpstreamData,
-            },
-          },
-        },
-      };
-      setLineChartData(result);
-    }
-  };
-
-  useEffect(() => formatLineChartData(metricsData?.filterSystemEvents?.items), [metricsData]);
+  useEffect(() => {
+    formatLineChartData(metricsData?.filterSystemEvents?.items);
+  }, [metricsData]);
 
   const statsArr = useMemo(() => {
     const status = data?.getAllStatus?.items[0]?.detailsJSON || {};
@@ -316,12 +260,14 @@ const Dashboard = () => {
   if (error) {
     return <Alert message="Error" description="Failed to load Dashboard" type="error" showIcon />;
   }
+
   return (
     <DashboardPage
       statsCardDetails={statsArr}
       pieChartDetails={pieChartsData}
-      lineChartDetails={lineChartData}
-      lineChartLoading={metricsLoading && networkStatus === NetworkStatus.loading}
+      lineChartData={lineChartData}
+      lineChartConfig={lineChartConfig}
+      lineChartLoading={metricsLoading}
       lineChartError={metricsError}
     />
   );
