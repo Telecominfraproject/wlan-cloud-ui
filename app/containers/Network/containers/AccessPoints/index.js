@@ -84,7 +84,7 @@ const accessPointsTableColumns = [
     render: renderTableCell,
   },
   {
-    title: 'CAPACITY',
+    title: 'OCCUPANCY',
     dataIndex: ['status', 'radioUtilization', 'details', 'capacityDetails'],
     render: renderTableCell,
   },
