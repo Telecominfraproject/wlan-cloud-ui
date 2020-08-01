@@ -6,6 +6,7 @@ import { System as SystemPage } from '@tip-wlan/wlan-cloud-ui-library';
 import Manufacturer from 'containers/System/containers/Manufacturer';
 import Firmware from 'containers/System/containers/Firmware';
 import AutoProvision from 'containers/System/containers/AutoProvision';
+import BlockedList from 'containers/System/containers/BlockedList';
 
 const System = () => {
   const { path } = useRouteMatch();
@@ -16,6 +17,7 @@ const System = () => {
         <Route exact path={`${path}/manufacturer`} component={Manufacturer} />
         <Route exact path={`${path}/firmware`} component={Firmware} />
         <Route exact path={`${path}/autoprovision`} component={AutoProvision} />
+        <Route exact path={`${path}/blockedlist`} component={BlockedList} />
 
         <Redirect from={path} to={`${path}/manufacturer`} />
       </Switch>
