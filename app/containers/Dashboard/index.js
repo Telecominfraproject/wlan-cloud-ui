@@ -128,7 +128,7 @@ const Dashboard = () => {
             inservicesAPs.push([eventTimestamp, equipmentInServiceCount]);
 
             let total5GHz = 0;
-            total5GHz += radios?.is5GHz || 0 + radios?.is5GHzL || 0 + radios?.is5GHzU || 0; // combine all 5GHz radios
+            total5GHz += (radios?.is5GHz || 0) + (radios?.is5GHzL || 0) + (radios?.is5GHzU || 0); // combine all 5GHz radios
 
             clientDevices2dot4GHz.push([eventTimestamp, radios.is2dot4GHz || 0]);
             clientDevices5GHz.push([eventTimestamp, total5GHz]);
