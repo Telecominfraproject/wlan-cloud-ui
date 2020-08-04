@@ -1,5 +1,5 @@
 import React, { useMemo, useContext, useState } from 'react';
-import { useLocation, Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
+import { Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import _ from 'lodash';
@@ -23,7 +23,6 @@ import {
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
-  const location = useLocation();
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
@@ -220,7 +219,6 @@ const Network = () => {
       onCheck={onCheck}
       checkedLocations={checkedLocations}
       locations={locationsTree}
-      activeTab={location.pathname}
       selectedLocation={selectedLocation && selectedLocation.getLocation}
       addModal={addModal}
       editModal={editModal}

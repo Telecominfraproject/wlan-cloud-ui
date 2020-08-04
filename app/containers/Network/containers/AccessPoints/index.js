@@ -2,9 +2,9 @@ import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
+import { notification } from 'antd';
 import { floor, padStart } from 'lodash';
-import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_EQUIPMENT } from 'graphql/queries';
@@ -102,12 +102,28 @@ const accessPointsTableColumns = [
 
 const AccessPoints = ({ checkedLocations }) => {
   const { customerId } = useContext(UserContext);
-  const [filterEquipment, { loading, error, data: equipData, fetchMore }] = useLazyQuery(
+  const [filterEquipment, { loading, error, data: equipData, refetch, fetchMore }] = useLazyQuery(
     FILTER_EQUIPMENT,
     {
       errorPolicy: 'all',
     }
   );
+
+  const handleOnRefresh = () => {
+    refetch()
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Access points reloaded.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Access points could not be reloaded.',
+        })
+      );
+  };
 
   const handleLoadMore = () => {
     if (!equipData.filterEquipment.context.lastPage) {
@@ -139,22 +155,18 @@ const AccessPoints = ({ checkedLocations }) => {
     fetchFilterEquipment();
   }, [checkedLocations]);
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error && !equipData?.filterEquipment?.items) {
-    return <Alert message="Error" description="Failed to load equipment." type="error" showIcon />;
-  }
-
   return (
-    <NetworkTable
+    <NetworkTableContainer
+      activeTab="/network/access-points"
+      onRefresh={handleOnRefresh}
       tableColumns={accessPointsTableColumns}
       tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}
       onLoadMore={handleLoadMore}
       isLastPage={
         equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
       }
+      loading={loading}
+      error={error && !equipData?.filterEquipment?.items && 'Failed to load equipment.'}
     />
   );
 };
