@@ -90,9 +90,8 @@ const ClientDevices = ({ checkedLocations }) => {
       tableData={data && data.filterClientSessions && data.filterClientSessions.items}
       onLoadMore={handleLoadMore}
       isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
-      onLoading={loading}
-      onError={error}
-      errorDescription="Failed to load client devices."
+      loading={loading}
+      error={error && !data?.filterClientSessions?.items && 'Failed to load client devices.'}
     />
   );
 };

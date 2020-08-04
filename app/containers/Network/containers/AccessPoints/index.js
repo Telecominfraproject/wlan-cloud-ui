@@ -165,9 +165,8 @@ const AccessPoints = ({ checkedLocations }) => {
       isLastPage={
         equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
       }
-      onLoading={loading}
-      onError={error}
-      errorDescription="Failed to load equipment."
+      loading={loading}
+      error={error && !equipData?.filterEquipment?.items && 'Failed to load equipment.'}
     />
   );
 };
