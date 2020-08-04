@@ -1,9 +1,9 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert, notification } from 'antd';
+import { notification } from 'antd';
 
-import { NetworkTableContainer, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_CLIENT_SESSIONS } from 'graphql/queries';
@@ -82,16 +82,6 @@ const ClientDevices = ({ checkedLocations }) => {
     fetchFilterClientSessions();
   }, [checkedLocations]);
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error && !data?.filterClientSessions?.items) {
-    return (
-      <Alert message="Error" description="Failed to load client devices." type="error" showIcon />
-    );
-  }
-
   return (
     <NetworkTableContainer
       activeTab="/network/client-devices"
@@ -100,6 +90,9 @@ const ClientDevices = ({ checkedLocations }) => {
       tableData={data && data.filterClientSessions && data.filterClientSessions.items}
       onLoadMore={handleLoadMore}
       isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
+      onLoading={loading}
+      onError={error}
+      errorDescription="Failed to load client devices."
     />
   );
 };

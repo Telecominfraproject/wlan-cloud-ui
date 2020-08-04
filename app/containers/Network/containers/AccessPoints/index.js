@@ -2,9 +2,9 @@ import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert, notification } from 'antd';
+import { notification } from 'antd';
 import { floor, padStart } from 'lodash';
-import { NetworkTableContainer, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_EQUIPMENT } from 'graphql/queries';
@@ -155,14 +155,6 @@ const AccessPoints = ({ checkedLocations }) => {
     fetchFilterEquipment();
   }, [checkedLocations]);
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error && !equipData?.filterEquipment?.items) {
-    return <Alert message="Error" description="Failed to load equipment." type="error" showIcon />;
-  }
-
   return (
     <NetworkTableContainer
       activeTab="/network/access-points"
@@ -173,6 +165,9 @@ const AccessPoints = ({ checkedLocations }) => {
       isLastPage={
         equipData && equipData.filterEquipment && equipData.filterEquipment.context.lastPage
       }
+      onLoading={loading}
+      onError={error}
+      errorDescription="Failed to load equipment."
     />
   );
 };
