@@ -31,6 +31,7 @@ const Alarms = () => {
   const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_ALARMS, {
     variables: { customerId },
+    errorPolicy: 'all',
   });
 
   const handleOnReload = () => {
@@ -73,9 +74,10 @@ const Alarms = () => {
     return <Loading />;
   }
 
-  if (error) {
+  if (error && !data?.getAllAlarms?.items) {
     return <Alert message="Error" description="Failed to load alarms." type="error" showIcon />;
   }
+
   return (
     <AlarmsPage
       data={data.getAllAlarms.items}

@@ -181,6 +181,7 @@ export const FILTER_SERVICE_METRICS = gql`
         rssi
         rxBytes
         txBytes
+        detailsJSON
       }
       context {
         lastPage

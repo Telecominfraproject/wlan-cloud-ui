@@ -24,7 +24,11 @@ RUN npm run build
 
 # production environment
 FROM nginx:stable-alpine
+RUN apk add --no-cache jq
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker_entrypoint.sh generate_config_js.sh /
+RUN chmod +x docker_entrypoint.sh generate_config_js.sh
+ 
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/docker_entrypoint.sh"]
