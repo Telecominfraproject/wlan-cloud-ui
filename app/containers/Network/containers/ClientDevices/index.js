@@ -62,7 +62,7 @@ const ClientDevices = ({ checkedLocations }) => {
     });
   };
 
-  const reloadTable = () => {
+  const handleOnRefresh = () => {
     refetch()
       .then(() => {
         notification.success({
@@ -85,10 +85,10 @@ const ClientDevices = ({ checkedLocations }) => {
   return (
     <NetworkTableContainer
       activeTab="/network/client-devices"
-      reloadTable={reloadTable}
       tableColumns={clientDevicesTableColumns}
       tableData={data && data.filterClientSessions && data.filterClientSessions.items}
       onLoadMore={handleLoadMore}
+      onRefresh={handleOnRefresh}
       isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
       loading={loading}
       error={error && !data?.filterClientSessions?.items && 'Failed to load client devices.'}

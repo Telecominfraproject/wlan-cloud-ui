@@ -109,7 +109,7 @@ const AccessPoints = ({ checkedLocations }) => {
     }
   );
 
-  const reloadTable = () => {
+  const handleOnRefresh = () => {
     refetch()
       .then(() => {
         notification.success({
@@ -158,7 +158,7 @@ const AccessPoints = ({ checkedLocations }) => {
   return (
     <NetworkTableContainer
       activeTab="/network/access-points"
-      reloadTable={reloadTable}
+      onRefresh={handleOnRefresh}
       tableColumns={accessPointsTableColumns}
       tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}
       onLoadMore={handleLoadMore}
