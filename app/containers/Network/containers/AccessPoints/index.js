@@ -105,6 +105,7 @@ const AccessPoints = ({ checkedLocations }) => {
   const [filterEquipment, { loading, error, data: equipData, fetchMore }] = useLazyQuery(
     FILTER_EQUIPMENT,
     {
+      fetchPolicy: 'cache-and-network',
       errorPolicy: 'all',
     }
   );
