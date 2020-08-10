@@ -1,8 +1,9 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLazyQuery } from '@apollo/react-hooks';
-import { Alert } from 'antd';
-import { NetworkTable, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { notification } from 'antd';
+
+import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { FILTER_CLIENT_SESSIONS } from 'graphql/queries';
@@ -28,7 +29,7 @@ const clientDevicesTableColumns = [
 
 const ClientDevices = ({ checkedLocations }) => {
   const { customerId } = useContext(UserContext);
-  const [filterClientSessions, { loading, error, data, fetchMore }] = useLazyQuery(
+  const [filterClientSessions, { loading, error, data, refetch, fetchMore }] = useLazyQuery(
     FILTER_CLIENT_SESSIONS,
     {
       errorPolicy: 'all',
@@ -61,26 +62,36 @@ const ClientDevices = ({ checkedLocations }) => {
     });
   };
 
+  const handleOnRefresh = () => {
+    refetch()
+      .then(() => {
+        notification.success({
+          message: 'Success',
+          description: 'Client devices reloaded.',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Client devices could not be reloaded.',
+        })
+      );
+  };
+
   useEffect(() => {
     fetchFilterClientSessions();
   }, [checkedLocations]);
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error && !data?.filterClientSessions?.items) {
-    return (
-      <Alert message="Error" description="Failed to load client devices." type="error" showIcon />
-    );
-  }
-
   return (
-    <NetworkTable
+    <NetworkTableContainer
+      activeTab="/network/client-devices"
       tableColumns={clientDevicesTableColumns}
       tableData={data && data.filterClientSessions && data.filterClientSessions.items}
       onLoadMore={handleLoadMore}
+      onRefresh={handleOnRefresh}
       isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
+      loading={loading}
+      error={error && !data?.filterClientSessions?.items && 'Failed to load client devices.'}
     />
   );
 };
