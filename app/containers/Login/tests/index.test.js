@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { fireEvent, cleanup, render } from '@testing-library/react';
+import { fireEvent, cleanup, render, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/react-testing';
 import UserProvider from 'contexts/UserProvider';
 import { ThemeProvider } from '@tip-wlan/wlan-cloud-ui-library';
@@ -46,10 +46,11 @@ describe('<Login />', () => {
         </MockedProvider>
       </ThemeProvider>
     );
+
     fireEvent.change(getByLabelText('E-mail'), { target: { value: 'test@test.com' } });
     fireEvent.change(getByLabelText('Password'), { target: { value: 'password' } });
     fireEvent.submit(getByTestId('loginButton'));
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await waitFor(() => expect(getByLabelText('E-mail')).toBeVisible());
   });
 
   it('login should not be successful when mutation is invalid', async () => {
@@ -65,7 +66,6 @@ describe('<Login />', () => {
     fireEvent.change(getByLabelText('E-mail'), { target: { value: 'test@test.com' } });
     fireEvent.change(getByLabelText('Password'), { target: { value: 'password' } });
     fireEvent.submit(getByTestId('loginButton'));
-    await new Promise(resolve => setTimeout(resolve, 100));
-    expect(getByText('Invalid e-mail or password.')).toBeVisible();
+    await waitFor(() => expect(getByText('Invalid e-mail or password.')).toBeVisible());
   });
 });

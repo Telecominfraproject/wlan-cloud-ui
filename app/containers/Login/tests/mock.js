@@ -1,4 +1,4 @@
-import { AUTHENTICATE_USER } from './graphql';
+import { AUTHENTICATE_USER } from '../../../graphql/mutations';
 
 export const loginMutationMock = {
   loginSuccess: {

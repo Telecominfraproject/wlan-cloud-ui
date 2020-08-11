@@ -1,35 +1,11 @@
 import React, { useContext } from 'react';
 import { AddProfile as AddProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
-import gql from 'graphql-tag';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { notification } from 'antd';
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
-
-const CREATE_PROFILE = gql`
-  mutation CreateProfile(
-    $profileType: String!
-    $customerId: ID!
-    $name: String!
-    $childProfileIds: [ID]
-    $details: JSONObject
-  ) {
-    createProfile(
-      profileType: $profileType
-      customerId: $customerId
-      name: $name
-      childProfileIds: $childProfileIds
-      details: $details
-    ) {
-      profileType
-      customerId
-      name
-      childProfileIds
-      details
-    }
-  }
-`;
+import { CREATE_PROFILE } from '../../graphql/mutations';
 
 const AddProfile = () => {
   const { customerId } = useContext(UserContext);

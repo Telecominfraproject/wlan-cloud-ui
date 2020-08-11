@@ -10,6 +10,84 @@ export const REFRESH_TOKEN = gql`
   }
 `;
 
+export const AUTHENTICATE_USER = gql`
+  mutation AuthenticateUser($email: String!, $password: String!) {
+    authenticateUser(email: $email, password: $password) {
+      access_token
+      refresh_token
+      expires_in
+    }
+  }
+`;
+
+export const CREATE_PROFILE = gql`
+  mutation CreateProfile(
+    $profileType: String!
+    $customerId: ID!
+    $name: String!
+    $childProfileIds: [ID]
+    $details: JSONObject
+  ) {
+    createProfile(
+      profileType: $profileType
+      customerId: $customerId
+      name: $name
+      childProfileIds: $childProfileIds
+      details: $details
+    ) {
+      profileType
+      customerId
+      name
+      childProfileIds
+      details
+    }
+  }
+`;
+
+export const CREATE_USER = gql`
+  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: ID!) {
+    createUser(username: $username, password: $password, role: $role, customerId: $customerId) {
+      username
+      role
+      customerId
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation UpdateUser(
+    $id: ID!
+    $username: String!
+    $password: String!
+    $role: String!
+    $customerId: ID!
+    $lastModifiedTimestamp: String
+  ) {
+    updateUser(
+      id: $id
+      username: $username
+      password: $password
+      role: $role
+      customerId: $customerId
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const DELETE_USER = gql`
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id) {
+      id
+    }
+  }
+`;
+
 export const CREATE_LOCATION = gql`
   mutation CreateLocation(
     $locationType: String!

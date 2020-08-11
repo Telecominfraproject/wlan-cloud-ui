@@ -1,31 +1,10 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
 import { useQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import { Alarms as AlarmsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
-
-const GET_ALL_ALARMS = gql`
-  query GetAllAlarms($customerId: ID!, $cursor: String) {
-    getAllAlarms(customerId: $customerId, cursor: $cursor) {
-      items {
-        severity
-        alarmCode
-        details
-        createdTimestamp
-        equipment {
-          id
-          name
-        }
-      }
-      context {
-        cursor
-        lastPage
-      }
-    }
-  }
-`;
+import { GET_ALL_ALARMS } from 'graphql/queries';
 
 const Alarms = () => {
   const { customerId } = useContext(UserContext);

@@ -1,5 +1,44 @@
 import gql from 'graphql-tag';
 
+export const GET_ALL_ALARMS = gql`
+  query GetAllAlarms($customerId: ID!, $cursor: String) {
+    getAllAlarms(customerId: $customerId, cursor: $cursor) {
+      items {
+        severity
+        alarmCode
+        details
+        createdTimestamp
+        equipment {
+          id
+          name
+        }
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
+
+export const GET_ALL_USERS = gql`
+  query GetAllUsers($customerId: ID!, $cursor: String) {
+    getAllUsers(customerId: $customerId, cursor: $cursor) {
+      items {
+        id
+        email: username
+        role
+        lastModifiedTimestamp
+        customerId
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
+
 export const GET_ALL_LOCATIONS = gql`
   query GetAllLocations($customerId: ID!) {
     getAllLocations(customerId: $customerId) {
