@@ -6,7 +6,7 @@ import { notification } from 'antd';
 import { Login as LoginPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
-import { AUTHENTICATE_USER } from '../../graphql/mutations';
+import { AUTHENTICATE_USER } from 'graphql/mutations';
 
 const Login = () => {
   const history = useHistory();

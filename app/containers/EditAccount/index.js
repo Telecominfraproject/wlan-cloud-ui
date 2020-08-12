@@ -1,48 +1,11 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
 import { useMutation, useQuery } from '@apollo/react-hooks';
 import { notification, Alert } from 'antd';
 import { EditAccount as EditAccountPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
-
-const GET_USER = gql`
-  query GetUser($id: ID!) {
-    getUser(id: $id) {
-      id
-      username
-      role
-      customerId
-      lastModifiedTimestamp
-    }
-  }
-`;
-
-const UPDATE_USER = gql`
-  mutation UpdateUser(
-    $id: ID!
-    $username: String!
-    $password: String!
-    $role: String!
-    $customerId: ID!
-    $lastModifiedTimestamp: String
-  ) {
-    updateUser(
-      id: $id
-      username: $username
-      password: $password
-      role: $role
-      customerId: $customerId
-      lastModifiedTimestamp: $lastModifiedTimestamp
-    ) {
-      id
-      username
-      role
-      customerId
-      lastModifiedTimestamp
-    }
-  }
-`;
+import { GET_USER } from 'graphql/queries';
+import { UPDATE_USER } from 'graphql/mutations';
 
 const EditAccount = () => {
   const { id, email } = useContext(UserContext);

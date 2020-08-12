@@ -1,5 +1,38 @@
 import gql from 'graphql-tag';
 
+export const GET_PROFILE = gql`
+  query GetProfile($id: ID!) {
+    getProfile(id: $id) {
+      id
+      profileType
+      customerId
+      name
+      childProfiles {
+        id
+        name
+        profileType
+        details
+      }
+      childProfileIds
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query GetUser($id: ID!) {
+    getUser(id: $id) {
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
+    }
+  }
+`;
+
 export const GET_EQUIPMENT = gql`
   query GetEquipment($id: ID!) {
     getEquipment(id: $id) {
@@ -81,11 +114,6 @@ export const GET_ALL_PROFILES = gql`
         name
         profileType
         details
-        childProfiles {
-          id
-          name
-          details
-        }
       }
       context {
         cursor

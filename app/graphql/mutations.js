@@ -20,6 +20,62 @@ export const AUTHENTICATE_USER = gql`
   }
 `;
 
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile(
+    $id: ID!
+    $profileType: String!
+    $customerId: ID!
+    $name: String!
+    $childProfileIds: [ID]
+    $lastModifiedTimestamp: String
+    $details: JSONObject
+  ) {
+    updateProfile(
+      id: $id
+      profileType: $profileType
+      customerId: $customerId
+      name: $name
+      childProfileIds: $childProfileIds
+      lastModifiedTimestamp: $lastModifiedTimestamp
+      details: $details
+    ) {
+      id
+      profileType
+      customerId
+      name
+      childProfileIds
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation UpdateUser(
+    $id: ID!
+    $username: String!
+    $password: String!
+    $role: String!
+    $customerId: ID!
+    $lastModifiedTimestamp: String
+  ) {
+    updateUser(
+      id: $id
+      username: $username
+      password: $password
+      role: $role
+      customerId: $customerId
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
+    }
+  }
+`;
+
 export const UPDATE_EQUIPMENT = gql`
   mutation UpdateEquipment(
     $id: ID!
@@ -65,6 +121,14 @@ export const UPDATE_EQUIPMENT = gql`
   }
 `;
 
+export const DELETE_PROFILE = gql`
+  mutation DeleteProfile($id: ID!) {
+    deleteProfile(id: $id) {
+      id
+    }
+  }
+`;
+
 export const CREATE_PROFILE = gql`
   mutation CreateProfile(
     $profileType: String!
@@ -95,32 +159,6 @@ export const CREATE_USER = gql`
       username
       role
       customerId
-    }
-  }
-`;
-
-export const UPDATE_USER = gql`
-  mutation UpdateUser(
-    $id: ID!
-    $username: String!
-    $password: String!
-    $role: String!
-    $customerId: ID!
-    $lastModifiedTimestamp: String
-  ) {
-    updateUser(
-      id: $id
-      username: $username
-      password: $password
-      role: $role
-      customerId: $customerId
-      lastModifiedTimestamp: $lastModifiedTimestamp
-    ) {
-      id
-      username
-      role
-      customerId
-      lastModifiedTimestamp
     }
   }
 `;

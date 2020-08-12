@@ -5,7 +5,7 @@ import { notification } from 'antd';
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
-import { CREATE_PROFILE } from '../../graphql/mutations';
+import { CREATE_PROFILE } from 'graphql/mutations';
 
 const AddProfile = () => {
   const { customerId } = useContext(UserContext);

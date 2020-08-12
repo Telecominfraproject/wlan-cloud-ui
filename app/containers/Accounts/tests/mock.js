@@ -1,5 +1,5 @@
-import { GET_ALL_USERS } from '../../../graphql/queries';
-import { CREATE_USER, UPDATE_USER, DELETE_USER } from '../../../graphql/mutations';
+import { GET_ALL_USERS } from 'graphql/queries';
+import { CREATE_USER, UPDATE_USER, DELETE_USER } from 'graphql/mutations';
 
 export const accountsQueryMock = {
   success: {

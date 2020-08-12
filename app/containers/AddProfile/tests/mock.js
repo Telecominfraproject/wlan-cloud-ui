@@ -1,5 +1,5 @@
 import { GET_ALL_PROFILES } from 'graphql/queries';
-import { CREATE_PROFILE } from '../../../graphql/mutations';
+import { CREATE_PROFILE } from 'graphql/mutations';
 
 export const getAllProfilesQueryMock = {
   success: {
