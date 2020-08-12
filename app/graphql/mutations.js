@@ -20,6 +20,51 @@ export const AUTHENTICATE_USER = gql`
   }
 `;
 
+export const UPDATE_EQUIPMENT = gql`
+  mutation UpdateEquipment(
+    $id: ID!
+    $equipmentType: String!
+    $inventoryId: String!
+    $customerId: ID!
+    $profileId: ID!
+    $locationId: ID!
+    $name: String!
+    $latitude: String
+    $longitude: String
+    $serial: String
+    $lastModifiedTimestamp: String
+    $details: JSONObject
+  ) {
+    updateEquipment(
+      id: $id
+      equipmentType: $equipmentType
+      inventoryId: $inventoryId
+      customerId: $customerId
+      profileId: $profileId
+      locationId: $locationId
+      name: $name
+      latitude: $latitude
+      longitude: $longitude
+      serial: $serial
+      lastModifiedTimestamp: $lastModifiedTimestamp
+      details: $details
+    ) {
+      id
+      equipmentType
+      inventoryId
+      customerId
+      profileId
+      locationId
+      name
+      latitude
+      longitude
+      serial
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
 export const CREATE_PROFILE = gql`
   mutation CreateProfile(
     $profileType: String!
