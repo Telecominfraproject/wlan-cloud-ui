@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
-import { Alert, Spin, notification } from 'antd';
+import { Alert, notification } from 'antd';
 
-import { Profile as ProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
+import { Profile as ProfilePage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_PROFILES = gql`
@@ -92,7 +92,7 @@ const Profiles = () => {
   };
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {

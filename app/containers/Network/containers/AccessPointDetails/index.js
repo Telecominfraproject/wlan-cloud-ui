@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { Alert, Spin, notification } from 'antd';
+import { Alert, notification } from 'antd';
 import moment from 'moment';
-import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import {
+  AccessPointDetails as AccessPointDetailsPage,
+  Loading,
+} from '@tip-wlan/wlan-cloud-ui-library';
 
 import { FILTER_SERVICE_METRICS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
@@ -264,7 +267,7 @@ const AccessPointDetails = ({ locations }) => {
       );
 
   if (loading || landingProfiles || landingFirmware) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {
