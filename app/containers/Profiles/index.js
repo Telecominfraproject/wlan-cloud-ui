@@ -8,8 +8,8 @@ import { Profile as ProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: ID!, $cursor: String) {
-    getAllProfiles(customerId: $customerId, cursor: $cursor) {
+  query GetAllProfiles($customerId: ID!, $cursor: String, $limit: Int) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, limit: $limit) {
       items {
         id
         name
@@ -35,7 +35,7 @@ const DELETE_PROFILE = gql`
 const Profiles = () => {
   const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_PROFILES, {
-    variables: { customerId },
+    variables: { customerId, limit: 100 },
   });
   const [deleteProfile] = useMutation(DELETE_PROFILE);
 
