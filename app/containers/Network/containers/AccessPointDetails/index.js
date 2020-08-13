@@ -10,7 +10,7 @@ import {
   Loading,
 } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { FILTER_SERVICE_METRICS } from 'graphql/queries';
+import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 
@@ -70,20 +70,6 @@ const GET_EQUIPMENT = gql`
         details
         createdTimestamp
       }
-    }
-  }
-`;
-
-export const GET_ALL_FIRMWARE = gql`
-  query GetAllFirmware {
-    getAllFirmware {
-      id
-      modelId
-      versionName
-      description
-      filename
-      commit
-      releaseDate
     }
   }
 `;
@@ -191,7 +177,10 @@ const AccessPointDetails = ({ locations }) => {
   const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
 
   const { data: dataFirmware, error: errorFirmware, loading: landingFirmware } = useQuery(
-    GET_ALL_FIRMWARE
+    GET_ALL_FIRMWARE,
+    {
+      variables: { modelId: data?.getEquipment?.model },
+    }
   );
 
   const refetchData = () => {
