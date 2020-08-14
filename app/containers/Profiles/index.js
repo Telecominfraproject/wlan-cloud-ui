@@ -6,8 +6,9 @@ import { Alert, notification } from 'antd';
 
 import { Profile as ProfilePage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
+import { DELETE_PROFILE } from 'graphql/mutations';
 
-const GET_ALL_PROFILES = gql`
+export const GET_ALL_PROFILES = gql`
   query GetAllProfiles($customerId: ID!, $cursor: String, $limit: Int) {
     getAllProfiles(customerId: $customerId, cursor: $cursor, limit: $limit) {
       items {
@@ -21,14 +22,6 @@ const GET_ALL_PROFILES = gql`
         cursor
         lastPage
       }
-    }
-  }
-`;
-
-const DELETE_PROFILE = gql`
-  mutation DeleteProfile($id: ID!) {
-    deleteProfile(id: $id) {
-      id
     }
   }
 `;

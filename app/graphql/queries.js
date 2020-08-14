@@ -1,5 +1,171 @@
 import gql from 'graphql-tag';
 
+export const GET_PROFILE = gql`
+  query GetProfile($id: ID!) {
+    getProfile(id: $id) {
+      id
+      profileType
+      customerId
+      name
+      childProfiles {
+        id
+        name
+        profileType
+        details
+      }
+      childProfileIds
+      createdTimestamp
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query GetUser($id: ID!) {
+    getUser(id: $id) {
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const GET_EQUIPMENT = gql`
+  query GetEquipment($id: ID!) {
+    getEquipment(id: $id) {
+      id
+      equipmentType
+      inventoryId
+      customerId
+      profileId
+      locationId
+      name
+      latitude
+      longitude
+      serial
+      lastModifiedTimestamp
+      details
+      profile {
+        id
+        name
+        childProfiles {
+          id
+          name
+          details
+        }
+      }
+      status {
+        firmware {
+          detailsJSON
+        }
+        protocol {
+          detailsJSON
+          details {
+            reportedMacAddr
+            manufacturer
+          }
+        }
+        radioUtilization {
+          detailsJSON
+        }
+        clientDetails {
+          detailsJSON
+          details {
+            numClientsPerRadio
+          }
+        }
+        osPerformance {
+          detailsJSON
+        }
+      }
+      model
+      alarmsCount
+      alarms {
+        severity
+        alarmCode
+        details
+        createdTimestamp
+      }
+    }
+  }
+`;
+
+export const GET_ALL_FIRMWARE = gql`
+  query GetAllFirmware($modelId: String) {
+    getAllFirmware(modelId: $modelId) {
+      id
+      modelId
+      versionName
+      description
+      filename
+      commit
+      releaseDate
+      validationCode
+      createdTimestamp
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const GET_ALL_PROFILES = gql`
+  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
+      items {
+        id
+        name
+        profileType
+        details
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
+
+export const GET_ALL_ALARMS = gql`
+  query GetAllAlarms($customerId: ID!, $cursor: String) {
+    getAllAlarms(customerId: $customerId, cursor: $cursor) {
+      items {
+        severity
+        alarmCode
+        details
+        createdTimestamp
+        equipment {
+          id
+          name
+        }
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
+
+export const GET_ALL_USERS = gql`
+  query GetAllUsers($customerId: ID!, $cursor: String) {
+    getAllUsers(customerId: $customerId, cursor: $cursor) {
+      items {
+        id
+        email: username
+        role
+        lastModifiedTimestamp
+        customerId
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
+
 export const GET_ALL_LOCATIONS = gql`
   query GetAllLocations($customerId: ID!) {
     getAllLocations(customerId: $customerId) {
@@ -191,23 +357,6 @@ export const FILTER_SERVICE_METRICS = gql`
   }
 `;
 
-export const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String) {
-    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
-      items {
-        id
-        name
-        profileType
-        details
-      }
-      context {
-        cursor
-        lastPage
-      }
-    }
-  }
-`;
-
 export const GET_ALL_STATUS = gql`
   query GetAllStatus($customerId: ID!, $statusDataTypes: [String]) {
     getAllStatus(customerId: $customerId, statusDataTypes: $statusDataTypes) {
@@ -238,23 +387,6 @@ export const GET_FIRMWARE_TRACK = gql`
     getFirmwareTrack(firmwareTrackName: $firmwareTrackName) {
       recordId
       trackName
-      createdTimestamp
-      lastModifiedTimestamp
-    }
-  }
-`;
-
-export const GET_ALL_FIRMWARE = gql`
-  query GetAllFirmware($modelId: String) {
-    getAllFirmware(modelId: $modelId) {
-      id
-      modelId
-      versionName
-      description
-      filename
-      commit
-      releaseDate
-      validationCode
       createdTimestamp
       lastModifiedTimestamp
     }

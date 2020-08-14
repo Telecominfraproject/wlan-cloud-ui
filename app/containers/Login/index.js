@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
 import { useMutation, useApolloClient } from '@apollo/react-hooks';
 import { useHistory } from 'react-router-dom';
 import { notification } from 'antd';
@@ -7,16 +6,7 @@ import { notification } from 'antd';
 import { Login as LoginPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
-
-const AUTHENTICATE_USER = gql`
-  mutation AuthenticateUser($email: String!, $password: String!) {
-    authenticateUser(email: $email, password: $password) {
-      access_token
-      refresh_token
-      expires_in
-    }
-  }
-`;
+import { AUTHENTICATE_USER } from 'graphql/mutations';
 
 const Login = () => {
   const history = useHistory();

@@ -1,72 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
-import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_PROFILES } from 'graphql/queries';
-import { FILE_UPLOAD } from 'graphql/mutations';
-
-const GET_PROFILE = gql`
-  query GetProfile($id: ID!) {
-    getProfile(id: $id) {
-      id
-      profileType
-      customerId
-      name
-      childProfiles {
-        id
-        name
-        profileType
-        details
-      }
-      childProfileIds
-      createdTimestamp
-      lastModifiedTimestamp
-      details
-    }
-  }
-`;
-
-const UPDATE_PROFILE = gql`
-  mutation UpdateProfile(
-    $id: ID!
-    $profileType: String!
-    $customerId: ID!
-    $name: String!
-    $childProfileIds: [ID]
-    $lastModifiedTimestamp: String
-    $details: JSONObject
-  ) {
-    updateProfile(
-      id: $id
-      profileType: $profileType
-      customerId: $customerId
-      name: $name
-      childProfileIds: $childProfileIds
-      lastModifiedTimestamp: $lastModifiedTimestamp
-      details: $details
-    ) {
-      id
-      profileType
-      customerId
-      name
-      childProfileIds
-      lastModifiedTimestamp
-      details
-    }
-  }
-`;
-
-const DELETE_PROFILE = gql`
-  mutation DeleteProfile($id: ID!) {
-    deleteProfile(id: $id) {
-      id
-    }
-  }
-`;
+import { GET_PROFILE, GET_ALL_PROFILES } from 'graphql/queries';
+import { FILE_UPLOAD, UPDATE_PROFILE, DELETE_PROFILE } from 'graphql/mutations';
 
 const ProfileDetails = () => {
   const { customerId } = useContext(UserContext);

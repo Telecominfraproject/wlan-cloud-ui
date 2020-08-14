@@ -1,73 +1,11 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 
 import { Accounts as AccountsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
-
+import { GET_ALL_USERS } from 'graphql/queries';
+import { CREATE_USER, UPDATE_USER, DELETE_USER } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
-
-const GET_ALL_USERS = gql`
-  query GetAllUsers($customerId: ID!, $cursor: String) {
-    getAllUsers(customerId: $customerId, cursor: $cursor) {
-      items {
-        id
-        email: username
-        role
-        lastModifiedTimestamp
-        customerId
-      }
-      context {
-        cursor
-        lastPage
-      }
-    }
-  }
-`;
-
-const CREATE_USER = gql`
-  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: ID!) {
-    createUser(username: $username, password: $password, role: $role, customerId: $customerId) {
-      username
-      role
-      customerId
-    }
-  }
-`;
-
-const UPDATE_USER = gql`
-  mutation UpdateUser(
-    $id: ID!
-    $username: String!
-    $password: String!
-    $role: String!
-    $customerId: ID!
-    $lastModifiedTimestamp: String
-  ) {
-    updateUser(
-      id: $id
-      username: $username
-      password: $password
-      role: $role
-      customerId: $customerId
-      lastModifiedTimestamp: $lastModifiedTimestamp
-    ) {
-      id
-      username
-      role
-      customerId
-      lastModifiedTimestamp
-    }
-  }
-`;
-
-const DELETE_USER = gql`
-  mutation DeleteUser($id: ID!) {
-    deleteUser(id: $id) {
-      id
-    }
-  }
-`;
 
 const Accounts = () => {
   const { customerId } = useContext(UserContext);

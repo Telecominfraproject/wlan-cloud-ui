@@ -10,6 +10,167 @@ export const REFRESH_TOKEN = gql`
   }
 `;
 
+export const AUTHENTICATE_USER = gql`
+  mutation AuthenticateUser($email: String!, $password: String!) {
+    authenticateUser(email: $email, password: $password) {
+      access_token
+      refresh_token
+      expires_in
+    }
+  }
+`;
+
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile(
+    $id: ID!
+    $profileType: String!
+    $customerId: ID!
+    $name: String!
+    $childProfileIds: [ID]
+    $lastModifiedTimestamp: String
+    $details: JSONObject
+  ) {
+    updateProfile(
+      id: $id
+      profileType: $profileType
+      customerId: $customerId
+      name: $name
+      childProfileIds: $childProfileIds
+      lastModifiedTimestamp: $lastModifiedTimestamp
+      details: $details
+    ) {
+      id
+      profileType
+      customerId
+      name
+      childProfileIds
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation UpdateUser(
+    $id: ID!
+    $username: String!
+    $password: String!
+    $role: String!
+    $customerId: ID!
+    $lastModifiedTimestamp: String
+  ) {
+    updateUser(
+      id: $id
+      username: $username
+      password: $password
+      role: $role
+      customerId: $customerId
+      lastModifiedTimestamp: $lastModifiedTimestamp
+    ) {
+      id
+      username
+      role
+      customerId
+      lastModifiedTimestamp
+    }
+  }
+`;
+
+export const UPDATE_EQUIPMENT = gql`
+  mutation UpdateEquipment(
+    $id: ID!
+    $equipmentType: String!
+    $inventoryId: String!
+    $customerId: ID!
+    $profileId: ID!
+    $locationId: ID!
+    $name: String!
+    $latitude: String
+    $longitude: String
+    $serial: String
+    $lastModifiedTimestamp: String
+    $details: JSONObject
+  ) {
+    updateEquipment(
+      id: $id
+      equipmentType: $equipmentType
+      inventoryId: $inventoryId
+      customerId: $customerId
+      profileId: $profileId
+      locationId: $locationId
+      name: $name
+      latitude: $latitude
+      longitude: $longitude
+      serial: $serial
+      lastModifiedTimestamp: $lastModifiedTimestamp
+      details: $details
+    ) {
+      id
+      equipmentType
+      inventoryId
+      customerId
+      profileId
+      locationId
+      name
+      latitude
+      longitude
+      serial
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
+export const DELETE_PROFILE = gql`
+  mutation DeleteProfile($id: ID!) {
+    deleteProfile(id: $id) {
+      id
+    }
+  }
+`;
+
+export const CREATE_PROFILE = gql`
+  mutation CreateProfile(
+    $profileType: String!
+    $customerId: ID!
+    $name: String!
+    $childProfileIds: [ID]
+    $details: JSONObject
+  ) {
+    createProfile(
+      profileType: $profileType
+      customerId: $customerId
+      name: $name
+      childProfileIds: $childProfileIds
+      details: $details
+    ) {
+      profileType
+      customerId
+      name
+      childProfileIds
+      details
+    }
+  }
+`;
+
+export const CREATE_USER = gql`
+  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: ID!) {
+    createUser(username: $username, password: $password, role: $role, customerId: $customerId) {
+      username
+      role
+      customerId
+    }
+  }
+`;
+
+export const DELETE_USER = gql`
+  mutation DeleteUser($id: ID!) {
+    deleteUser(id: $id) {
+      id
+    }
+  }
+`;
+
 export const CREATE_LOCATION = gql`
   mutation CreateLocation(
     $locationType: String!
