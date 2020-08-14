@@ -3,9 +3,12 @@ import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { Alert, Spin, notification } from 'antd';
+import { Alert, notification } from 'antd';
 import moment from 'moment';
-import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import {
+  AccessPointDetails as AccessPointDetailsPage,
+  Loading,
+} from '@tip-wlan/wlan-cloud-ui-library';
 
 import { FILTER_SERVICE_METRICS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
@@ -27,6 +30,7 @@ const GET_EQUIPMENT = gql`
       lastModifiedTimestamp
       details
       profile {
+        id
         name
         childProfiles {
           id
@@ -130,8 +134,8 @@ const UPDATE_EQUIPMENT = gql`
 `;
 
 export const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String) {
-    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
+  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String, $limit: Int) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type, limit: $limit) {
       items {
         id
         name
@@ -164,7 +168,7 @@ const AccessPointDetails = ({ locations }) => {
   const { data: dataProfiles, error: errorProfiles, loading: landingProfiles } = useQuery(
     GET_ALL_PROFILES,
     {
-      variables: { customerId, type: 'equipment_ap' },
+      variables: { customerId, type: 'equipment_ap', limit: 100 },
     }
   );
   const {
@@ -263,7 +267,7 @@ const AccessPointDetails = ({ locations }) => {
       );
 
   if (loading || landingProfiles || landingFirmware) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {

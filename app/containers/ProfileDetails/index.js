@@ -2,8 +2,8 @@ import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { Alert, Spin, notification } from 'antd';
-import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import { Alert, notification } from 'antd';
+import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
@@ -152,7 +152,7 @@ const ProfileDetails = () => {
       );
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {
