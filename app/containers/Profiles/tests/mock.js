@@ -1,11 +1,11 @@
-import { GET_ALL_PROFILES } from 'graphql/queries';
 import { DELETE_PROFILE } from 'graphql/mutations';
+import { GET_ALL_PROFILES } from '..';
 
 export const profilesQueryMock = {
   success: {
     request: {
       query: GET_ALL_PROFILES,
-      variables: { customerId: 2 },
+      variables: { customerId: 2, limit: 100 },
     },
     result: {
       data: {
@@ -71,7 +71,7 @@ export const profilesQueryMock = {
   loadmore: {
     request: {
       query: GET_ALL_PROFILES,
-      variables: { customerId: 2, cursor: 'test' },
+      variables: { customerId: 2, limit: 100, cursor: 'test' },
     },
     result: {
       data: {

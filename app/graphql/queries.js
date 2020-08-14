@@ -49,6 +49,7 @@ export const GET_EQUIPMENT = gql`
       lastModifiedTimestamp
       details
       profile {
+        id
         name
         childProfiles {
           id
@@ -93,8 +94,8 @@ export const GET_EQUIPMENT = gql`
 `;
 
 export const GET_ALL_FIRMWARE = gql`
-  query GetAllFirmware {
-    getAllFirmware {
+  query GetAllFirmware($modelId: String) {
+    getAllFirmware(modelId: $modelId) {
       id
       modelId
       versionName
@@ -102,6 +103,9 @@ export const GET_ALL_FIRMWARE = gql`
       filename
       commit
       releaseDate
+      validationCode
+      createdTimestamp
+      lastModifiedTimestamp
     }
   }
 `;

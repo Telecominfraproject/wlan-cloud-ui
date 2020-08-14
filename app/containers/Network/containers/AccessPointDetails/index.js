@@ -1,19 +1,37 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
+import gql from 'graphql-tag';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
 import moment from 'moment';
 import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
-import {
-  GET_EQUIPMENT,
-  GET_ALL_PROFILES,
-  GET_ALL_FIRMWARE,
-  FILTER_SERVICE_METRICS,
-} from 'graphql/queries';
+import { GET_EQUIPMENT, GET_ALL_FIRMWARE, FILTER_SERVICE_METRICS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT, UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
+
+export const GET_ALL_PROFILES = gql`
+  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String, $limit: Int) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type, limit: $limit) {
+      items {
+        id
+        name
+        profileType
+        details
+        childProfiles {
+          id
+          name
+          details
+        }
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
 
 const toTime = moment();
 const fromTime = moment().subtract(1, 'hour');
@@ -28,7 +46,7 @@ const AccessPointDetails = ({ locations }) => {
   const { data: dataProfiles, error: errorProfiles, loading: landingProfiles } = useQuery(
     GET_ALL_PROFILES,
     {
-      variables: { customerId, type: 'equipment_ap' },
+      variables: { customerId, type: 'equipment_ap', limit: 100 },
     }
   );
   const {

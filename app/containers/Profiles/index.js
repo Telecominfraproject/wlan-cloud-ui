@@ -1,15 +1,32 @@
 import React, { useContext } from 'react';
+import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, Spin, notification } from 'antd';
 import { Profile as ProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_PROFILES } from 'graphql/queries';
 import { DELETE_PROFILE } from 'graphql/mutations';
+
+export const GET_ALL_PROFILES = gql`
+  query GetAllProfiles($customerId: ID!, $cursor: String, $limit: Int) {
+    getAllProfiles(customerId: $customerId, cursor: $cursor, limit: $limit) {
+      items {
+        id
+        name
+        profileType
+        details
+      }
+      context {
+        cursor
+        lastPage
+      }
+    }
+  }
+`;
 
 const Profiles = () => {
   const { customerId } = useContext(UserContext);
   const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_PROFILES, {
-    variables: { customerId },
+    variables: { customerId, limit: 100 },
   });
   const [deleteProfile] = useMutation(DELETE_PROFILE);
 

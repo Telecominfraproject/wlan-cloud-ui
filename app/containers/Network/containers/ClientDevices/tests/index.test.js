@@ -4,8 +4,8 @@ import { MockedProvider } from '@apollo/react-testing';
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import UserProvider from 'contexts/UserProvider';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AccessPointsQueryMock } from './mock';
-import AccessPoints from '..';
+import { ClientDevicesQueryMock } from './mock';
+import ClientDevices from '..';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -30,95 +30,109 @@ const mockProp = {
   updateToken: jest.fn(),
 };
 
-describe('<AccessPoints />', () => {
+describe('<ClientDevices />', () => {
   afterEach(jest.resetModules);
 
   it('should render with data', async () => {
     const { getByText } = render(
-      <MockedProvider mocks={[AccessPointsQueryMock.filterEquipment.success]} addTypename={false}>
+      <MockedProvider
+        mocks={[ClientDevicesQueryMock.filterClientSessions.success]}
+        addTypename={false}
+      >
         <UserProvider {...mockProp}>
           <Router>
-            <AccessPoints checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
+            <ClientDevices checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
           </Router>
         </UserProvider>
       </MockedProvider>
     );
-    await waitFor(() => expect(getByText('AP 1')).toBeVisible());
+    await waitFor(() => expect(getByText('74:9c:00:01:45:ae')).toBeVisible());
+    await waitFor(() => expect(getByText('hostName-128213363803566')).toBeVisible());
   });
 
   it('error message should be visible with error true', async () => {
     const { getByText } = render(
-      <MockedProvider mocks={[AccessPointsQueryMock.filterEquipment.error]} addTypename={false}>
+      <MockedProvider
+        mocks={[ClientDevicesQueryMock.filterClientSessions.error]}
+        addTypename={false}
+      >
         <UserProvider {...mockProp}>
           <Router>
-            <AccessPoints checkedLocations={[1, 2, 3]} />
+            <ClientDevices checkedLocations={[1, 2, 3]} />
           </Router>
         </UserProvider>
       </MockedProvider>
     );
-    await waitFor(() => expect(getByText('Failed to load equipment.')).toBeVisible());
+    await waitFor(() => expect(getByText('Failed to load client devices.')).toBeVisible());
   });
 
   it('click on Load More should fetch more data', async () => {
-    const { getByRole, getByText } = render(
+    const { getByRole, getByText, getAllByText } = render(
       <MockedProvider
         mocks={[
-          AccessPointsQueryMock.filterEquipment.success,
-          AccessPointsQueryMock.filterEquipment.loadmore,
+          ClientDevicesQueryMock.filterClientSessions.success,
+          ClientDevicesQueryMock.filterClientSessions.loadmore,
         ]}
         addTypename={false}
       >
         <UserProvider {...mockProp}>
           <Router>
-            <AccessPoints checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
+            <ClientDevices checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
           </Router>
         </UserProvider>
       </MockedProvider>
     );
-    await waitFor(() => expect(getByText('AP 1')).toBeVisible());
+    await waitFor(() => expect(getByText('74:9c:00:01:45:ae')).toBeVisible());
+    await waitFor(() => expect(getByText('hostName-128213363803566')).toBeVisible());
     fireEvent.click(getByRole('button', { name: /load more/i }));
-    await waitFor(() => expect(getByText('AP 1')).toBeVisible());
+    await waitFor(() => expect(getByText('74:9c:00:01:45:ae')).toBeVisible());
+    await waitFor(() => expect(getAllByText('hostName-128213363803566')[1]).toBeVisible());
   });
 
   it('click on reload button should refetch data', async () => {
     const { getByText, container } = render(
       <MockedProvider
         mocks={[
-          AccessPointsQueryMock.filterEquipment.success,
-          AccessPointsQueryMock.filterEquipment.success,
+          ClientDevicesQueryMock.filterClientSessions.success,
+          ClientDevicesQueryMock.filterClientSessions.success,
         ]}
         addTypename={false}
       >
         <UserProvider {...mockProp}>
           <Router>
-            <AccessPoints checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
+            <ClientDevices checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
           </Router>
         </UserProvider>
       </MockedProvider>
     );
-    await waitFor(() => expect(getByText('AP 1')).toBeVisible());
+    await waitFor(() => expect(getByText('74:9c:00:01:45:ae')).toBeVisible());
+    await waitFor(() => expect(getByText('hostName-128213363803566')).toBeVisible());
     const reloadButton = container.querySelector(
       '.ant-btn.index-module__Button___VGygY.ant-btn-icon-only'
     );
     fireEvent.click(reloadButton);
-    await waitFor(() => expect(getByText('Access points reloaded.')).toBeVisible());
+    await waitFor(() => expect(getByText('Client devices reloaded.')).toBeVisible());
   });
 
   it('click on reload button should not refetch data when query return error', async () => {
     const { getByText, container } = render(
-      <MockedProvider mocks={[AccessPointsQueryMock.filterEquipment.success]} addTypename={false}>
+      <MockedProvider
+        mocks={[ClientDevicesQueryMock.filterClientSessions.success]}
+        addTypename={false}
+      >
         <UserProvider {...mockProp}>
           <Router>
-            <AccessPoints checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
+            <ClientDevices checkedLocations={['2', '3', '4', '5', '6', '7', '8']} />
           </Router>
         </UserProvider>
       </MockedProvider>
     );
-    await waitFor(() => expect(getByText('AP 1')).toBeVisible());
+    await waitFor(() => expect(getByText('74:9c:00:01:45:ae')).toBeVisible());
+    await waitFor(() => expect(getByText('hostName-128213363803566')).toBeVisible());
     const reloadButton = container.querySelector(
       '.ant-btn.index-module__Button___VGygY.ant-btn-icon-only'
     );
     fireEvent.click(reloadButton);
-    await waitFor(() => expect(getByText('Access points could not be reloaded.')).toBeVisible());
+    await waitFor(() => expect(getByText('Client devices could not be reloaded.')).toBeVisible());
   });
 });

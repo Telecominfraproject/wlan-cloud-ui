@@ -1,10 +1,6 @@
-import {
-  GET_EQUIPMENT,
-  GET_ALL_PROFILES,
-  GET_ALL_FIRMWARE,
-  FILTER_SERVICE_METRICS,
-} from 'graphql/queries';
+import { GET_EQUIPMENT, GET_ALL_FIRMWARE, FILTER_SERVICE_METRICS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT, UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
+import { GET_ALL_PROFILES } from '..';
 
 export const APDetailsQueryMock = {
   getEquipment: {

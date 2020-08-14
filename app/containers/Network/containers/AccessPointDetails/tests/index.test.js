@@ -44,25 +44,6 @@ jest.useFakeTimers();
 describe('<AccessPointDetails />', () => {
   afterEach(jest.resetModules);
 
-  // it('should render with data', async () => {
-  //   const { getByText } = render(
-  //     <MockedProvider
-  //       mocks={[
-  //         APDetailsQueryMock.getEquipment.success,
-  //         APDetailsQueryMock.getAllProfiles.success,
-  //         APDetailsQueryMock.getAllFirmware.success,
-  //         APDetailsQueryMock.filterServiceMetrics.success,
-  //       ]}
-  //       addTypename={false}
-  //     >
-  //       <UserProvider {...mockProp}>
-  //         <AccessPointDetails locations={[1, 2, 3]} />
-  //       </UserProvider>
-  //     </MockedProvider>
-  //   );
-  //   jest.advanceTimersByTime('1000');
-  // });
-
   it('error message should be visible with error true', async () => {
     const { getByText } = render(
       <MockedProvider
@@ -79,7 +60,7 @@ describe('<AccessPointDetails />', () => {
         </UserProvider>
       </MockedProvider>
     );
-    jest.advanceTimersByTime('1000');
+    jest.advanceTimersByTime(1000);
     await waitFor(() => expect(getByText('Failed to load Access Point data.')).toBeVisible());
   });
 
@@ -99,7 +80,7 @@ describe('<AccessPointDetails />', () => {
         </UserProvider>
       </MockedProvider>
     );
-    jest.advanceTimersByTime('1000');
+    jest.advanceTimersByTime(1000);
     await waitFor(() => expect(getByText('Failed to load Access Point profiles.')).toBeVisible());
   });
 
@@ -119,28 +100,7 @@ describe('<AccessPointDetails />', () => {
         </UserProvider>
       </MockedProvider>
     );
-    jest.advanceTimersByTime('1000');
+    jest.advanceTimersByTime(1000);
     await waitFor(() => expect(getByText('Failed to load Access Point firmware.')).toBeVisible());
   });
-
-  // it('error message should be visible with error true', async () => {
-  //   const { getByText } = render(
-  //     <MockedProvider
-  //       mocks={[
-  //         APDetailsQueryMock.getEquipment.success,
-  //         APDetailsQueryMock.getAllProfiles.success,
-  //         APDetailsQueryMock.getAllProfiles.success,
-  //         APDetailsQueryMock.getAllFirmware.success,
-  //         APDetailsQueryMock.filterServiceMetrics.success,
-  //         APDetailsQueryMock.getEquipment.success,
-  //       ]}
-  //       addTypename={false}
-  //     >
-  //       <UserProvider {...mockProp}>
-  //         <AccessPointDetails locations={[1, 2, 3]} />
-  //       </UserProvider>
-  //     </MockedProvider>
-  //   );
-  //   jest.advanceTimersByTime(60000);
-  // });
 });
