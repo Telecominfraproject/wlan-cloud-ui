@@ -1,8 +1,10 @@
 import React, { useContext } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import { Alert, Spin, notification } from 'antd';
-import { Profile as ProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
+
+import { Alert, notification } from 'antd';
+
+import { Profile as ProfilePage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 import { DELETE_PROFILE } from 'graphql/mutations';
 
@@ -14,6 +16,7 @@ export const GET_ALL_PROFILES = gql`
         name
         profileType
         details
+        equipmentCount
       }
       context {
         cursor
@@ -83,7 +86,7 @@ const Profiles = () => {
   };
 
   if (loading) {
-    return <Spin size="large" />;
+    return <Loading />;
   }
 
   if (error) {
