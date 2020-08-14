@@ -15,6 +15,7 @@ const GET_ALL_PROFILES = gql`
         name
         profileType
         details
+        equipmentCount
       }
       context {
         cursor
