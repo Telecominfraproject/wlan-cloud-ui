@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import gql from 'graphql-tag';
-import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import moment from 'moment';
 import {
@@ -154,14 +154,13 @@ const AccessPointDetails = ({ locations }) => {
     },
   });
 
-  const [
-    getAllFirmware,
-    { data: dataFirmware, error: errorFirmware, loading: loadingFirmware },
-  ] = useLazyQuery(GET_ALL_FIRMWARE);
-
-  useEffect(() => {
-    getAllFirmware({ variables: { modelId: data?.getEquipment?.model?.toLowerCase() } });
-  }, [data]);
+  const { data: dataFirmware, error: errorFirmware, loading: loadingFirmware } = useQuery(
+    GET_ALL_FIRMWARE,
+    {
+      skip: !data?.getEquipment?.model,
+      variables: { modelId: data?.getEquipment?.model.toLowerCase() },
+    }
+  );
 
   const { data: dataProfiles, error: errorProfiles, loading: loadingProfiles } = useQuery(
     GET_ALL_PROFILES,
