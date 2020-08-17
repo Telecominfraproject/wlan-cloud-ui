@@ -6,7 +6,9 @@ Install Dependencies:
 `npm install`
 
 You will get an error installing the package [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) because it is in a private npm registry. Run
-`npm login`
+```
+npm login --registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/
+```
 And enter the supplied credentials. Ask @sean-macfarlane for credentials if you don't have. 
 
 ### Set up with local wlan-cloud-ui-library
