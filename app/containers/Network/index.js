@@ -254,8 +254,7 @@ const Network = () => {
           render={props => <AccessPoints checkedLocations={checkedLocations} {...props} />}
         />
         <Route
-          exact
-          path={`${path}/access-points/:id`}
+          path={`${path}/access-points/:id/:tab`}
           render={props => <AccessPointDetails locations={locationsTree} {...props} />}
         />
         <Route
