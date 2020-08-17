@@ -11,6 +11,12 @@ npm login --registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm
 ```
 And enter the supplied credentials. Ask @sean-macfarlane for credentials if you don't have. 
 
+Install package:
+```
+npm i --registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/ @tip-wlan/wlan-cloud-ui-library
+```
+
+
 ### Set up with local wlan-cloud-ui-library
 *Skip this section if you are not using a local [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library)*
 
