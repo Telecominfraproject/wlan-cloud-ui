@@ -158,7 +158,7 @@ const AccessPointDetails = ({ locations }) => {
     GET_ALL_FIRMWARE,
     {
       skip: !data?.getEquipment?.model,
-      variables: { modelId: data?.getEquipment?.model.toLowerCase() },
+      variables: { modelId: data?.getEquipment?.model?.toLowerCase() },
     }
   );
 
@@ -260,7 +260,7 @@ const AccessPointDetails = ({ locations }) => {
         })
       );
 
-  if (loading || loadingProfiles || loadingFirmware) {
+  if (loading) {
     return <Loading />;
   }
 
@@ -269,28 +269,6 @@ const AccessPointDetails = ({ locations }) => {
       <Alert
         message="Error"
         description="Failed to load Access Point data."
-        type="error"
-        showIcon
-      />
-    );
-  }
-
-  if (errorProfiles) {
-    return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point profiles."
-        type="error"
-        showIcon
-      />
-    );
-  }
-
-  if (errorFirmware) {
-    return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point firmware."
         type="error"
         showIcon
       />
@@ -311,6 +289,10 @@ const AccessPointDetails = ({ locations }) => {
       firmware={dataFirmware?.getAllFirmware}
       locations={locations}
       onUpdateEquipmentFirmware={handleUpdateEquipmentFirmware}
+      loadingProfiles={loadingProfiles}
+      errorProfiles={errorProfiles}
+      loadingFirmware={loadingFirmware}
+      errorFirmware={errorFirmware}
     />
   );
 };
