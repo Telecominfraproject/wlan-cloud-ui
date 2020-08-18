@@ -33,8 +33,8 @@ const CREATE_PROFILE = gql`
 
 const AddProfile = () => {
   const { customerId } = useContext(UserContext);
-  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES, {
-    variables: { customerId, type: 'ssid' },
+  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'ssid', limit: 100 },
   });
   const [createProfile] = useMutation(CREATE_PROFILE);
 

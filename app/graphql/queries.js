@@ -191,19 +191,29 @@ export const FILTER_SERVICE_METRICS = gql`
   }
 `;
 
-export const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String) {
-    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
+export const GET_ALL_PROFILES = fields => gql`
+  query GetAllProfiles(
+    $customerId: ID!
+    $cursor: String
+    $limit: Int
+    $type: String
+    $context: JSONObject
+  ) {
+    getAllProfiles(
+      customerId: $customerId
+      cursor: $cursor
+      limit: $limit
+      type: $type
+      context: $context
+    ) {
       items {
         id
         name
         profileType
         details
+        ${fields}
       }
-      context {
-        cursor
-        lastPage
-      }
+      context
     }
   }
 `;
