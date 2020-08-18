@@ -1,6 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useLocation } from 'react-router-dom';
 
 import { Alert, notification } from 'antd';
 
@@ -39,6 +40,11 @@ const Profiles = () => {
     variables: { customerId, limit: 100 },
   });
   const [deleteProfile] = useMutation(DELETE_PROFILE);
+  const location = useLocation();
+
+  useEffect(() => {
+    refetch();
+  }, [location.pathname === '/profiles']);
 
   const reloadTable = () => {
     refetch()

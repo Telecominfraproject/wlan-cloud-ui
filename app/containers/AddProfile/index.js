@@ -39,7 +39,7 @@ const AddProfile = () => {
   const [createProfile] = useMutation(CREATE_PROFILE);
 
   const handleAddProfile = (profileType, name, details, childProfileIds = []) => {
-    createProfile({
+    return createProfile({
       variables: {
         profileType,
         customerId,
