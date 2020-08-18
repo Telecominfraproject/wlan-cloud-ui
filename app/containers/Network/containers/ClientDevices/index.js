@@ -39,7 +39,7 @@ const ClientDevices = ({ checkedLocations }) => {
   const handleLoadMore = () => {
     if (!data.filterClientSessions.context.lastPage) {
       fetchMore({
-        variables: { cursor: data.filterClientSessions.context.cursor },
+        variables: { context: data.filterClientSessions.context },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const previousEntry = previousResult.filterClientSessions;
           const newItems = fetchMoreResult.filterClientSessions.items;

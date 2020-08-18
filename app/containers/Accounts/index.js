@@ -8,8 +8,8 @@ import { Accounts as AccountsPage, Loading } from '@tip-wlan/wlan-cloud-ui-libra
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_USERS = gql`
-  query GetAllUsers($customerId: ID!, $cursor: String) {
-    getAllUsers(customerId: $customerId, cursor: $cursor) {
+  query GetAllUsers($customerId: ID!, $context: JSONObject) {
+    getAllUsers(customerId: $customerId, context: $context) {
       items {
         id
         email: username
@@ -17,10 +17,7 @@ const GET_ALL_USERS = gql`
         lastModifiedTimestamp
         customerId
       }
-      context {
-        cursor
-        lastPage
-      }
+      context
     }
   }
 `;
@@ -82,7 +79,7 @@ const Accounts = () => {
   const handleLoadMore = () => {
     if (!data.getAllUsers.context.lastPage) {
       fetchMore({
-        variables: { cursor: data.getAllUsers.context.cursor },
+        variables: { context: data.getAllUsers.context },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const previousEntry = previousResult.getAllUsers;
           const newItems = fetchMoreResult.getAllUsers.items;
