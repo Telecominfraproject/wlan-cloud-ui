@@ -80,6 +80,11 @@ const ProfileDetails = () => {
   const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
   });
+
+  const { data: radiusProfiles } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'radius' },
+  });
+
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
 
@@ -170,6 +175,7 @@ const ProfileDetails = () => {
       ssidProfiles={
         (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
       }
+      radiusProfiles={radiusProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
     />
   );
