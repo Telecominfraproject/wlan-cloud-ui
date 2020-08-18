@@ -81,7 +81,7 @@ const ProfileDetails = () => {
     variables: { customerId, type: 'ssid' },
   });
 
-  const { data: radiusProfiles } = useQuery(GET_ALL_PROFILES, {
+  const { data: radiusProfiles } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'radius' },
   });
 
