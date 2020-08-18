@@ -10,7 +10,7 @@ import {
   Loading,
 } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { FILTER_SERVICE_METRICS, GET_ALL_PROFILES } from 'graphql/queries';
+import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE, GET_ALL_PROFILES } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 
@@ -74,20 +74,6 @@ const GET_EQUIPMENT = gql`
   }
 `;
 
-export const GET_ALL_FIRMWARE = gql`
-  query GetAllFirmware {
-    getAllFirmware {
-      id
-      modelId
-      versionName
-      description
-      filename
-      commit
-      releaseDate
-    }
-  }
-`;
-
 const UPDATE_EQUIPMENT = gql`
   mutation UpdateEquipment(
     $id: ID!
@@ -141,9 +127,20 @@ const AccessPointDetails = ({ locations }) => {
   const { customerId } = useContext(UserContext);
 
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
-    variables: { id },
+    variables: {
+      id,
+    },
   });
-  const { data: dataProfiles, error: errorProfiles, loading: landingProfiles } = useQuery(
+
+  const { data: dataFirmware, error: errorFirmware, loading: loadingFirmware } = useQuery(
+    GET_ALL_FIRMWARE,
+    {
+      skip: !data?.getEquipment?.model,
+      variables: { modelId: data?.getEquipment?.model?.toLowerCase() },
+    }
+  );
+
+  const { data: dataProfiles, error: errorProfiles, loading: loadingProfiles } = useQuery(
     GET_ALL_PROFILES(`
     childProfiles {
       id
@@ -154,6 +151,7 @@ const AccessPointDetails = ({ locations }) => {
       variables: { customerId, type: 'equipment_ap', limit: 100 },
     }
   );
+
   const {
     loading: metricsLoading,
     error: metricsError,
@@ -172,10 +170,6 @@ const AccessPointDetails = ({ locations }) => {
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
   const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
-
-  const { data: dataFirmware, error: errorFirmware, loading: landingFirmware } = useQuery(
-    GET_ALL_FIRMWARE
-  );
 
   const refetchData = () => {
     refetch();
@@ -249,7 +243,7 @@ const AccessPointDetails = ({ locations }) => {
         })
       );
 
-  if (loading || landingProfiles || landingFirmware) {
+  if (loading) {
     return <Loading />;
   }
 
@@ -264,42 +258,24 @@ const AccessPointDetails = ({ locations }) => {
     );
   }
 
-  if (errorProfiles) {
-    return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point profiles."
-        type="error"
-        showIcon
-      />
-    );
-  }
-
-  if (errorFirmware) {
-    return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point firmware."
-        type="error"
-        showIcon
-      />
-    );
-  }
-
   return (
     <AccessPointDetailsPage
       handleRefresh={refetchData}
       onUpdateEquipment={handleUpdateEquipment}
-      data={data.getEquipment}
-      profiles={dataProfiles.getAllProfiles.items}
+      data={data?.getEquipment}
+      profiles={dataProfiles?.getAllProfiles?.items}
       osData={{
         loading: metricsLoading,
         error: metricsError,
         data: metricsData && metricsData.filterServiceMetrics.items,
       }}
-      firmware={dataFirmware.getAllFirmware}
+      firmware={dataFirmware?.getAllFirmware}
       locations={locations}
       onUpdateEquipmentFirmware={handleUpdateEquipmentFirmware}
+      loadingProfiles={loadingProfiles}
+      errorProfiles={errorProfiles}
+      loadingFirmware={loadingFirmware}
+      errorFirmware={errorFirmware}
     />
   );
 };
