@@ -10,7 +10,7 @@ import {
   Loading,
 } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE } from 'graphql/queries';
+import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE, GET_ALL_PROFILES } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 
@@ -119,28 +119,6 @@ const UPDATE_EQUIPMENT = gql`
   }
 `;
 
-export const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String, $limit: Int) {
-    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type, limit: $limit) {
-      items {
-        id
-        name
-        profileType
-        details
-        childProfiles {
-          id
-          name
-          details
-        }
-      }
-      context {
-        cursor
-        lastPage
-      }
-    }
-  }
-`;
-
 const toTime = moment();
 const fromTime = moment().subtract(1, 'hour');
 
@@ -163,7 +141,12 @@ const AccessPointDetails = ({ locations }) => {
   );
 
   const { data: dataProfiles, error: errorProfiles, loading: loadingProfiles } = useQuery(
-    GET_ALL_PROFILES,
+    GET_ALL_PROFILES(`
+    childProfiles {
+      id
+      name
+      details
+    }`),
     {
       variables: { customerId, type: 'equipment_ap', limit: 100 },
     }
