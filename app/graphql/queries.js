@@ -16,13 +16,13 @@ export const FILTER_EQUIPMENT = gql`
     $locationIds: [ID]
     $customerId: ID!
     $equipmentType: String
-    $cursor: String
+    $context: JSONObject
   ) {
     filterEquipment(
       customerId: $customerId
       locationIds: $locationIds
       equipmentType: $equipmentType
-      cursor: $cursor
+      context: $context
     ) {
       items {
         name
@@ -63,10 +63,7 @@ export const FILTER_EQUIPMENT = gql`
           }
         }
       }
-      context {
-        lastPage
-        cursor
-      }
+      context
     }
   }
 `;
@@ -76,13 +73,13 @@ export const FILTER_EQUIPMENT_BULK_EDIT_APS = gql`
     $locationIds: [ID]
     $customerId: ID!
     $equipmentType: String
-    $cursor: String
+    $context: JSONObject
   ) {
     filterEquipment(
       customerId: $customerId
       locationIds: $locationIds
       equipmentType: $equipmentType
-      cursor: $cursor
+      context: $context
     ) {
       items {
         name
@@ -91,10 +88,7 @@ export const FILTER_EQUIPMENT_BULK_EDIT_APS = gql`
         channel
         details
       }
-      context {
-        lastPage
-        cursor
-      }
+      context
     }
   }
 `;
@@ -112,8 +106,8 @@ export const GET_LOCATION = gql`
 `;
 
 export const FILTER_CLIENT_SESSIONS = gql`
-  query FilterClientSessions($customerId: ID!, $locationIds: [ID], $cursor: String) {
-    filterClientSessions(customerId: $customerId, locationIds: $locationIds, cursor: $cursor) {
+  query FilterClientSessions($customerId: ID!, $locationIds: [ID], $context: JSONObject) {
+    filterClientSessions(customerId: $customerId, locationIds: $locationIds, context: $context) {
       items {
         id
         macAddress
@@ -127,10 +121,7 @@ export const FILTER_CLIENT_SESSIONS = gql`
           name
         }
       }
-      context {
-        lastPage
-        cursor
-      }
+      context
     }
   }
 `;
@@ -157,7 +148,7 @@ export const GET_CLIENT_SESSION = gql`
 export const FILTER_SERVICE_METRICS = gql`
   query FilterServiceMetrics(
     $customerId: ID!
-    $cursor: String
+    $context: JSONObject
     $fromTime: String!
     $toTime: String!
     $clientMacs: [String]
@@ -167,7 +158,7 @@ export const FILTER_SERVICE_METRICS = gql`
   ) {
     filterServiceMetrics(
       customerId: $customerId
-      cursor: $cursor
+      context: $context
       fromTime: $fromTime
       toTime: $toTime
       clientMacs: $clientMacs
@@ -183,27 +174,34 @@ export const FILTER_SERVICE_METRICS = gql`
         txBytes
         detailsJSON
       }
-      context {
-        lastPage
-        cursor
-      }
+      context
     }
   }
 `;
 
-export const GET_ALL_PROFILES = gql`
-  query GetAllProfiles($customerId: ID!, $cursor: String, $type: String) {
-    getAllProfiles(customerId: $customerId, cursor: $cursor, type: $type) {
+export const GET_ALL_PROFILES = (fields = '') => gql`
+  query GetAllProfiles(
+    $customerId: ID!
+    $cursor: String
+    $limit: Int
+    $type: String
+    $context: JSONObject
+  ) {
+    getAllProfiles(
+      customerId: $customerId
+      cursor: $cursor
+      limit: $limit
+      type: $type
+      context: $context
+    ) {
       items {
         id
         name
         profileType
         details
+        ${fields}
       }
-      context {
-        cursor
-        lastPage
-      }
+      context
     }
   }
 `;
@@ -219,10 +217,7 @@ export const GET_ALL_STATUS = gql`
           clientCountPerOui
         }
       }
-      context {
-        lastPage
-        cursor
-      }
+      context
     }
   }
 `;
@@ -298,7 +293,7 @@ export const FILTER_SYSTEM_EVENTS = gql`
     $toTime: String!
     $equipmentIds: [ID]
     $dataTypes: [String]
-    $cursor: String
+    $context: JSONObject
     $limit: Int
   ) {
     filterSystemEvents(
@@ -307,14 +302,11 @@ export const FILTER_SYSTEM_EVENTS = gql`
       toTime: $toTime
       dataTypes: $dataTypes
       equipmentIds: $equipmentIds
-      cursor: $cursor
+      context: $context
       limit: $limit
     ) {
       items
-      context {
-        lastPage
-        cursor
-      }
+      context
     }
   }
 `;

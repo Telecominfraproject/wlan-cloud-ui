@@ -21,7 +21,7 @@ const AutoProvision = () => {
     }
   );
   const { data: dataProfile, loading: loadingProfile, error: errorProfile } = useQuery(
-    GET_ALL_PROFILES,
+    GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'equipment_ap' },
     }

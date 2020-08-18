@@ -7,8 +7,8 @@ import { Alarms as AlarmsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 
 const GET_ALL_ALARMS = gql`
-  query GetAllAlarms($customerId: ID!, $cursor: String) {
-    getAllAlarms(customerId: $customerId, cursor: $cursor) {
+  query GetAllAlarms($customerId: ID!, $context: JSONObject) {
+    getAllAlarms(customerId: $customerId, context: $context) {
       items {
         severity
         alarmCode
@@ -19,10 +19,7 @@ const GET_ALL_ALARMS = gql`
           name
         }
       }
-      context {
-        cursor
-        lastPage
-      }
+      context
     }
   }
 `;
@@ -53,7 +50,7 @@ const Alarms = () => {
   const handleLoadMore = () => {
     if (!data.getAllAlarms.context.lastPage) {
       fetchMore({
-        variables: { cursor: data.getAllAlarms.context.cursor },
+        variables: { context: data.getAllAlarms.context },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const previousEntry = previousResult.getAllAlarms;
           const newItems = fetchMoreResult.getAllAlarms.items;

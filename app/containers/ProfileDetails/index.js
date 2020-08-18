@@ -77,7 +77,7 @@ const ProfileDetails = () => {
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id },
   });
-  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES, {
+  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
   });
   const [updateProfile] = useMutation(UPDATE_PROFILE);

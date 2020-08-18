@@ -327,7 +327,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   const handleLoadMore = () => {
     if (!equipData.filterEquipment.context.lastPage) {
       fetchMore({
-        variables: { cursor: equipData.filterEquipment.context.cursor },
+        variables: { context: equipData.filterEquipment.context },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           const previousEntry = previousResult.filterEquipment;
           const newItems = fetchMoreResult.filterEquipment.items;
