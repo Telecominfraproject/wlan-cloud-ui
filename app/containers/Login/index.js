@@ -27,7 +27,7 @@ const Login = () => {
   const handleLogin = (email, password) => {
     authenticateUser({ variables: { email, password } })
       .then(({ data }) => {
-        client.resetStore();
+        client.cache.reset();
         updateToken(data.authenticateUser);
         history.push('/');
       })
