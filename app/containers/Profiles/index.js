@@ -83,7 +83,7 @@ const Profiles = () => {
           message: 'Success',
           description: 'Profile successfully deleted.',
         });
-        reloadTable();
+        refetch();
       })
       .catch(() =>
         notification.error({
