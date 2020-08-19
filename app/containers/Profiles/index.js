@@ -28,8 +28,10 @@ const Profiles = () => {
   const location = useLocation();
 
   useEffect(() => {
-    refetch();
-  }, [location.pathname === '/profiles']);
+    if (location.state && location.state.refetch) {
+      refetch();
+    }
+  }, []);
 
   const reloadTable = () => {
     refetch()
