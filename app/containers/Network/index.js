@@ -1,5 +1,5 @@
 import React, { useMemo, useContext, useState } from 'react';
-import { Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
+import { Switch, Route, useRouteMatch, Redirect, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
 import { Alert, notification } from 'antd';
 import _ from 'lodash';
@@ -22,6 +22,7 @@ import {
 
 const Network = () => {
   const { path } = useRouteMatch();
+  const location = useLocation();
   const { customerId } = useContext(UserContext);
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
@@ -260,20 +261,11 @@ const Network = () => {
         />
         <Route
           exact
-          path={`${path}/access-points/:id`}
-          render={props => (
-            <Redirect
-              to={{ pathname: `${path}/access-points/${props?.match?.params?.id}/general` }}
-            />
-          )}
-        />
-
-        <Route
-          exact
           path={`${path}/client-devices`}
           render={props => <ClientDevices checkedLocations={checkedLocations} {...props} />}
         />
         <Route exact path={`${path}/client-devices/:id`} component={ClientDeviceDetails} />
+        <Redirect from={location.pathname} to={`${location.pathname}/general`} />
         <Redirect from={path} to={`${path}/access-points`} />
       </Switch>
     </NetworkPage>
