@@ -51,7 +51,7 @@ const Network = () => {
   };
 
   const formatLocationListForTree = (list = []) => {
-    const checkedTreeLocations = [];
+    const checkedTreeLocations = ['0'];
     list.forEach(ele => {
       checkedTreeLocations.push(ele.id);
     });
@@ -91,7 +91,11 @@ const Network = () => {
     return [
       {
         title: (
-          <PopoverMenu locationType="NETWORK" setAddModal={setAddModal}>
+          <PopoverMenu
+            locationId='0'
+            locationType="NETWORK"
+            setAddModal={setAddModal}
+          >
             Network
           </PopoverMenu>
         ),
@@ -201,7 +205,7 @@ const Network = () => {
   };
 
   const locationsTree = useMemo(
-    () => formatLocationListForTree(data && data.getAllLocations)[0].children,
+    () => formatLocationListForTree(data && data.getAllLocations),
     [data]
   );
 
