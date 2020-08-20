@@ -258,15 +258,6 @@ const Network = () => {
           path={`${path}/access-points/:id/:tab`}
           render={props => <AccessPointDetails locations={locationsTree} {...props} />}
         />
-        <Route
-          exact
-          path={`${path}/access-points/:id`}
-          render={props => (
-            <Redirect
-              to={{ pathname: `${path}/access-points/${props?.match?.params?.id}/general` }}
-            />
-          )}
-        />
 
         <Route
           exact
@@ -274,6 +265,7 @@ const Network = () => {
           render={props => <ClientDevices checkedLocations={checkedLocations} {...props} />}
         />
         <Route exact path={`${path}/client-devices/:id`} component={ClientDeviceDetails} />
+        <Redirect from={`${path}/access-points/:id`} to={`${path}/access-points/:id/general`} />
         <Redirect from={path} to={`${path}/access-points`} />
       </Switch>
     </NetworkPage>
