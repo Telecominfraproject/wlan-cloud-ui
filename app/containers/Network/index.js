@@ -20,6 +20,13 @@ import {
   CREATE_EQUIPMENT,
 } from 'graphql/mutations';
 
+const TREE_ROOT = {
+  id: '0',
+  value: '0',
+  key: '0',
+  locationType: 'NETWORK'
+};
+
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
@@ -99,10 +106,8 @@ const Network = () => {
             Network
           </PopoverMenu>
         ),
-        id: '0',
-        value: '0',
-        key: '0',
         children: unflatten(list),
+        ...TREE_ROOT,
       },
     ];
   };
@@ -223,7 +228,7 @@ const Network = () => {
       onCheck={onCheck}
       checkedLocations={checkedLocations}
       locations={locationsTree}
-      selectedLocation={selectedLocation && selectedLocation.getLocation}
+      selectedLocation={selectedLocation && selectedLocation.getLocation || TREE_ROOT}
       addModal={addModal}
       editModal={editModal}
       deleteModal={deleteModal}
