@@ -27,7 +27,7 @@ const Network = () => {
     variables: { customerId },
   });
   const { loading: loadingProfile, error: errorProfile, data: apProfiles } = useQuery(
-    GET_ALL_PROFILES,
+    GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'equipment_ap' },
     }
