@@ -20,13 +20,6 @@ import {
   CREATE_EQUIPMENT,
 } from 'graphql/mutations';
 
-const TREE_ROOT = {
-  id: '0',
-  value: '0',
-  key: '0',
-  locationType: 'NETWORK'
-};
-
 const Network = () => {
   const { path } = useRouteMatch();
   const { customerId } = useContext(UserContext);
@@ -106,20 +99,34 @@ const Network = () => {
             Network
           </PopoverMenu>
         ),
+        id: '0',
+        key: '0',
+        value: '0',
         children: unflatten(list),
-        ...TREE_ROOT,
       },
     ];
   };
 
-  const handleAddLocation = (name, parentId, locationType) => {
+  const handleAddLocation = ({ location }) => {
     setAddModal(false);
+    let id;
+    let locationType;
+
+    // adding location from root makes selecetedLocation null so we check for that
+    if (selectedLocation && selectedLocation.getLocation) {
+      id = selectedLocation.getLocation.id;
+      locationType = 'SITE';
+    } else {
+      id = '0';
+      locationType = 'COUNTRY';
+    }
+
     createLocation({
       variables: {
         locationType,
         customerId,
-        parentId,
-        name,
+        parentId: id,
+        name: location,
       },
     })
       .then(() => {
@@ -137,8 +144,10 @@ const Network = () => {
       );
   };
 
-  const handleEditLocation = (id, parentId, name, locationType, lastModifiedTimestamp) => {
+  const handleEditLocation = ({ name }) => {
     setEditModal(false);
+    const { id, parentId, locationType, lastModifiedTimestamp } = selectedLocation.getLocation;
+
     updateLocation({
       variables: {
         customerId,
@@ -164,8 +173,10 @@ const Network = () => {
       );
   };
 
-  const handleDeleteLocation = id => {
+  const handleDeleteLocation = () => {
     setDeleteModal(false);
+    const { id } = selectedLocation.getLocation;
+
     deleteLocation({ variables: { id } })
       .then(() => {
         notification.success({
@@ -182,8 +193,10 @@ const Network = () => {
       );
   };
 
-  const handleCreateEquipment = (inventoryId, locationId, name, profileId) => {
+  const handleCreateEquipment = ({ inventoryId, name, profileId }) => {
     setApModal(false);
+    const { id: locationId } = selectedLocation.getLocation;
+
     createEquipment({ variables: { customerId, inventoryId, locationId, name, profileId } })
       .then(() => {
         notification.success({
@@ -228,7 +241,7 @@ const Network = () => {
       onCheck={onCheck}
       checkedLocations={checkedLocations}
       locations={locationsTree}
-      selectedLocation={selectedLocation && selectedLocation.getLocation || TREE_ROOT}
+      selectedLocation={selectedLocation && selectedLocation.getLocation}
       addModal={addModal}
       editModal={editModal}
       deleteModal={deleteModal}
