@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useLazyQuery } from '@apollo/react-hooks';
+import { useLazyQuery } from '@apollo/client';
 import { notification } from 'antd';
 
 import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';

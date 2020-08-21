@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { AddProfile as AddProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
-import gql from 'graphql-tag';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery, gql } from '@apollo/client';
 import { notification } from 'antd';
 
 import UserContext from 'contexts/UserContext';

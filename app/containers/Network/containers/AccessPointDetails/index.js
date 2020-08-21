@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
-import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import moment from 'moment';
 import {
