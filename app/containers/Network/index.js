@@ -34,7 +34,7 @@ const Network = () => {
   const { loading: loadingProfile, error: errorProfile, data: apProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
-      variables: { customerId, type: 'equipment_ap' },
+      variables: { customerId, type: 'equipment_ap', limit: 100 },
     }
   );
 

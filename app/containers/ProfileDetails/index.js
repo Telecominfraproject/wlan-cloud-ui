@@ -78,11 +78,11 @@ const ProfileDetails = () => {
     variables: { id },
   });
   const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'ssid' },
+    variables: { customerId, type: 'ssid', limit: 100 },
   });
 
   const { data: radiusProfiles } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'radius' },
+    variables: { customerId, type: 'radius', limit: 100 },
   });
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
