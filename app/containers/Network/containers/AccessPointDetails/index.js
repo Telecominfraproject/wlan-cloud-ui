@@ -136,7 +136,7 @@ const AccessPointDetails = ({ locations }) => {
     GET_ALL_FIRMWARE,
     {
       skip: !data?.getEquipment?.model,
-      variables: { modelId: data?.getEquipment?.model?.toLowerCase() },
+      variables: { modelId: data?.getEquipment?.model },
     }
   );
 
