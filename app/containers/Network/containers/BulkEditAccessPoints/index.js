@@ -2,7 +2,7 @@ import React, { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, notification } from 'antd';
 import { useParams } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/client';
 import { BulkEditAccessPoints, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { FILTER_EQUIPMENT_BULK_EDIT_APS } from 'graphql/queries';

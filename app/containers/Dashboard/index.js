@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
 import { Alert } from 'antd';
 import moment from 'moment';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { Dashboard as DashboardPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 import { FILTER_SYSTEM_EVENTS, GET_ALL_STATUS } from 'graphql/queries';

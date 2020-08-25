@@ -1,12 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router } from 'react-router-dom';
-import { ApolloClient } from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { onError } from 'apollo-link-error';
+import { ApolloClient, ApolloProvider, ApolloLink, Observable } from '@apollo/client';
+import { InMemoryCache } from '@apollo/client/cache';
+import { onError } from '@apollo/client/link/error';
 import { createUploadLink } from 'apollo-upload-client';
-import { ApolloLink, Observable } from 'apollo-link';
-import { ApolloProvider } from '@apollo/react-hooks';
 
 import 'styles/antd.less';
 import 'styles/index.scss';
