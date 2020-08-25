@@ -24,7 +24,7 @@ const MOUNT_NODE = document.getElementById('root');
 const cache = new InMemoryCache();
 
 const uploadLink = createUploadLink({
-  uri: API_URI,
+  uri: `${API_URI}graphql`,
 });
 
 const request = async operation => {
