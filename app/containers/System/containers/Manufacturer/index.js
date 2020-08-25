@@ -1,6 +1,5 @@
 import React from 'react';
-import gql from 'graphql-tag';
-import { useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { useMutation, useLazyQuery, gql } from '@apollo/client';
 import { notification } from 'antd';
 import { Manufacturer as ManufacturerPage } from '@tip-wlan/wlan-cloud-ui-library';
 import { OUI_UPLOAD } from 'graphql/mutations';
