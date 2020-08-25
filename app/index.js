@@ -16,13 +16,13 @@ import { getItem, setItem, removeItem } from 'utils/localStorage';
 import history from 'utils/history';
 
 const API_URI =
-  process.env.NODE_ENV === 'development' ? 'http://localhost:4000/' : window.REACT_APP_API;
+  process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : window.REACT_APP_API;
 const MOUNT_NODE = document.getElementById('root');
 
 const cache = new InMemoryCache();
 
 const uploadLink = createUploadLink({
-  uri: `${API_URI}graphql`,
+  uri: `${API_URI}/graphql`,
 });
 
 const request = async operation => {
