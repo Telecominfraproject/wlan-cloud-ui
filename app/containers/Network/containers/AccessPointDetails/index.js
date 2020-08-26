@@ -139,7 +139,12 @@ const AccessPointDetails = ({ locations }) => {
     }
   );
 
-  const { data: dataProfiles, error: errorProfiles, loading: loadingProfiles } = useQuery(
+  const {
+    data: dataProfiles,
+    error: errorProfiles,
+    loading: loadingProfiles,
+    fetchMore,
+  } = useQuery(
     GET_ALL_PROFILES(`
     childProfiles {
       id
@@ -147,7 +152,7 @@ const AccessPointDetails = ({ locations }) => {
       details
     }`),
     {
-      variables: { customerId, type: 'equipment_ap', limit: 100 },
+      variables: { customerId, type: 'equipment_ap' },
     }
   );
 
@@ -242,6 +247,26 @@ const AccessPointDetails = ({ locations }) => {
         })
       );
 
+  const handleFetchProfiles = () => {
+    if (!dataProfiles?.getAllProfiles?.context?.lastPage) {
+      fetchMore({
+        variables: { context: dataProfiles.getAllProfiles.context },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.getAllProfiles;
+          const newItems = fetchMoreResult.getAllProfiles.items;
+
+          return {
+            getAllProfiles: {
+              context: fetchMoreResult.getAllProfiles.context,
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -275,6 +300,8 @@ const AccessPointDetails = ({ locations }) => {
       errorProfiles={errorProfiles}
       loadingFirmware={loadingFirmware}
       errorFirmware={errorFirmware}
+      onFetchMoreProfiles={handleFetchProfiles}
+      isLastProfilesPage={dataProfiles?.getAllProfiles?.context?.lastPage}
     />
   );
 };
