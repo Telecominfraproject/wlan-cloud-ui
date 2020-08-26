@@ -268,15 +268,17 @@ const Network = () => {
         />
         <Route
           exact
-          path={`${path}/access-points/:id`}
+          path={`${path}/access-points/:id/:tab`}
           render={props => <AccessPointDetails locations={locationsTree} {...props} />}
         />
+
         <Route
           exact
           path={`${path}/client-devices`}
           render={props => <ClientDevices checkedLocations={checkedLocations} {...props} />}
         />
         <Route exact path={`${path}/client-devices/:id`} component={ClientDeviceDetails} />
+        <Redirect from={`${path}/access-points/:id`} to={`${path}/access-points/:id/general`} />
         <Redirect from={path} to={`${path}/access-points`} />
       </Switch>
     </NetworkPage>

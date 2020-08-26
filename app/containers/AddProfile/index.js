@@ -54,7 +54,7 @@ const AddProfile = () => {
           message: 'Success',
           description: 'Profile successfully created.',
         });
-        history.push('/profiles', { refetch: true});
+        history.push('/profiles', { refetch: true });
       })
       .catch(() =>
         notification.error({

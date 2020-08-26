@@ -26,11 +26,10 @@ const Login = () => {
   const handleLogin = (email, password) => {
     authenticateUser({ variables: { email, password } })
       .then(({ data }) => {
-        client.resetStore()
-          .then(() => {
-            updateToken(data.authenticateUser);
-            history.push('/');
-          });
+        client.resetStore().then(() => {
+          updateToken(data.authenticateUser);
+          history.push('/');
+        });
       })
       .catch(() =>
         notification.error({
