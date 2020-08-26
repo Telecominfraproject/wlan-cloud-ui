@@ -1,6 +1,6 @@
 import React, { useMemo, useContext, useState } from 'react';
 import { Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
-import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import _ from 'lodash';
 import { Network as NetworkPage, PopoverMenu, Loading } from '@tip-wlan/wlan-cloud-ui-library';
@@ -34,7 +34,7 @@ const Network = () => {
   const { loading: loadingProfile, error: errorProfile, data: apProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
-      variables: { customerId, type: 'equipment_ap' },
+      variables: { customerId, type: 'equipment_ap', limit: 100 },
     }
   );
 

@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { useLocation } from 'react-router-dom';
 import { Alert, notification } from 'antd';
 import { Profile as ProfilePage, Loading } from '@tip-wlan/wlan-cloud-ui-library';

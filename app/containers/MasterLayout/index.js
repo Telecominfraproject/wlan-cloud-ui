@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
-import { useApolloClient, useQuery } from '@apollo/react-hooks';
+import { useApolloClient, useQuery } from '@apollo/client';
 import { AppLayout as Layout } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { GET_ALARM_COUNT } from 'graphql/queries';

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { BlockedList as BlockedListPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import { GET_BLOCKED_CLIENTS } from 'graphql/queries';

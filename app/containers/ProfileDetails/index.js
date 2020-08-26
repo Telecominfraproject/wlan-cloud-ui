@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
-import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -78,11 +77,11 @@ const ProfileDetails = () => {
     variables: { id },
   });
   const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'ssid' },
+    variables: { customerId, type: 'ssid', limit: 100 },
   });
 
   const { data: radiusProfiles } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'radius' },
+    variables: { customerId, type: 'radius', limit: 100 },
   });
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);

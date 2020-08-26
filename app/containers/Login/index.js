@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
-import { useMutation, useApolloClient } from '@apollo/react-hooks';
+import { useMutation, useApolloClient, gql } from '@apollo/client';
 import { useHistory } from 'react-router-dom';
 import { notification } from 'antd';
 

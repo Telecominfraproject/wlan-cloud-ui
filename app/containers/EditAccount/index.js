@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery, gql } from '@apollo/client';
 import { notification, Alert } from 'antd';
 import { EditAccount as EditAccountPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
