@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { AddProfile as AddProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
-import gql from 'graphql-tag';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery, gql } from '@apollo/client';
 import { notification } from 'antd';
+import { useHistory } from 'react-router-dom';
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
@@ -37,6 +37,7 @@ const AddProfile = () => {
     variables: { customerId, type: 'ssid', limit: 100 },
   });
   const [createProfile] = useMutation(CREATE_PROFILE);
+  const history = useHistory();
 
   const handleAddProfile = (profileType, name, details, childProfileIds = []) => {
     createProfile({
@@ -53,6 +54,7 @@ const AddProfile = () => {
           message: 'Success',
           description: 'Profile successfully created.',
         });
+        history.push('/profiles', { refetch: true});
       })
       .catch(() =>
         notification.error({

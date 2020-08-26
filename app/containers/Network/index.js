@@ -1,6 +1,6 @@
 import React, { useMemo, useContext, useState } from 'react';
 import { Switch, Route, useRouteMatch, Redirect } from 'react-router-dom';
-import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import _ from 'lodash';
 import { Network as NetworkPage, PopoverMenu, Loading } from '@tip-wlan/wlan-cloud-ui-library';
@@ -12,7 +12,12 @@ import ClientDeviceDetails from 'containers/Network/containers/ClientDeviceDetai
 import BulkEditAccessPoints from 'containers/Network/containers/BulkEditAccessPoints';
 
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_LOCATIONS, GET_LOCATION, GET_ALL_PROFILES } from 'graphql/queries';
+import {
+  GET_ALL_LOCATIONS,
+  GET_LOCATION,
+  GET_ALL_PROFILES,
+  FILTER_EQUIPMENT,
+} from 'graphql/queries';
 import {
   CREATE_LOCATION,
   UPDATE_LOCATION,
@@ -29,7 +34,7 @@ const Network = () => {
   const { loading: loadingProfile, error: errorProfile, data: apProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
-      variables: { customerId, type: 'equipment_ap' },
+      variables: { customerId, type: 'equipment_ap', limit: 100 },
     }
   );
 
@@ -37,12 +42,20 @@ const Network = () => {
   const [createLocation] = useMutation(CREATE_LOCATION);
   const [updateLocation] = useMutation(UPDATE_LOCATION);
   const [deleteLocation] = useMutation(DELETE_LOCATION);
-  const [createEquipment] = useMutation(CREATE_EQUIPMENT);
   const [checkedLocations, setCheckedLocations] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
   const [apModal, setApModal] = useState(false);
+
+  const [createEquipment] = useMutation(CREATE_EQUIPMENT, {
+    refetchQueries: [
+      {
+        query: FILTER_EQUIPMENT,
+        variables: { customerId, locationIds: checkedLocations, equipmentType: 'AP' },
+      },
+    ],
+  });
 
   const handleGetSingleLocation = id => {
     getLocation({

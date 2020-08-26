@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState, useRef } from 'react';
 import { Alert } from 'antd';
 import moment from 'moment';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/client';
 import { Dashboard as DashboardPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 import { FILTER_SYSTEM_EVENTS, GET_ALL_STATUS } from 'graphql/queries';
@@ -13,7 +13,7 @@ function formatBytes(bytes, decimals = 2) {
   const dm = decimals < 0 ? 0 : decimals;
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const i = Math.floor(Math.log(Math.abs(bytes)) / Math.log(k));
 
   // eslint-disable-next-line no-restricted-properties
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i] || ''}`;

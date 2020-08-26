@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { Alarms as AlarmsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 

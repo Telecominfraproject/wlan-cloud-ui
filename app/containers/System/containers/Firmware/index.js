@@ -1,5 +1,5 @@
 import React from 'react';
-import { useQuery, useMutation, useLazyQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { notification } from 'antd';
 import {
   GET_ALL_FIRMWARE,

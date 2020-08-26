@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
-import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import React, { useContext, useEffect } from 'react';
+import { useQuery, useMutation, gql } from '@apollo/client';
+import { useLocation } from 'react-router-dom';
 import { Alert, notification } from 'antd';
 import { Profile as ProfilePage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -24,6 +24,13 @@ const Profiles = () => {
     }
   );
   const [deleteProfile] = useMutation(DELETE_PROFILE);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && location.state.refetch) {
+      refetch();
+    }
+  }, []);
 
   const reloadTable = () => {
     refetch()

@@ -1,12 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router } from 'react-router-dom';
-import { ApolloClient } from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { onError } from 'apollo-link-error';
+import { ApolloClient, ApolloProvider, ApolloLink, Observable } from '@apollo/client';
+import { InMemoryCache } from '@apollo/client/cache';
+import { onError } from '@apollo/client/link/error';
 import { createUploadLink } from 'apollo-upload-client';
-import { ApolloLink, Observable } from 'apollo-link';
-import { ApolloProvider } from '@apollo/react-hooks';
 
 import 'styles/antd.less';
 import 'styles/index.scss';
@@ -18,13 +16,13 @@ import { getItem, setItem, removeItem } from 'utils/localStorage';
 import history from 'utils/history';
 
 const API_URI =
-  process.env.NODE_ENV === 'development' ? 'http://localhost:4000/' : window.REACT_APP_API;
+  process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : window.REACT_APP_API;
 const MOUNT_NODE = document.getElementById('root');
 
 const cache = new InMemoryCache();
 
 const uploadLink = createUploadLink({
-  uri: API_URI,
+  uri: `${API_URI}/graphql`,
 });
 
 const request = async operation => {

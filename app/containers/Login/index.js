@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import gql from 'graphql-tag';
-import { useMutation, useApolloClient } from '@apollo/react-hooks';
+import { useMutation, useApolloClient, gql } from '@apollo/client';
 import { useHistory } from 'react-router-dom';
 import { notification } from 'antd';
 
@@ -27,9 +26,11 @@ const Login = () => {
   const handleLogin = (email, password) => {
     authenticateUser({ variables: { email, password } })
       .then(({ data }) => {
-        client.resetStore();
-        updateToken(data.authenticateUser);
-        history.push('/');
+        client.resetStore()
+          .then(() => {
+            updateToken(data.authenticateUser);
+            history.push('/');
+          });
       })
       .catch(() =>
         notification.error({
