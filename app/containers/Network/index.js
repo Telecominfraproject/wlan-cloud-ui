@@ -64,7 +64,7 @@ const Network = () => {
   };
 
   const formatLocationListForTree = (list = []) => {
-    const checkedTreeLocations = [];
+    const checkedTreeLocations = ['0'];
     list.forEach(ele => {
       checkedTreeLocations.push(ele.id);
     });
@@ -104,26 +104,42 @@ const Network = () => {
     return [
       {
         title: (
-          <PopoverMenu locationType="NETWORK" setAddModal={setAddModal}>
+          <PopoverMenu
+            locationId='0'
+            locationType="NETWORK"
+            setAddModal={setAddModal}
+          >
             Network
           </PopoverMenu>
         ),
         id: '0',
-        value: '0',
         key: '0',
+        value: '0',
         children: unflatten(list),
       },
     ];
   };
 
-  const handleAddLocation = (name, parentId, locationType) => {
+  const handleAddLocation = ({ location }) => {
     setAddModal(false);
+    let id;
+    let locationType;
+
+    // adding location from root makes selecetedLocation null so we check for that
+    if (selectedLocation && selectedLocation.getLocation) {
+      id = selectedLocation.getLocation.id;
+      locationType = 'SITE';
+    } else {
+      id = '0';
+      locationType = 'COUNTRY';
+    }
+
     createLocation({
       variables: {
         locationType,
         customerId,
-        parentId,
-        name,
+        parentId: id,
+        name: location,
       },
     })
       .then(() => {
@@ -141,8 +157,10 @@ const Network = () => {
       );
   };
 
-  const handleEditLocation = (id, parentId, name, locationType, lastModifiedTimestamp) => {
+  const handleEditLocation = ({ name }) => {
     setEditModal(false);
+    const { id, parentId, locationType, lastModifiedTimestamp } = selectedLocation.getLocation;
+
     updateLocation({
       variables: {
         customerId,
@@ -168,8 +186,10 @@ const Network = () => {
       );
   };
 
-  const handleDeleteLocation = id => {
+  const handleDeleteLocation = () => {
     setDeleteModal(false);
+    const { id } = selectedLocation.getLocation;
+
     deleteLocation({ variables: { id } })
       .then(() => {
         notification.success({
@@ -186,8 +206,10 @@ const Network = () => {
       );
   };
 
-  const handleCreateEquipment = (inventoryId, locationId, name, profileId) => {
+  const handleCreateEquipment = ({ inventoryId, name, profileId }) => {
     setApModal(false);
+    const { id: locationId } = selectedLocation.getLocation;
+
     createEquipment({ variables: { customerId, inventoryId, locationId, name, profileId } })
       .then(() => {
         notification.success({
@@ -214,7 +236,7 @@ const Network = () => {
   };
 
   const locationsTree = useMemo(
-    () => formatLocationListForTree(data && data.getAllLocations)[0].children,
+    () => formatLocationListForTree(data && data.getAllLocations),
     [data]
   );
 
