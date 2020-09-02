@@ -7,6 +7,7 @@ import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cl
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
 import { FILE_UPLOAD } from 'graphql/mutations';
+import { updateQueryGetAllProfiles } from 'graphql/functions';
 
 const GET_PROFILE = gql`
   query GetProfile($id: ID!) {
@@ -76,6 +77,7 @@ const ProfileDetails = () => {
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id },
   });
+
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
   });
@@ -84,6 +86,13 @@ const ProfileDetails = () => {
     GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'radius' },
+    }
+  );
+
+  const { data: captiveProfiles, fetchMore: fetchMoreCaptiveProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'captive_portal' },
     }
   );
 
@@ -152,45 +161,60 @@ const ProfileDetails = () => {
         })
       );
 
-  const handleFetchProfiles = () => {
-    if (!ssidProfiles.getAllProfiles.context.lastPage) {
+  const handleFetchProfiles = e => {
+    if (ssidProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
       fetchMore({
         variables: { context: { ...ssidProfiles.getAllProfiles.context } },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllProfiles;
-          const newItems = fetchMoreResult.getAllProfiles.items;
-
-          return {
-            getAllProfiles: {
-              context: { ...fetchMoreResult.getAllProfiles.context },
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
-        },
+        updateQuery: updateQueryGetAllProfiles,
       });
     }
+
+    return true;
   };
 
-  const handleFetchRadiusProfiles = () => {
-    if (!radiusProfiles.getAllProfiles.context.lastPage) {
+  const handleFetchRadiusProfiles = e => {
+    if (radiusProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
       fetchMoreRadiusProfiles({
         variables: { context: { ...radiusProfiles.getAllProfiles.context } },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllProfiles;
-          const newItems = fetchMoreResult.getAllProfiles.items;
-
-          return {
-            getAllProfiles: {
-              context: { ...fetchMoreResult.getAllProfiles.context },
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
-        },
+        updateQuery: updateQueryGetAllProfiles,
       });
     }
+
+    return true;
   };
+
+  const handleFetchCaptiveProfiles = e => {
+    if (captiveProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreCaptiveProfiles({
+        variables: { context: { ...captiveProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -217,11 +241,11 @@ const ProfileDetails = () => {
         (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
       }
       radiusProfiles={radiusProfiles?.getAllProfiles?.items}
+      captiveProfiles={captiveProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchProfiles}
-      isLastProfilesPage={ssidProfiles?.getAllProfiles?.context?.lastPage}
       onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
-      isLastRadiusPage={radiusProfiles?.getAllProfiles?.context?.lastPage}
+      onFetchMoreCaptiveProfiles={handleFetchCaptiveProfiles}
     />
   );
 };

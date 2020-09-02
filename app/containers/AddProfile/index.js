@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
+import { updateQueryGetAllProfiles } from 'graphql/functions';
 
 const CREATE_PROFILE = gql`
   mutation CreateProfile(
@@ -63,24 +64,23 @@ const AddProfile = () => {
         })
       );
   };
-  const handleFetchProfiles = () => {
-    if (!ssidProfiles.getAllProfiles.context.lastPage) {
+
+  const handleFetchProfiles = e => {
+    if (ssidProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
       fetchMore({
         variables: { context: { ...ssidProfiles.getAllProfiles.context } },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllProfiles;
-          const newItems = fetchMoreResult.getAllProfiles.items;
-
-          return {
-            getAllProfiles: {
-              context: { ...fetchMoreResult.getAllProfiles.context },
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
-        },
+        updateQuery: updateQueryGetAllProfiles,
       });
     }
+
+    return true;
   };
 
   return (
@@ -90,7 +90,6 @@ const AddProfile = () => {
         (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
       }
       onFetchMoreProfiles={handleFetchProfiles}
-      isLastProfilesPage={ssidProfiles?.getAllProfiles?.context?.lastPage}
     />
   );
 };

@@ -5,6 +5,7 @@ import { Alert, notification } from 'antd';
 import { Profile as ProfilePage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { GET_ALL_PROFILES } from 'graphql/queries';
+import { updateQueryGetAllProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
 
 const DELETE_PROFILE = gql`
@@ -52,18 +53,7 @@ const Profiles = () => {
     if (!data.getAllProfiles.context.lastPage) {
       fetchMore({
         variables: { context: { ...data.getAllProfiles.context } },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllProfiles;
-          const newItems = fetchMoreResult.getAllProfiles.items;
-
-          return {
-            getAllProfiles: {
-              context: { ...fetchMoreResult.getAllProfiles.context },
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
-        },
+        updateQuery: updateQueryGetAllProfiles,
       });
     }
   };

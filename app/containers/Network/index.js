@@ -24,6 +24,7 @@ import {
   DELETE_LOCATION,
   CREATE_EQUIPMENT,
 } from 'graphql/mutations';
+import { updateQueryGetAllProfiles } from 'graphql/functions';
 
 const Network = () => {
   const { path } = useRouteMatch();
@@ -104,11 +105,7 @@ const Network = () => {
     return [
       {
         title: (
-          <PopoverMenu
-            locationId='0'
-            locationType="NETWORK"
-            setAddModal={setAddModal}
-          >
+          <PopoverMenu locationId="0" locationType="NETWORK" setAddModal={setAddModal}>
             Network
           </PopoverMenu>
         ),
@@ -235,30 +232,27 @@ const Network = () => {
     setCheckedLocations(checkedKeys.checked);
   };
 
-  const handleFetchProfiles = () => {
-    if (!apProfiles?.getAllProfiles?.context?.lastPage) {
-      fetchMore({
-        variables: { context: apProfiles.getAllProfiles.context },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllProfiles;
-          const newItems = fetchMoreResult.getAllProfiles.items;
+  const handleFetchProfiles = e => {
+    if (apProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
 
-          return {
-            getAllProfiles: {
-              context: fetchMoreResult.getAllProfiles.context,
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
-        },
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMore({
+        variables: { context: { ...apProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
       });
     }
+
+    return true;
   };
 
-  const locationsTree = useMemo(
-    () => formatLocationListForTree(data && data.getAllLocations),
-    [data]
-  );
+  const locationsTree = useMemo(() => formatLocationListForTree(data && data.getAllLocations), [
+    data,
+  ]);
 
   if (loading) {
     return <Loading />;

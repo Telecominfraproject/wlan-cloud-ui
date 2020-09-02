@@ -11,6 +11,7 @@ import {
 
 import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE, GET_ALL_PROFILES } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
+import { updateQueryGetAllProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
 
 const GET_EQUIPMENT = gql`
@@ -247,24 +248,22 @@ const AccessPointDetails = ({ locations }) => {
         })
       );
 
-  const handleFetchProfiles = () => {
-    if (!dataProfiles?.getAllProfiles?.context?.lastPage) {
-      fetchMore({
-        variables: { context: dataProfiles.getAllProfiles.context },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllProfiles;
-          const newItems = fetchMoreResult.getAllProfiles.items;
+  const handleFetchProfiles = e => {
+    if (dataProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
 
-          return {
-            getAllProfiles: {
-              context: fetchMoreResult.getAllProfiles.context,
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
-        },
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMore({
+        variables: { context: { ...dataProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
       });
     }
+
+    return true;
   };
 
   if (loading) {
