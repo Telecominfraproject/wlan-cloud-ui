@@ -31,10 +31,10 @@ const Network = () => {
   const { loading, error, refetch, data } = useQuery(GET_ALL_LOCATIONS, {
     variables: { customerId },
   });
-  const { loading: loadingProfile, error: errorProfile, data: apProfiles } = useQuery(
+  const { loading: loadingProfile, error: errorProfile, data: apProfiles, fetchMore } = useQuery(
     GET_ALL_PROFILES(),
     {
-      variables: { customerId, type: 'equipment_ap', limit: 100 },
+      variables: { customerId, type: 'equipment_ap' },
     }
   );
 
@@ -235,6 +235,26 @@ const Network = () => {
     setCheckedLocations(checkedKeys.checked);
   };
 
+  const handleFetchProfiles = () => {
+    if (!apProfiles?.getAllProfiles?.context?.lastPage) {
+      fetchMore({
+        variables: { context: apProfiles.getAllProfiles.context },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.getAllProfiles;
+          const newItems = fetchMoreResult.getAllProfiles.items;
+
+          return {
+            getAllProfiles: {
+              context: fetchMoreResult.getAllProfiles.context,
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
+
   const locationsTree = useMemo(
     () => formatLocationListForTree(data && data.getAllLocations),
     [data]
@@ -270,6 +290,8 @@ const Network = () => {
       profiles={(apProfiles && apProfiles.getAllProfiles && apProfiles.getAllProfiles.items) || []}
       loadingProfile={loadingProfile}
       errorProfile={errorProfile}
+      onFetchMoreProfiles={handleFetchProfiles}
+      isLastProfilesPage={apProfiles?.getAllProfiles?.context?.lastPage}
     >
       <Switch>
         <Route

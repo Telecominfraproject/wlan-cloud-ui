@@ -33,8 +33,8 @@ const CREATE_PROFILE = gql`
 
 const AddProfile = () => {
   const { customerId } = useContext(UserContext);
-  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'ssid', limit: 100 },
+  const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'ssid' },
   });
   const [createProfile] = useMutation(CREATE_PROFILE);
   const history = useHistory();
@@ -63,6 +63,25 @@ const AddProfile = () => {
         })
       );
   };
+  const handleFetchProfiles = () => {
+    if (!ssidProfiles.getAllProfiles.context.lastPage) {
+      fetchMore({
+        variables: { context: { ...ssidProfiles.getAllProfiles.context } },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.getAllProfiles;
+          const newItems = fetchMoreResult.getAllProfiles.items;
+
+          return {
+            getAllProfiles: {
+              context: { ...fetchMoreResult.getAllProfiles.context },
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
 
   return (
     <AddProfilePage
@@ -70,6 +89,8 @@ const AddProfile = () => {
       ssidProfiles={
         (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
       }
+      onFetchMoreProfiles={handleFetchProfiles}
+      isLastProfilesPage={ssidProfiles?.getAllProfiles?.context?.lastPage}
     />
   );
 };

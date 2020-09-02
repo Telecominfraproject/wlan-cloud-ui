@@ -183,14 +183,12 @@ export const GET_ALL_PROFILES = (fields = '') => gql`
   query GetAllProfiles(
     $customerId: ID!
     $cursor: String
-    $limit: Int
     $type: String
     $context: JSONObject
   ) {
     getAllProfiles(
       customerId: $customerId
       cursor: $cursor
-      limit: $limit
       type: $type
       context: $context
     ) {

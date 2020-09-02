@@ -76,13 +76,16 @@ const ProfileDetails = () => {
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id },
   });
-  const { data: ssidProfiles } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'ssid', limit: 100 },
+  const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'ssid' },
   });
 
-  const { data: radiusProfiles } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'radius', limit: 100 },
-  });
+  const { data: radiusProfiles, fetchMore: fetchMoreRadiusProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'radius' },
+    }
+  );
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
@@ -149,6 +152,45 @@ const ProfileDetails = () => {
         })
       );
 
+  const handleFetchProfiles = () => {
+    if (!ssidProfiles.getAllProfiles.context.lastPage) {
+      fetchMore({
+        variables: { context: { ...ssidProfiles.getAllProfiles.context } },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.getAllProfiles;
+          const newItems = fetchMoreResult.getAllProfiles.items;
+
+          return {
+            getAllProfiles: {
+              context: { ...fetchMoreResult.getAllProfiles.context },
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
+
+  const handleFetchRadiusProfiles = () => {
+    if (!radiusProfiles.getAllProfiles.context.lastPage) {
+      fetchMoreRadiusProfiles({
+        variables: { context: { ...radiusProfiles.getAllProfiles.context } },
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          const previousEntry = previousResult.getAllProfiles;
+          const newItems = fetchMoreResult.getAllProfiles.items;
+
+          return {
+            getAllProfiles: {
+              context: { ...fetchMoreResult.getAllProfiles.context },
+              items: [...previousEntry.items, ...newItems],
+              __typename: previousEntry.__typename,
+            },
+          };
+        },
+      });
+    }
+  };
   if (loading) {
     return <Loading />;
   }
@@ -176,6 +218,10 @@ const ProfileDetails = () => {
       }
       radiusProfiles={radiusProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
+      onFetchMoreProfiles={handleFetchProfiles}
+      isLastProfilesPage={ssidProfiles?.getAllProfiles?.context?.lastPage}
+      onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
+      isLastRadiusPage={radiusProfiles?.getAllProfiles?.context?.lastPage}
     />
   );
 };
