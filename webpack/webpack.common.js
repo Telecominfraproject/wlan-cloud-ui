@@ -47,7 +47,7 @@ module.exports = {
       favicon: './app/images/favicon.ico',
     }),
     new webpack.DefinePlugin({
-      'process.env.GRAPHQL_URL': JSON.stringify(process.env.GRAPHQL_URL),
+      'process.env.API': JSON.stringify(process.env.API || 'http://localhost:4000'),
     }),
   ],
 };

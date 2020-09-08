@@ -15,10 +15,7 @@ import { REFRESH_TOKEN } from 'graphql/mutations';
 import { getItem, setItem, removeItem } from 'utils/localStorage';
 import history from 'utils/history';
 
-const API_URI =
-  process.env.NODE_ENV === 'development'
-    ? 'https://wlan-graphql.zone3.lab.connectus.ai'
-    : window.REACT_APP_API;
+const API_URI = process.env.NODE_ENV === 'production' ? window.REACT_APP_API : process.env.API;
 const MOUNT_NODE = document.getElementById('root');
 
 const cache = new InMemoryCache();

@@ -1,0 +1,51 @@
+const path = require('path');
+
+const commonPaths = require('./paths');
+
+module.exports = {
+  mode: 'development',
+  output: {
+    path: commonPaths.outputPath,
+    publicPath: '/',
+    filename: '[name].js',
+    chunkFilename: '[name].js',
+  },
+  devtool: 'inline-source-map',
+  devServer: {
+    port: 3000,
+    historyApiFallback: true,
+    contentBase: commonPaths.outputPath,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(css|scss)$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[name]__[local]___[hash:base64:5]',
+              },
+              sourceMap: true,
+            },
+          },
+          {
+            loader: 'sass-loader',
+          },
+        ],
+      },
+    ],
+  },
+  resolve: {
+    modules: ['node_modules', 'app'],
+    alias: {
+      app: path.resolve(__dirname, '../', 'app'),
+      react: path.resolve(__dirname, '../', 'node_modules', 'react'),
+      'react-router-dom': path.resolve('./node_modules/react-router-dom'),
+    },
+  },
+};

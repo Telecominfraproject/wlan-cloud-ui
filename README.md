@@ -5,7 +5,10 @@
 Install Dependencies:
 `npm install`
 
-You will get an error installing the package [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) because it is in a private npm registry. Run
+You will get an error installing the package [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) because it is in a private npm registry.
+You can either install the package with the commands below or clone the repo [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) and skip to the section Set up Full Development.
+
+Run
 
 ```
 npm login --registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/
@@ -19,7 +22,7 @@ Install package:
 npm i --registry=https://tip.jfrog.io/artifactory/api/npm/tip-wlan-cloud-npm-repo/ @tip-wlan/wlan-cloud-ui-library
 ```
 
-### Set up with local wlan-cloud-ui-library
+### Set up Full Development
 
 _Skip this section if you are not using a local [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library)_
 
@@ -43,15 +46,25 @@ If `npm link` fails due to Permissions run with `sudo`
 sudo npm link ../wlan-cloud-ui-library
 ```
 
+To run Full Development you must clone [wlan-cloud-graphql-gw](https://github.com/Telecominfraproject/wlan-cloud-graphql-gw), follow it's README, and run it. Or you use the live production build by setting the environment variable `API` to the GraphQL domain.
+
 ## Run:
 
-### Development
+### Bare Development
+
+This is if you only want to run this repo locally, and want to use the live production builds of [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) and [wlan-cloud-graphql-gw](https://github.com/Telecominfraproject/wlan-cloud-graphql-gw)
+
+`npm run start:bare`
+
+### Full Development
+
+If you have cloned [wlan-cloud-ui-library](https://github.com/Telecominfraproject/wlan-cloud-ui-library) and [wlan-cloud-graphql-gw](https://github.com/Telecominfraproject/wlan-cloud-graphql-gw)
 
 `npm start`
 
 ### Tests
 
-`npm run test`
+`npm test`
 
 ### Production
 
