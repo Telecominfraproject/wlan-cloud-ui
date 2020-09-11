@@ -25,6 +25,24 @@ const renderTableCell = tabCell => {
   return tabCell;
 };
 
+const renderDefaultTableCell = tabCell => {
+  if (Array.isArray(tabCell)) {
+    return (
+      <div className={styles.tabColumn}>
+        {tabCell.map((i, key) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <span key={key}>{i}</span>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className={styles.tabColumn}>
+      <span>0</span>
+    </div>
+  );
+};
+
 const durationToString = duration =>
   `${floor(duration.asDays())}d ${floor(duration.hours())}h ${padStart(
     duration.minutes(),
@@ -96,7 +114,7 @@ const accessPointsTableColumns = [
   {
     title: 'DEVICES',
     dataIndex: ['status', 'clientDetails', 'details', 'numClientsPerRadio'],
-    render: renderTableCell,
+    render: renderDefaultTableCell,
   },
 ];
 
