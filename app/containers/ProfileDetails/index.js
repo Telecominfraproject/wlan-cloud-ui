@@ -76,6 +76,7 @@ const ProfileDetails = () => {
 
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id },
+    fetchPolicy: 'network-only',
   });
 
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {

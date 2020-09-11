@@ -22,6 +22,7 @@ const Profiles = () => {
     GET_ALL_PROFILES(`equipmentCount`),
     {
       variables: { customerId },
+      fetchPolicy: 'network-only',
     }
   );
   const [deleteProfile] = useMutation(DELETE_PROFILE);
