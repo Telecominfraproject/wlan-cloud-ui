@@ -64,7 +64,7 @@ const accessPointsTableColumns = [
     render: renderTableCell,
   },
   {
-    title: 'FIRMWARE VERSION',
+    title: 'FIRMWARE',
     dataIndex: ['status', 'firmware', 'detailsJSON', 'activeSwVersion'],
     render: renderTableCell,
   },
