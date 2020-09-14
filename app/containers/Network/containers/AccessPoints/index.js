@@ -11,18 +11,21 @@ import { FILTER_EQUIPMENT } from 'graphql/queries';
 
 import styles from './index.module.scss';
 
-const renderTableCell = tabCell => {
-  if (Array.isArray(tabCell)) {
+const renderTableCell = (text, _record, _index, defaultValue = 'N/A') => {
+  if (Array.isArray(text)) {
+    if (text.length < 1) {
+      return defaultValue;
+    }
     return (
       <div className={styles.tabColumn}>
-        {tabCell.map((i, key) => (
+        {text.map((i, key) => (
           // eslint-disable-next-line react/no-array-index-key
           <span key={key}>{i}</span>
         ))}
       </div>
     );
   }
-  return tabCell;
+  return text !== null ? text : defaultValue;
 };
 
 const durationToString = duration =>
@@ -96,7 +99,7 @@ const accessPointsTableColumns = [
   {
     title: 'DEVICES',
     dataIndex: ['status', 'clientDetails', 'details', 'numClientsPerRadio'],
-    render: renderTableCell,
+    render: (text, record, index) => renderTableCell(text, record, index, 0),
   },
 ];
 
