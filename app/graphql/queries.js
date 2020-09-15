@@ -61,6 +61,9 @@ export const FILTER_EQUIPMENT = gql`
               numClientsPerRadio
             }
           }
+          firmware {
+            detailsJSON
+          }
         }
       }
       context
