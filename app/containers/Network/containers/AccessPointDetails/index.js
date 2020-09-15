@@ -229,7 +229,7 @@ const AccessPointDetails = ({ locations }) => {
   const handleUpdateEquipmentFirmware = (equipmentId, firmwareVersionId) =>
     updateEquipmentFirmware({ variables: { equipmentId, firmwareVersionId } })
       .then(firmwareResp => {
-        if (firmwareResp && firmwareResp.updateEquipmentFirmware.success === false) {
+        if (firmwareResp && firmwareResp.data.updateEquipmentFirmware.success === false) {
           notification.error({
             message: 'Error',
             description: 'Equipment Firmware Upgrade could not be updated.',
