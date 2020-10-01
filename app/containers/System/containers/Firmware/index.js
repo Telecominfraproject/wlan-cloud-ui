@@ -91,12 +91,14 @@ const Firmware = () => {
           trackAssignmentData.getAllFirmwareTrackAssignment[index].firmwareVersionRecordId;
         const prevTrackRecordId =
           trackAssignmentData.getAllFirmwareTrackAssignment[index].trackRecordId;
-        deleteTrackAssignment({
-          variables: {
-            firmwareTrackId: prevTrackRecordId,
-            firmwareVersionId: prevFirmwareVersionRecordId,
-          },
-        });
+        if (prevFirmwareVersionRecordId !== firmwareVersionRecordId) {
+          deleteTrackAssignment({
+            variables: {
+              firmwareTrackId: prevTrackRecordId,
+              firmwareVersionId: prevFirmwareVersionRecordId,
+            },
+          });
+        }
       }
     });
 
