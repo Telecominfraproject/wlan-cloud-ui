@@ -10,7 +10,11 @@ import {
 } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE, GET_ALL_PROFILES } from 'graphql/queries';
-import { UPDATE_EQUIPMENT_FIRMWARE } from 'graphql/mutations';
+import {
+  UPDATE_EQUIPMENT_FIRMWARE,
+  REQUEST_EQUIPMENT_SWITCH_BANK,
+  REQUEST_EQUIPMENT_REBOOT,
+} from 'graphql/mutations';
 import { updateQueryGetAllProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
 
@@ -175,6 +179,8 @@ const AccessPointDetails = ({ locations }) => {
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
   const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
+  const [requestEquipmentSwitchBank] = useMutation(REQUEST_EQUIPMENT_SWITCH_BANK);
+  const [requestEquipmentReboot] = useMutation(REQUEST_EQUIPMENT_REBOOT);
 
   const refetchData = () => {
     refetch();
@@ -229,15 +235,15 @@ const AccessPointDetails = ({ locations }) => {
   const handleUpdateEquipmentFirmware = (equipmentId, firmwareVersionId) =>
     updateEquipmentFirmware({ variables: { equipmentId, firmwareVersionId } })
       .then(firmwareResp => {
-        if (firmwareResp && firmwareResp.data.updateEquipmentFirmware.success === false) {
-          notification.error({
-            message: 'Error',
-            description: 'Equipment Firmware Upgrade could not be updated.',
-          });
-        } else {
+        if (firmwareResp?.data?.updateEquipmentFirmware?.success === true) {
           notification.success({
             message: 'Success',
             description: 'Equipment Firmware Upgrade in progress',
+          });
+        } else {
+          notification.error({
+            message: 'Error',
+            description: 'Equipment Firmware Upgrade could not be updated.',
           });
         }
       })
@@ -245,6 +251,50 @@ const AccessPointDetails = ({ locations }) => {
         notification.error({
           message: 'Error',
           description: 'Equipment Firmware Upgrade could not be updated.',
+        })
+      );
+
+  const handleRequestEquipmentSwitchBank = equipmentId =>
+    requestEquipmentSwitchBank({ variables: { equipmentId } })
+      .then(firmwareResp => {
+        if (firmwareResp?.data?.requestEquipmentSwitchBank?.success === true) {
+          notification.success({
+            message: 'Success',
+            description: 'Equipment Firmware in progress',
+          });
+        } else {
+          notification.error({
+            message: 'Error',
+            description: 'Equipment Firmware could not be updated.',
+          });
+        }
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Equipment Firmware could not be updated.',
+        })
+      );
+
+  const handleRequestEquipmentReboot = equipmentId =>
+    requestEquipmentReboot({ variables: { equipmentId } })
+      .then(firmwareResp => {
+        if (firmwareResp?.data?.requestEquipmentReboot?.success === true) {
+          notification.success({
+            message: 'Success',
+            description: 'Equipment Firmware in progress',
+          });
+        } else {
+          notification.error({
+            message: 'Error',
+            description: 'Equipment Firmware could not be updated.',
+          });
+        }
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Equipment Firmware could not be updated.',
         })
       );
 
@@ -295,6 +345,8 @@ const AccessPointDetails = ({ locations }) => {
       firmware={dataFirmware?.getAllFirmware}
       locations={locations}
       onUpdateEquipmentFirmware={handleUpdateEquipmentFirmware}
+      onRequestEquipmentSwitchBank={handleRequestEquipmentSwitchBank}
+      onRequestEquipmentReboot={handleRequestEquipmentReboot}
       loadingProfiles={loadingProfiles}
       errorProfiles={errorProfiles}
       loadingFirmware={loadingFirmware}

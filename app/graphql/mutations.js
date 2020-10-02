@@ -99,6 +99,22 @@ export const UPDATE_EQUIPMENT_FIRMWARE = gql`
   }
 `;
 
+export const REQUEST_EQUIPMENT_SWITCH_BANK = gql`
+  mutation RequestEquipmentSwitchBank($equipmentId: ID) {
+    requestEquipmentSwitchBank(equipmentId: $equipmentId) {
+      success
+    }
+  }
+`;
+
+export const REQUEST_EQUIPMENT_REBOOT = gql`
+  mutation RequestEquipmentReboot($equipmentId: ID) {
+    requestEquipmentReboot(equipmentId: $equipmentId) {
+      success
+    }
+  }
+`;
+
 export const UPDATE_TRACK_ASSIGNMENT = gql`
   mutation UpdateFirmwareTrackAssignment(
     $trackRecordId: ID!
