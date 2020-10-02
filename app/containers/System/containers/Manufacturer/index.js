@@ -44,7 +44,7 @@ const System = () => {
         });
       }
     },
-    variables: { queryCompleted: 'true' },
+    fetchPolicy: 'no-cache',
   });
   const [fileUpload] = useMutation(OUI_UPLOAD);
 
