@@ -6,6 +6,10 @@ on:
     branches:
       - master
 
+    schedule:
+      # runs at cronjob at 5AM
+      - cron:  '00 09 * * *'
+
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
@@ -47,6 +51,10 @@ jobs:
       - name: Build image
         run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
 
+
+      - name: Set current date as env variable
+        run: echo "::set-env name=TIMESTAMP::$(date +'%Y-%m-%d')"      
+
       - name: Login to Docker Hub
         env:
           DOCKER_PASSWORD: ${{ secrets.REPO_PASSWORD }}
@@ -74,3 +82,6 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+
+          docker tag image $IMAGE_ID:$VERSION-$TIMESTAMP
+          docker push $IMAGE_ID:$VERSION-$TIMESTAMP
