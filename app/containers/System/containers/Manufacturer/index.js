@@ -37,7 +37,7 @@ const System = () => {
       });
     },
     onCompleted: () => {
-      if (!data.getOui.oui) {
+      if (!data?.getOui?.oui) {
         notification.error({
           message: 'Error',
           description: 'No matching manufacturer found for OUI',
