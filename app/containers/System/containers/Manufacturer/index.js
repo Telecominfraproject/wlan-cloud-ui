@@ -36,6 +36,15 @@ const System = () => {
         description: 'No matching manufacturer found for OUI',
       });
     },
+    onCompleted: () => {
+      if (!data?.getOui?.oui) {
+        notification.error({
+          message: 'Error',
+          description: 'No matching manufacturer found for OUI',
+        });
+      }
+    },
+    fetchPolicy: 'no-cache',
   });
   const [fileUpload] = useMutation(OUI_UPLOAD);
 
