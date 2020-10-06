@@ -40,12 +40,11 @@ jobs:
             docker build . --file Dockerfile --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
           fi
   push:
-    #This job would execute only on push events
-    if: github.event_name == 'push'    
     # Ensure test job passes before pushing image.
     needs: test
 
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'    
 
     steps:
       - uses: actions/checkout@v2
@@ -87,12 +86,12 @@ jobs:
           
   Nightlybuild:
     #This job would execute only on schedule events
-    if: github.event_name == 'schedule'
+
     # Ensure test job passes before pushing image.
     needs: test
 
     runs-on: ubuntu-latest
-
+    if: github.event_name == 'schedule'
     steps:
       - uses: actions/checkout@v2
       - name: Checking if the last commit was more than 24 hrs
