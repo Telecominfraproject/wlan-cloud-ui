@@ -5,7 +5,7 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
-    
+
     # Publish `v1.2.3` tags as releases.
     tags:
       - v*
@@ -44,14 +44,13 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'    
+    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
-    
+        run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}    
 
       - name: Login to Docker Hub
         env:
