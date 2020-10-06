@@ -49,6 +49,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Updating commit file
+        if: steps.check.outputs.key == 'true'
+        run: |
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo date=$TIMESTAMP > app/commit.properties
+          echo commitId=$GITHUB_SHA >> app/commit.properties
+          echo projectVersion=$VERSION>> app/commit.properties
+
       - name: Build image
         run: docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
 
