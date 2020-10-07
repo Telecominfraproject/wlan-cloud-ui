@@ -83,24 +83,17 @@ const Firmware = () => {
     firmwareVersionRecordId,
     modelId,
     createdTimestamp,
-    lastModifiedTimestamp
+    lastModifiedTimestamp,
+    prevFirmwareVersionRecordId
   ) => {
-    trackAssignmentData.getAllFirmwareTrackAssignment.forEach((element, index) => {
-      if (element.modelId === modelId) {
-        const prevFirmwareVersionRecordId =
-          trackAssignmentData.getAllFirmwareTrackAssignment[index].firmwareVersionRecordId;
-        const prevTrackRecordId =
-          trackAssignmentData.getAllFirmwareTrackAssignment[index].trackRecordId;
-        if (prevFirmwareVersionRecordId !== firmwareVersionRecordId) {
-          deleteTrackAssignment({
-            variables: {
-              firmwareTrackId: prevTrackRecordId,
-              firmwareVersionId: prevFirmwareVersionRecordId,
-            },
-          });
-        }
-      }
-    });
+    if (prevFirmwareVersionRecordId !== firmwareVersionRecordId) {
+      deleteTrackAssignment({
+        variables: {
+          firmwareTrackId: firmwareTrackData.getFirmwareTrack.recordId,
+          firmwareVersionId: prevFirmwareVersionRecordId,
+        },
+      });
+    }
 
     updateTrackAssignment({
       variables: {
