@@ -13,6 +13,10 @@ on:
   # Run tests for any PRs.
   pull_request:
 
+  schedule:
+      # runs nightly build at 5AM
+      - cron:  '00 09 * * *'
+
 env:
   IMAGE_NAME: wlan-cloud-ui
   DOCKER_REPO: tip-tip-wlan-cloud-docker-repo.jfrog.io
@@ -56,6 +60,7 @@ jobs:
       - name: Push image
         run: |
           IMAGE_ID=$DOCKER_REPO/$IMAGE_NAME
+          TIMESTAMP=$(date +'%Y-%m-%d')
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -71,6 +76,10 @@ jobs:
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
+          echo TIMESTAMP=$TIMESTAMP
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+          
+          docker tag image $IMAGE_ID:$VERSION-$TIMESTAMP
+          docker push $IMAGE_ID:$VERSION-$TIMESTAMP          
