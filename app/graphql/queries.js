@@ -1,5 +1,11 @@
 import { gql } from '@apollo/client';
 
+export const GET_API_URL = gql`
+  query GetApiUrl {
+    getApiUrl
+  }
+`;
+
 export const GET_ALL_LOCATIONS = gql`
   query GetAllLocations($customerId: ID!) {
     getAllLocations(customerId: $customerId) {
