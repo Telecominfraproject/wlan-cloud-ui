@@ -34,15 +34,12 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{ secrets.REPO_PASSWORD }}        
         run: |
+          echo date=$TIMESTAMP > app/commit.properties
+          echo commitId=$GITHUB_SHA >> app/commit.properties
+          echo projectVersion=$VERSION>> app/commit.properties
           docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
-          if [ -f docker-compose.test.yml ]; then
-            docker-compose --file docker-compose.test.yml build --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
-            docker-compose --file docker-compose.test.yml run sut
-          else
-            docker build . --file Dockerfile --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
-          fi
+
           
-            docker build . -f Dockerfile -t image --build-arg NPM_TOKEN=${{secrets.NPM_REPO_AUTH_TOKEN}}
           IMAGE_ID=$DOCKER_REPO/$IMAGE_NAME
           TIMESTAMP=$(date +'%Y-%m-%d')
 
