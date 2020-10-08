@@ -34,6 +34,8 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{ secrets.REPO_PASSWORD }}        
         run: |
+          echo "${DOCKER_PASSWORD}" | docker login $DOCKER_REPO --username "build-pipeline" --password-stdin
+
           echo date=$TIMESTAMP > app/commit.properties
           echo commitId=$GITHUB_SHA >> app/commit.properties
           echo projectVersion=$VERSION>> app/commit.properties
@@ -60,8 +62,8 @@ jobs:
           echo TIMESTAMP=$TIMESTAMP
 
           
-          docker tag image $IMAGE_ID:$VERSION-AJ
-          docker push $IMAGE_ID:$VERSION-AJ 
+          docker tag image $IMAGE_ID:latest-AJ
+          docker push $IMAGE_ID:latest-AJ 
   push:
     # Ensure test job passes before pushing image.
     needs: test
