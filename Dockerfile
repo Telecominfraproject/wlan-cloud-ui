@@ -12,7 +12,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
 COPY package*.json ./
-COPY app/commit.properties ./
+
 
 #RUN npm install
 # If you are building your code for production
@@ -29,6 +29,7 @@ RUN apk add --no-cache jq
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY docker_entrypoint.sh generate_config_js.sh /
+COPY app/commit.properties //
 RUN chmod +x docker_entrypoint.sh generate_config_js.sh
  
 EXPOSE 80
