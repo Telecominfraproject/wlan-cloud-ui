@@ -83,8 +83,18 @@ const Firmware = () => {
     firmwareVersionRecordId,
     modelId,
     createdTimestamp,
-    lastModifiedTimestamp
+    lastModifiedTimestamp,
+    prevFirmwareVersionRecordId
   ) => {
+    if (prevFirmwareVersionRecordId !== firmwareVersionRecordId) {
+      deleteTrackAssignment({
+        variables: {
+          firmwareTrackId: firmwareTrackData.getFirmwareTrack.recordId,
+          firmwareVersionId: prevFirmwareVersionRecordId,
+        },
+      });
+    }
+
     updateTrackAssignment({
       variables: {
         trackRecordId: firmwareTrackData.getFirmwareTrack.recordId,
