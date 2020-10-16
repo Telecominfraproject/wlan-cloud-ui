@@ -61,6 +61,10 @@ const BlockedList = () => {
 
   if (loading) return <Loading />;
 
+  if (error?.message === '401: Unauthorized') {
+    return null;
+  }
+
   if (error)
     return (
       <Alert message="Error" description="Failed to load Client Data." type="error" showIcon />

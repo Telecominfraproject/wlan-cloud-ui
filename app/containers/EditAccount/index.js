@@ -79,6 +79,10 @@ const EditAccount = () => {
     return <Loading />;
   }
 
+  if (error?.message === '401: Unauthorized') {
+    return null;
+  }
+
   if (error) {
     return <Alert message="Error" description="Failed to load User." type="error" showIcon />;
   }

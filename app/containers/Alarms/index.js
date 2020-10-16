@@ -70,6 +70,10 @@ const Alarms = () => {
     return <Loading />;
   }
 
+  if (error?.message === '401: Unauthorized') {
+    return null;
+  }
+
   if (error && !data?.getAllAlarms?.items) {
     return <Alert message="Error" description="Failed to load alarms." type="error" showIcon />;
   }
