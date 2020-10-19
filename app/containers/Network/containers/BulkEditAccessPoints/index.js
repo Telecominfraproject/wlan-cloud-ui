@@ -347,10 +347,6 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     return <Loading />;
   }
 
-  if (filterEquipmentError?.message === '401: Unauthorized') {
-    return null;
-  }
-
   if (filterEquipmentError) {
     return (
       <Alert message="Error" description="Failed to load equipments data." type="error" showIcon />

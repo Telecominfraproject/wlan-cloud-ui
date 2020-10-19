@@ -166,10 +166,6 @@ const Accounts = () => {
     return <Loading />;
   }
 
-  if (error?.message === '401: Unauthorized') {
-    return null;
-  }
-
   if (error) {
     return <Alert message="Error" description="Failed to load Users." type="error" showIcon />;
   }

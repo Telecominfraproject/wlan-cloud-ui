@@ -58,10 +58,6 @@ const ClientDeviceDetails = () => {
     return <Loading />;
   }
 
-  if (error?.message === '401: Unauthorized') {
-    return null;
-  }
-
   if (error && !data?.getClientSession) {
     return (
       <Alert message="Error" description="Failed to load Client Device." type="error" showIcon />

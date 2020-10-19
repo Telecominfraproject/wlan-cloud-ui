@@ -320,10 +320,6 @@ const AccessPointDetails = ({ locations }) => {
     return <Loading />;
   }
 
-  if (error?.message === '401: Unauthorized') {
-    return null;
-  }
-
   if (error) {
     return (
       <Alert
