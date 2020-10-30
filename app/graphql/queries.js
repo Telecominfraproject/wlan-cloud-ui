@@ -126,6 +126,7 @@ export const FILTER_CLIENT_SESSIONS = gql`
         radioType
         signal
         manufacturer
+        details
         equipment {
           name
         }
