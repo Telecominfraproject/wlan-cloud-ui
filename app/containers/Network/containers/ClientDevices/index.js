@@ -24,7 +24,25 @@ const clientDevicesTableColumns = [
   { title: 'SSID', dataIndex: 'ssid' },
   { title: 'BAND', dataIndex: 'radioType' },
   { title: 'SIGNAL', dataIndex: 'signal' },
-  { title: 'STATUS', dataIndex: 'status' },
+  {
+    title: 'STATUS',
+    dataIndex: ['details', 'associationState'],
+    render: text => (
+      <>
+        {!text ? (
+          'N/A'
+        ) : (
+          <>
+            {text === 'Active_Data' ? (
+              'Connected'
+            ) : (
+              <>{text === 'Disconnected' ? 'Disconnected' : 'N/A'}</>
+            )}
+          </>
+        )}
+      </>
+    ),
+  },
 ];
 
 const ClientDevices = ({ checkedLocations }) => {
@@ -82,35 +100,11 @@ const ClientDevices = ({ checkedLocations }) => {
     fetchFilterClientSessions();
   }, [checkedLocations]);
 
-  const clientDevicesTableData = () => {
-    const oldTableData = data && data.filterClientSessions && data.filterClientSessions.items;
-    if (!oldTableData) {
-      return [];
-    }
-
-    const newTable = oldTableData.map(obj => {
-      let status = obj.details.associationState;
-      if (status === 'Active_Data') {
-        status = 'Connected';
-      } else if (status === 'Disconnected') {
-        status = 'Disconnected';
-      } else {
-        status = 'N/A';
-      }
-
-      const newObj = { ...obj, status };
-      delete newObj.details;
-      return newObj;
-    });
-
-    return newTable;
-  };
-
   return (
     <NetworkTableContainer
       activeTab="/network/client-devices"
       tableColumns={clientDevicesTableColumns}
-      tableData={clientDevicesTableData()}
+      tableData={data?.filterClientSessions?.items}
       onLoadMore={handleLoadMore}
       onRefresh={handleOnRefresh}
       isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
