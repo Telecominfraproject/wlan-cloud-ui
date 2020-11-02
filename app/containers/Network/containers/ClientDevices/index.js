@@ -27,21 +27,15 @@ const clientDevicesTableColumns = [
   {
     title: 'STATUS',
     dataIndex: ['details', 'associationState'],
-    render: text => (
-      <>
-        {!text ? (
-          'N/A'
-        ) : (
-          <>
-            {text === 'Active_Data' ? (
-              'Connected'
-            ) : (
-              <>{text === 'Disconnected' ? 'Disconnected' : 'N/A'}</>
-            )}
-          </>
-        )}
-      </>
-    ),
+    render: text => {
+      if (text === 'Active_Data') {
+        return 'Connected';
+      }
+      if (text === 'Disconnected') {
+        return 'Disconnected';
+      }
+      return 'N/A';
+    },
   },
 ];
 
