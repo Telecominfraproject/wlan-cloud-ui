@@ -24,7 +24,19 @@ const clientDevicesTableColumns = [
   { title: 'SSID', dataIndex: 'ssid' },
   { title: 'BAND', dataIndex: 'radioType' },
   { title: 'SIGNAL', dataIndex: 'signal' },
-  { title: 'STATUS', dataIndex: 'status' },
+  {
+    title: 'STATUS',
+    dataIndex: ['details', 'associationState'],
+    render: text => {
+      if (text === 'Active_Data') {
+        return 'Connected';
+      }
+      if (text === 'Disconnected') {
+        return 'Disconnected';
+      }
+      return 'N/A';
+    },
+  },
 ];
 
 const ClientDevices = ({ checkedLocations }) => {
@@ -86,7 +98,7 @@ const ClientDevices = ({ checkedLocations }) => {
     <NetworkTableContainer
       activeTab="/network/client-devices"
       tableColumns={clientDevicesTableColumns}
-      tableData={data && data.filterClientSessions && data.filterClientSessions.items}
+      tableData={data?.filterClientSessions?.items}
       onLoadMore={handleLoadMore}
       onRefresh={handleOnRefresh}
       isLastPage={data && data.filterClientSessions && data.filterClientSessions.context.lastPage}
