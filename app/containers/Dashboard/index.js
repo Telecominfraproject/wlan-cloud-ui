@@ -41,7 +41,7 @@ const lineChartConfig = [
   { key: 'clientDevices', title: 'Client Devices (24 hours)' },
   {
     key: 'traffic',
-    title: 'Traffic (24 hours)',
+    title: 'Usage Information (24 hours)',
     options: { formatter: trafficLabelFormatter, tooltipFormatter: trafficTooltipFormatter },
   },
 ];
@@ -88,6 +88,9 @@ const Dashboard = () => {
     },
   });
 
+  const [totalUpstreamTraffic, setTotalUpstreamTraffic] = useState(0);
+  const [totalDownstreamTraffic, setTotalDownstreamTraffic] = useState(0);
+
   const { loading: metricsLoading, error: metricsError, data: metricsData, fetchMore } = useQuery(
     FILTER_SYSTEM_EVENTS,
     {
@@ -110,7 +113,6 @@ const Dashboard = () => {
         const clientDevices5GHz = [];
         const trafficBytesDownstreamData = [];
         const trafficBytesUpstreamData = [];
-
         list.forEach(
           ({
             eventTimestamp,
@@ -135,6 +137,9 @@ const Dashboard = () => {
 
             trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
             trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
+
+            setTotalUpstreamTraffic(previous => previous + trafficBytesUpstream);
+            setTotalDownstreamTraffic(previous => previous + trafficBytesDownstream);
           }
         );
 
@@ -197,14 +202,11 @@ const Dashboard = () => {
 
   const statsArr = useMemo(() => {
     const status = data?.getAllStatus?.items[0]?.detailsJSON || {};
-
     const {
       associatedClientsCountPerRadio,
       totalProvisionedEquipment,
       equipmentInServiceCount,
       equipmentWithClientsCount,
-      trafficBytesDownstream,
-      trafficBytesUpstream,
     } = status;
 
     const clientRadios = {};
@@ -238,8 +240,8 @@ const Dashboard = () => {
       },
       {
         title: 'Usage Information',
-        'Total Traffic (US)': formatBytes(trafficBytesUpstream),
-        'Total Traffic (DS)': formatBytes(trafficBytesDownstream),
+        'Total Traffic (US)': formatBytes(totalUpstreamTraffic),
+        'Total Traffic (DS)': formatBytes(totalDownstreamTraffic),
       },
     ];
   }, [data]);
