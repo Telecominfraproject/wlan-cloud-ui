@@ -113,6 +113,7 @@ const Dashboard = () => {
         const clientDevices5GHz = [];
         const trafficBytesDownstreamData = [];
         const trafficBytesUpstreamData = [];
+
         list.forEach(
           ({
             eventTimestamp,
@@ -202,6 +203,7 @@ const Dashboard = () => {
 
   const statsArr = useMemo(() => {
     const status = data?.getAllStatus?.items[0]?.detailsJSON || {};
+
     const {
       associatedClientsCountPerRadio,
       totalProvisionedEquipment,
