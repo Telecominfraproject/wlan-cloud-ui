@@ -88,6 +88,9 @@ const Dashboard = () => {
     },
   });
 
+  const [totalUpstreamTraffic, setTotalUpstreamTraffic] = useState(0);
+  const [totalDownstreamTraffic, setTotalDownstreamTraffic] = useState(0);
+
   const { loading: metricsLoading, error: metricsError, data: metricsData, fetchMore } = useQuery(
     FILTER_SYSTEM_EVENTS,
     {
@@ -135,6 +138,9 @@ const Dashboard = () => {
 
             trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
             trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
+
+            setTotalUpstreamTraffic(previous => previous + trafficBytesUpstream);
+            setTotalDownstreamTraffic(previous => previous + trafficBytesDownstream);
           }
         );
 
@@ -203,8 +209,6 @@ const Dashboard = () => {
       totalProvisionedEquipment,
       equipmentInServiceCount,
       equipmentWithClientsCount,
-      trafficBytesDownstream,
-      trafficBytesUpstream,
     } = status;
 
     const clientRadios = {};
@@ -237,9 +241,9 @@ const Dashboard = () => {
         ...clientRadios,
       },
       {
-        title: 'Usage Information',
-        'Total Traffic (US)': formatBytes(trafficBytesUpstream),
-        'Total Traffic (DS)': formatBytes(trafficBytesDownstream),
+        title: 'Usage Information (24 hours)',
+        'Total Traffic (US)': formatBytes(totalUpstreamTraffic),
+        'Total Traffic (DS)': formatBytes(totalDownstreamTraffic),
       },
     ];
   }, [data]);
