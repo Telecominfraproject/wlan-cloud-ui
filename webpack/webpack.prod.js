@@ -14,6 +14,7 @@ module.exports = {
     chunkFilename: `${commonPaths.jsFolder}/[name].[chunkhash].js`,
   },
   optimization: {
+    minimize: true,
     minimizer: [
       new TerserPlugin({
         // Use multi-process parallel running to improve the build speed
@@ -65,6 +66,23 @@ module.exports = {
             },
           },
           'sass-loader',
+        ],
+      },
+      {
+        test: /\.less$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+          },
+          {
+            loader: 'less-loader', // compiles Less to CSS
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
         ],
       },
     ],
