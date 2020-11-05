@@ -41,7 +41,7 @@ const lineChartConfig = [
   { key: 'clientDevices', title: 'Client Devices (24 hours)' },
   {
     key: 'traffic',
-    title: 'Usage Information (24 hours)',
+    title: 'Traffic (24 hours)',
     options: { formatter: trafficLabelFormatter, tooltipFormatter: trafficTooltipFormatter },
   },
 ];
@@ -241,7 +241,7 @@ const Dashboard = () => {
         ...clientRadios,
       },
       {
-        title: 'Usage Information',
+        title: 'Usage Information (24 hours)',
         'Total Traffic (US)': formatBytes(totalUpstreamTraffic),
         'Total Traffic (DS)': formatBytes(totalDownstreamTraffic),
       },
