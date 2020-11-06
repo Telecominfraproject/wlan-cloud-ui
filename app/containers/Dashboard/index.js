@@ -88,9 +88,6 @@ const Dashboard = () => {
     },
   });
 
-  const [totalUpstreamTraffic, setTotalUpstreamTraffic] = useState(0);
-  const [totalDownstreamTraffic, setTotalDownstreamTraffic] = useState(0);
-
   const { loading: metricsLoading, error: metricsError, data: metricsData, fetchMore } = useQuery(
     FILTER_SYSTEM_EVENTS,
     {
@@ -113,6 +110,8 @@ const Dashboard = () => {
         const clientDevices5GHz = [];
         const trafficBytesDownstreamData = [];
         const trafficBytesUpstreamData = [];
+        let totalDown = 0;
+        let totalUp = 0;
 
         list.forEach(
           ({
@@ -139,8 +138,8 @@ const Dashboard = () => {
             trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream || 0]);
             trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream || 0]);
 
-            setTotalUpstreamTraffic(previous => previous + trafficBytesUpstream);
-            setTotalDownstreamTraffic(previous => previous + trafficBytesDownstream);
+            totalDown += trafficBytesDownstream;
+            totalUp += trafficBytesUpstream;
           }
         );
 
@@ -169,6 +168,8 @@ const Dashboard = () => {
               value: [...prev.traffic.trafficBytesUpstream.value, ...trafficBytesUpstreamData],
             },
           },
+          totalDownstreamTraffic: totalDown,
+          totalUpstreamTraffic: totalUp,
         };
       });
     }
@@ -201,7 +202,7 @@ const Dashboard = () => {
     formatLineChartData(metricsData?.filterSystemEvents?.items);
   }, [metricsData]);
 
-  const statsArr = useMemo(() => {
+  const statsData = useMemo(() => {
     const status = data?.getAllStatus?.items[0]?.detailsJSON || {};
 
     const {
@@ -228,24 +229,13 @@ const Dashboard = () => {
       });
     }
 
-    return [
-      {
-        title: 'Access Point',
-        'Total Provisioned': totalProvisionedEquipment,
-        'In Service': equipmentInServiceCount,
-        'With Clients': equipmentWithClientsCount,
-      },
-      {
-        title: 'Client Devices',
-        'Total Associated': totalAssociated,
-        ...clientRadios,
-      },
-      {
-        title: 'Usage Information (24 hours)',
-        'Total Traffic (US)': formatBytes(totalUpstreamTraffic),
-        'Total Traffic (DS)': formatBytes(totalDownstreamTraffic),
-      },
-    ];
+    return {
+      totalProvisionedEquipment,
+      equipmentInServiceCount,
+      equipmentWithClientsCount,
+      totalAssociated,
+      clientRadios,
+    };
   }, [data]);
 
   const pieChartsData = useMemo(() => {
@@ -267,7 +257,24 @@ const Dashboard = () => {
 
   return (
     <DashboardPage
-      statsCardDetails={statsArr}
+      statsCardDetails={[
+        {
+          title: 'Access Point',
+          'Total Provisioned': statsData?.totalProvisionedEquipment,
+          'In Service': statsData?.equipmentInServiceCount,
+          'With Clients': statsData?.equipmentWithClientsCount,
+        },
+        {
+          title: 'Client Devices',
+          'Total Associated': statsData?.totalAssociated,
+          ...statsData?.clientRadios,
+        },
+        {
+          title: 'Usage Information (24 hours)',
+          'Total Traffic (US)': formatBytes(lineChartData?.totalUpstreamTraffic),
+          'Total Traffic (DS)': formatBytes(lineChartData?.totalDownstreamTraffic),
+        },
+      ]}
       pieChartDetails={pieChartsData}
       lineChartData={lineChartData}
       lineChartConfig={lineChartConfig}
