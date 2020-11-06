@@ -138,8 +138,8 @@ const Dashboard = () => {
             trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream || 0]);
             trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream || 0]);
 
-            totalDown += trafficBytesDownstream;
-            totalUp += trafficBytesUpstream;
+            totalDown += trafficBytesDownstream || 0;
+            totalUp += trafficBytesUpstream || 0;
           }
         );
 
