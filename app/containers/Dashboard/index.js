@@ -134,10 +134,10 @@ const Dashboard = () => {
             total5GHz += (radios?.is5GHz || 0) + (radios?.is5GHzL || 0) + (radios?.is5GHzU || 0); // combine all 5GHz radios
 
             clientDevices2dot4GHz.push([eventTimestamp, radios.is2dot4GHz || 0]);
-            clientDevices5GHz.push([eventTimestamp, total5GHz]);
+            clientDevices5GHz.push([eventTimestamp, total5GHz || 0]);
 
-            trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream]);
-            trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream]);
+            trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream || 0]);
+            trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream || 0]);
 
             setTotalUpstreamTraffic(previous => previous + trafficBytesUpstream);
             setTotalDownstreamTraffic(previous => previous + trafficBytesDownstream);
