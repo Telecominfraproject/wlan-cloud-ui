@@ -106,7 +106,7 @@ const Dashboard = () => {
   );
 
   const formatLineChartData = (list = []) => {
-    if (list.length) {
+    if (list && list.length) {
       setLineChartData(prev => {
         const inservicesAPs = [];
         const clientDevices2dot4GHz = [];
@@ -246,7 +246,7 @@ const Dashboard = () => {
         'Total Traffic (DS)': formatBytes(totalDownstreamTraffic),
       },
     ];
-  }, [data]);
+  }, [totalUpstreamTraffic]);
 
   const pieChartsData = useMemo(() => {
     const { clientCountPerOui, equipmentCountPerOui } = data?.getAllStatus?.items[0]?.details || {};
