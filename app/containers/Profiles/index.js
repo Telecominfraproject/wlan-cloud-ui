@@ -34,8 +34,12 @@ const Profiles = () => {
     }
   }, []);
 
+  const refetchTableData = () => {
+    return refetch({ variables: { uniqueRefresh: Math.random() } });
+  };
+
   const reloadTable = () => {
-    refetch({ variables: { uniqueRefresh: Math.random() } })
+    refetchTableData()
       .then(() => {
         notification.success({
           message: 'Success',
@@ -66,7 +70,7 @@ const Profiles = () => {
           message: 'Success',
           description: 'Profile successfully deleted.',
         });
-        refetch();
+        refetchTableData();
       })
       .catch(() =>
         notification.error({
