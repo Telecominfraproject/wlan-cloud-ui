@@ -35,7 +35,7 @@ const Profiles = () => {
   }, []);
 
   const reloadTable = () => {
-    refetch()
+    refetch({ variables: { uniqueRefresh: Math.random() } })
       .then(() => {
         notification.success({
           message: 'Success',
