@@ -30,12 +30,16 @@ const Profiles = () => {
 
   useEffect(() => {
     if (location.state && location.state.refetch) {
-      refetch();
+      refetch({
+        variables: { customerId },
+      });
     }
   }, []);
 
   const reloadTable = () => {
-    refetch()
+    refetch({
+      variables: { customerId },
+    })
       .then(() => {
         notification.success({
           message: 'Success',
@@ -60,13 +64,20 @@ const Profiles = () => {
   };
 
   const handleDeleteProfile = id => {
-    deleteProfile({ variables: { id } })
+    deleteProfile({
+      variables: { id },
+      refetchQueries: [
+        {
+          query: GET_ALL_PROFILES(`equipmentCount`),
+          variables: { customerId },
+        },
+      ],
+    })
       .then(() => {
         notification.success({
           message: 'Success',
           description: 'Profile successfully deleted.',
         });
-        refetch();
       })
       .catch(() =>
         notification.error({
