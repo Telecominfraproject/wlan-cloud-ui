@@ -31,14 +31,14 @@ const Profiles = () => {
   useEffect(() => {
     if (location.state && location.state.refetch) {
       refetch({
-        variables: { customerId },
+        variables: { refresh: Date.now() },
       });
     }
   }, []);
 
   const reloadTable = () => {
     refetch({
-      variables: { customerId },
+      variables: { refresh: Date.now() },
     })
       .then(() => {
         notification.success({
