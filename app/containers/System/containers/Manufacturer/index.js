@@ -31,9 +31,8 @@ const UPDATE_OUI = gql`
   }
 `;
 
-const token = getItem(AUTH_TOKEN);
-
 const System = () => {
+  const token = getItem(AUTH_TOKEN);
   const [loadingFileUpload, setLoadingFileUpload] = useState(false);
 
   const { data: apiUrl } = useQuery(GET_API_URL);
