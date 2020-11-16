@@ -13,9 +13,9 @@
     "start:bare": "cross-env API=https://wlan-graphql.zone3.lab.connectus.ai NODE_ENV=bare webpack-dev-server",
     "start:dev": "cross-env API=https://wlan-graphql.zone3.lab.connectus.ai NODE_ENV=development webpack-dev-server",
     "build": "webpack --mode=production",
-    "format": "prettier --write \"app/**/*.js\"",
-    "eslint-fix": "eslint --fix \"app/**/*.js\"",
-    "eslint": "eslint \"app/**/*.js\" --max-warnings=0"
+    "format": "prettier --write 'app/**/*.js'",
+    "eslint-fix": "eslint --fix 'app/**/*.js'",
+    "eslint": "eslint 'app/**/*.js' --max-warnings=0"
   },
   "license": "MIT",
   "dependencies": {
@@ -93,7 +93,7 @@
   "lint-staged": {
     "*.{js,jsx}": [
       "pretty-quick --staged",
-      "eslint . --fix \"app/**/*.js\" --max-warnings=0",
+      "eslint --fix 'app/**/*.js' --max-warnings=0",
       "git add"
     ]
   },
