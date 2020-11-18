@@ -4,6 +4,7 @@ import { Alert, notification } from 'antd';
 import { BlockedList as BlockedListPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import { GET_BLOCKED_CLIENTS } from 'graphql/queries';
 import { UPDATE_CLIENT, ADD_BLOCKED_CLIENT } from 'graphql/mutations';
+import { Redirect } from 'react-router-dom';
 import UserContext from 'contexts/UserContext';
 
 const BlockedList = () => {
@@ -61,10 +62,15 @@ const BlockedList = () => {
 
   if (loading) return <Loading />;
 
-  if (error)
+  if (error) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return (
       <Alert message="Error" description="Failed to load Client Data." type="error" showIcon />
     );
+  }
 
   return (
     <BlockedListPage

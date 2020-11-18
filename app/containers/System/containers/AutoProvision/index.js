@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { AutoProvision as AutoProvisionPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { Redirect } from 'react-router-dom';
 
 import UserContext from 'contexts/UserContext';
 import { GET_CUSTOMER, GET_ALL_LOCATIONS, GET_ALL_PROFILES } from 'graphql/queries';
@@ -65,6 +66,10 @@ const AutoProvision = () => {
   }
 
   if (error) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return (
       <Alert message="Error" description="Failed to load Customer Data." type="error" showIcon />
     );

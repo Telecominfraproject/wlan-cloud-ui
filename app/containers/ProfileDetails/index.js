@@ -221,6 +221,10 @@ const ProfileDetails = () => {
   }
 
   if (error) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return (
       <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
     );

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useMutation, useQuery, gql } from '@apollo/client';
 import { notification, Alert } from 'antd';
 import { EditAccount as EditAccountPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { Redirect } from 'react-router-dom';
 
 import UserContext from 'contexts/UserContext';
 
@@ -80,6 +81,10 @@ const EditAccount = () => {
   }
 
   if (error) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return <Alert message="Error" description="Failed to load User." type="error" showIcon />;
   }
 

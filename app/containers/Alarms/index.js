@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { useQuery, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { Alarms as AlarmsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { Redirect } from 'react-router-dom';
 
 import UserContext from 'contexts/UserContext';
 
@@ -71,6 +72,10 @@ const Alarms = () => {
   }
 
   if (error && !data?.getAllAlarms?.items) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return <Alert message="Error" description="Failed to load alarms." type="error" showIcon />;
   }
 

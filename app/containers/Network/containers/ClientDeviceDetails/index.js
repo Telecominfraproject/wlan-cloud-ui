@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import moment from 'moment';
 import { Alert, notification } from 'antd';
@@ -59,6 +59,10 @@ const ClientDeviceDetails = () => {
   }
 
   if (error && !data?.getClientSession) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return (
       <Alert message="Error" description="Failed to load Client Device." type="error" showIcon />
     );

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import moment from 'moment';
@@ -321,6 +321,10 @@ const AccessPointDetails = ({ locations }) => {
   }
 
   if (error) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return (
       <Alert
         message="Error"

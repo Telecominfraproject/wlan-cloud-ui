@@ -1,7 +1,7 @@
 import React, { useContext, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, notification } from 'antd';
-import { useParams } from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
 import { BulkEditAccessPoints, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -348,6 +348,12 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   }
 
   if (filterEquipmentError) {
+    if (
+      filterEquipmentError.message === '403: Forbidden' ||
+      filterEquipmentError.message === '401: Unauthorized'
+    ) {
+      return <Redirect to="/login" />;
+    }
     return (
       <Alert message="Error" description="Failed to load equipments data." type="error" showIcon />
     );
