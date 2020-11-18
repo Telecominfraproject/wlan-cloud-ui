@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client';
 import { Dashboard as DashboardPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 import { FILTER_SYSTEM_EVENTS, GET_ALL_STATUS } from 'graphql/queries';
+import { Redirect } from 'react-router-dom';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -252,6 +253,9 @@ const Dashboard = () => {
   }
 
   if (error) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
     return <Alert message="Error" description="Failed to load Dashboard" type="error" showIcon />;
   }
 

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
+import { Redirect } from 'react-router-dom';
 
 import { Accounts as AccountsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -167,6 +168,10 @@ const Accounts = () => {
   }
 
   if (error) {
+    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
+      return <Redirect to="/login" />;
+    }
+
     return <Alert message="Error" description="Failed to load Users." type="error" showIcon />;
   }
 
