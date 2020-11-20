@@ -75,11 +75,11 @@ const App = () => {
           <ProtectedRouteWithLayout exact path="/" component={RedirectToDashboard} />
           <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
           <ProtectedRouteWithLayout path="/network" component={Network} />
-          <ProtectedRouteWithLayout path="/system" component={System} />
+          <ProtectedRouteWithLayout path="/configure/system" component={System} />
 
-          <ProtectedRouteWithLayout exact path="/profiles" component={Profiles} />
+          <ProtectedRouteWithLayout exact path="/configure/profiles" component={Profiles} />
           <ProtectedRouteWithLayout exact path="/profiles/:id" component={ProfileDetails} />
-          <ProtectedRouteWithLayout exact path="/addprofile" component={AddProfile} />
+          <ProtectedRouteWithLayout exact path="/configure/addprofile" component={AddProfile} />
 
           <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
           <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
