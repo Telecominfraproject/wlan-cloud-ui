@@ -7,7 +7,7 @@ import { ThemeProvider } from '@tip-wlan/wlan-cloud-ui-library';
 import logo from 'images/tip-logo.png';
 import logoMobile from 'images/tip-logo-mobile.png';
 
-import { AUTH_TOKEN, COMPANY } from 'constants/index';
+import { AUTH_TOKEN, COMPANY, ROUTES } from 'constants/index';
 import Login from 'containers/Login';
 
 import Network from 'containers/Network';
@@ -32,7 +32,7 @@ import ProtectedRouteWithLayout from './components/ProtectedRouteWithLayout';
 const RedirectToDashboard = () => (
   <Redirect
     to={{
-      pathname: '/dashboard',
+      pathname: ROUTES.dashboard,
     }}
   />
 );
@@ -65,26 +65,30 @@ const App = () => {
       updateUser={updateUser}
       updateToken={updateToken}
     >
-      <ThemeProvider company={COMPANY} logo={logo} logoMobile={logoMobile}>
+      <ThemeProvider company={COMPANY} logo={logo} logoMobile={logoMobile} routes={ROUTES}>
         <Helmet titleTemplate={`%s - ${COMPANY}`} defaultTitle={COMPANY}>
           <meta name="description" content={COMPANY} />
         </Helmet>
 
         <Switch>
-          <UnauthenticatedRoute exact path="/login" component={Login} />
-          <ProtectedRouteWithLayout exact path="/" component={RedirectToDashboard} />
-          <ProtectedRouteWithLayout exact path="/dashboard" component={Dashboard} />
-          <ProtectedRouteWithLayout path="/network" component={Network} />
-          <ProtectedRouteWithLayout path="/configure/system" component={System} />
+          <UnauthenticatedRoute exact path={ROUTES.login} component={Login} />
+          <ProtectedRouteWithLayout exact path={ROUTES.root} component={RedirectToDashboard} />
+          <ProtectedRouteWithLayout exact path={ROUTES.dashboard} component={Dashboard} />
+          <ProtectedRouteWithLayout path={ROUTES.network} component={Network} />
+          <ProtectedRouteWithLayout path={ROUTES.system} component={System} />
 
-          <ProtectedRouteWithLayout exact path="/configure/profiles" component={Profiles} />
-          <ProtectedRouteWithLayout exact path="/profiles/:id" component={ProfileDetails} />
-          <ProtectedRouteWithLayout exact path="/configure/addprofile" component={AddProfile} />
+          <ProtectedRouteWithLayout exact path={ROUTES.profiles} component={Profiles} />
+          <ProtectedRouteWithLayout
+            exact
+            path={`${ROUTES.profiles}/:id`}
+            component={ProfileDetails}
+          />
+          <ProtectedRouteWithLayout exact path={ROUTES.addprofile} component={AddProfile} />
 
-          <ProtectedRouteWithLayout exact path="/alarms" component={Alarms} />
-          <ProtectedRouteWithLayout exact path="/account/edit" component={EditAccount} />
+          <ProtectedRouteWithLayout exact path={ROUTES.alarms} component={Alarms} />
+          <ProtectedRouteWithLayout exact path={ROUTES.account} component={EditAccount} />
           {user.role === 'SuperUser' && (
-            <ProtectedRouteWithLayout exact path="/accounts" component={Accounts} />
+            <ProtectedRouteWithLayout exact path={ROUTES.users} component={Accounts} />
           )}
         </Switch>
       </ThemeProvider>

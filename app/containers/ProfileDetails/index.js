@@ -4,6 +4,7 @@ import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
+import { ROUTES } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
 import { FILE_UPLOAD } from 'graphql/mutations';
@@ -227,7 +228,7 @@ const ProfileDetails = () => {
   }
 
   if (redirect) {
-    return <Redirect to="/profiles" />;
+    return <Redirect to={ROUTES.profiles} />;
   }
 
   return (

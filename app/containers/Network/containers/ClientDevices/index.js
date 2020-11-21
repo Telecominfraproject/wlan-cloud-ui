@@ -5,6 +5,7 @@ import { notification } from 'antd';
 
 import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';
 
+import { ROUTES } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { FILTER_CLIENT_SESSIONS } from 'graphql/queries';
 
@@ -96,7 +97,7 @@ const ClientDevices = ({ checkedLocations }) => {
 
   return (
     <NetworkTableContainer
-      activeTab="/network/client-devices"
+      activeTab={ROUTES.clientDevices}
       tableColumns={clientDevicesTableColumns}
       tableData={data?.filterClientSessions?.items}
       onLoadMore={handleLoadMore}

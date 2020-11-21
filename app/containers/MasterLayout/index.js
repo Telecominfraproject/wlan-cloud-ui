@@ -6,7 +6,7 @@ import { AppLayout as Layout } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { GET_ALARM_COUNT } from 'graphql/queries';
 
-import { AUTH_TOKEN } from 'constants/index';
+import { AUTH_TOKEN, ROUTES } from 'constants/index';
 
 import { removeItem } from 'utils/localStorage';
 
@@ -30,59 +30,40 @@ const MasterLayout = ({ children }) => {
   const menuItems = [
     {
       key: 'dashboard',
-      path: '/dashboard',
+      path: ROUTES.dashboard,
       text: 'Dashboard',
     },
     {
       key: 'network',
-      path: '/network',
+      path: ROUTES.network,
       text: 'Network',
     },
     {
       key: 'profiles',
-      path: '/profiles',
+      path: ROUTES.profiles,
       text: 'Profiles',
     },
     {
       key: 'system',
-      path: '/system',
+      path: ROUTES.system,
       text: 'System',
     },
   ];
 
   const mobileMenuItems = [
-    {
-      key: 'dashboard',
-      path: '/dashboard',
-      text: 'Dashboard',
-    },
-    {
-      key: 'network',
-      path: '/network',
-      text: 'Network',
-    },
-    {
-      key: 'profiles',
-      path: '/profiles',
-      text: 'Profiles',
-    },
-    {
-      key: 'system',
-      path: '/system',
-      text: 'System',
-    },
+    ...menuItems,
     {
       key: 'settings',
       text: 'Settings',
       children: [
         {
           key: 'editAccount',
-          path: '/account/edit',
+          path: ROUTES.account,
           text: 'Edit Account',
         },
         {
           key: 'logout',
-          path: '/',
+          path: ROUTES.root,
           text: 'Log Out',
         },
       ],
@@ -91,14 +72,14 @@ const MasterLayout = ({ children }) => {
 
   if (role === 'SuperUser') {
     menuItems.push({
-      key: 'accounts',
-      path: '/accounts',
-      text: 'Accounts',
+      key: 'users',
+      path: ROUTES.users,
+      text: 'Users',
     });
     mobileMenuItems.push({
-      key: 'accounts',
-      path: '/accounts',
-      text: 'Accounts',
+      key: 'users',
+      path: ROUTES.users,
+      text: 'Users',
     });
   }
 

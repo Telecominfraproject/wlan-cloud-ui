@@ -4,6 +4,7 @@ import { useMutation, useQuery, gql } from '@apollo/client';
 import { notification } from 'antd';
 import { useHistory } from 'react-router-dom';
 
+import { ROUTES } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
 import { updateQueryGetAllProfiles } from 'graphql/functions';
@@ -55,7 +56,7 @@ const AddProfile = () => {
           message: 'Success',
           description: 'Profile successfully created.',
         });
-        history.push('/profiles', { refetch: true });
+        history.push(ROUTES.profiles, { refetch: true });
       })
       .catch(() =>
         notification.error({
