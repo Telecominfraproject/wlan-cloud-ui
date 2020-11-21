@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Switch, Redirect } from 'react-router-dom';
 
-import { ThemeProvider } from '@tip-wlan/wlan-cloud-ui-library';
+import { ThemeProvider, GenericNotFound } from '@tip-wlan/wlan-cloud-ui-library';
 
 import logo from 'images/tip-logo.png';
 import logoMobile from 'images/tip-logo-mobile.png';
@@ -90,6 +90,7 @@ const App = () => {
           {user.role === 'SuperUser' && (
             <ProtectedRouteWithLayout exact path={ROUTES.users} component={Accounts} />
           )}
+          <ProtectedRouteWithLayout component={GenericNotFound} />
         </Switch>
       </ThemeProvider>
     </UserProvider>
