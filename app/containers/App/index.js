@@ -42,7 +42,7 @@ const App = () => {
   let initialUser = {};
   if (token) {
     const { userId, userName, userRole, customerId } = parseJwt(token.access_token);
-    initialUser = { id: userId, email: userName, role: userRole, customerId };
+    initialUser = { id: userId, email: userName, roles: userRole, customerId };
   }
   const [user, setUser] = useState(initialUser);
 
@@ -50,7 +50,7 @@ const App = () => {
     setItem(AUTH_TOKEN, newToken);
     if (newToken) {
       const { userId, userName, userRole, customerId } = parseJwt(newToken.access_token);
-      setUser({ id: userId, email: userName, role: userRole, customerId });
+      setUser({ id: userId, email: userName, roles: userRole, customerId });
     }
   };
 
@@ -60,7 +60,7 @@ const App = () => {
     <UserProvider
       id={user.id}
       email={user.email}
-      role={user.role}
+      roles={user.roles}
       customerId={user.customerId}
       updateUser={updateUser}
       updateToken={updateToken}
@@ -87,7 +87,7 @@ const App = () => {
 
           <ProtectedRouteWithLayout exact path={ROUTES.alarms} component={Alarms} />
           <ProtectedRouteWithLayout exact path={ROUTES.account} component={EditAccount} />
-          {user.role === 'SuperUser' && (
+          {user?.roles?.[0] === 'SuperUser' && (
             <ProtectedRouteWithLayout exact path={ROUTES.users} component={Accounts} />
           )}
           <ProtectedRouteWithLayout component={GenericNotFound} />

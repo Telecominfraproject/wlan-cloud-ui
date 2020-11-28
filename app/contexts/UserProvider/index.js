@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import UserContext from 'contexts/UserContext';
 
-const UserProvider = ({ children, id, email, role, customerId, updateUser, updateToken }) => (
-  <UserContext.Provider value={{ id, email, role, customerId, updateUser, updateToken }}>
+const UserProvider = ({ children, id, email, roles, customerId, updateUser, updateToken }) => (
+  <UserContext.Provider value={{ id, email, roles, customerId, updateUser, updateToken }}>
     {children}
   </UserContext.Provider>
 );
@@ -15,14 +15,14 @@ UserProvider.propTypes = {
   updateToken: PropTypes.func.isRequired,
   id: PropTypes.number,
   email: PropTypes.string,
-  role: PropTypes.string,
+  roles: PropTypes.instanceOf(Array),
   customerId: PropTypes.number,
 };
 
 UserProvider.defaultProps = {
   id: null,
   email: null,
-  role: null,
+  roles: [],
   customerId: null,
 };
 
