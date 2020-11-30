@@ -38,6 +38,9 @@ const AddProfile = () => {
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
   });
+  const { data: rfProfiles, fetchMore: fetchMoreRfProfiles } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'rf' },
+  });
   const [createProfile] = useMutation(CREATE_PROFILE);
   const history = useHistory();
 
@@ -84,13 +87,35 @@ const AddProfile = () => {
     return true;
   };
 
+  const handleFetchRfProfiles = e => {
+    if (rfProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreRfProfiles({
+        variables: { context: { ...rfProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
   return (
     <AddProfilePage
       onCreateProfile={handleAddProfile}
       ssidProfiles={
         (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
       }
+      rfProfiles={
+        (rfProfiles && rfProfiles.getAllProfiles && rfProfiles.getAllProfiles.items) || []
+      }
       onFetchMoreProfiles={handleFetchProfiles}
+      onFetchMoreRfProfiles={handleFetchRfProfiles}
     />
   );
 };

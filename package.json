@@ -11,7 +11,7 @@
     "test": "jest --passWithNoTests --coverage",
     "start": "cross-env NODE_ENV=development webpack-dev-server",
     "start:bare": "cross-env API=https://wlan-graphql.zone3.lab.connectus.ai NODE_ENV=bare webpack-dev-server",
-    "start:dev": "cross-env API=https://wlan-graphql.zone3.lab.connectus.ai NODE_ENV=development webpack-dev-server",
+    "start:dev": "cross-env API=https://wlan-graphql.qa.lab.wlan.tip.build NODE_ENV=development webpack-dev-server",
     "build": "webpack --mode=production",
     "format": "prettier --write 'app/**/*{.js,.scss}'",
     "eslint-fix": "eslint --fix 'app/**/*.js'",
