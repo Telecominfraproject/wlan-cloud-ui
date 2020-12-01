@@ -108,12 +108,8 @@ const AddProfile = () => {
   return (
     <AddProfilePage
       onCreateProfile={handleAddProfile}
-      ssidProfiles={
-        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
-      }
-      rfProfiles={
-        (rfProfiles && rfProfiles.getAllProfiles && rfProfiles.getAllProfiles.items) || []
-      }
+      ssidProfiles={ssidProfiles?.getAllProfiles?.items}
+      rfProfiles={rfProfiles?.getAllProfiles?.items}
       onFetchMoreProfiles={handleFetchProfiles}
       onFetchMoreRfProfiles={handleFetchRfProfiles}
     />

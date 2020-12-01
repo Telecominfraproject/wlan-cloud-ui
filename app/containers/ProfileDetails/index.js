@@ -261,12 +261,8 @@ const ProfileDetails = () => {
       childProfileIds={data.getProfile.childProfileIds}
       onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
-      ssidProfiles={
-        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
-      }
-      rfProfiles={
-        (rfProfiles && rfProfiles.getAllProfiles && rfProfiles.getAllProfiles.items) || []
-      }
+      ssidProfiles={ssidProfiles?.getAllProfiles?.items}
+      rfProfiles={rfProfiles?.getAllProfiles?.items}
       radiusProfiles={radiusProfiles?.getAllProfiles?.items}
       captiveProfiles={captiveProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
