@@ -258,6 +258,7 @@ const ProfileDetails = () => {
       name={data.getProfile.name}
       profileType={data.getProfile.profileType}
       details={data.getProfile.details}
+      childProfiles={data.getProfile.childProfiles}
       childProfileIds={data.getProfile.childProfileIds}
       onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
