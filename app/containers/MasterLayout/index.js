@@ -13,7 +13,7 @@ import { removeItem } from 'utils/localStorage';
 import UserContext from 'contexts/UserContext';
 
 const MasterLayout = ({ children }) => {
-  const { role, customerId } = useContext(UserContext);
+  const { roles, customerId } = useContext(UserContext);
 
   const client = useApolloClient();
   const location = useLocation();
@@ -70,7 +70,7 @@ const MasterLayout = ({ children }) => {
     },
   ];
 
-  if (role === 'SuperUser') {
+  if (roles?.[0] === 'SuperUser') {
     menuItems.push({
       key: 'users',
       path: ROUTES.users,

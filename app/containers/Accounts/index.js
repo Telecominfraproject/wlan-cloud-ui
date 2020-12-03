@@ -12,7 +12,7 @@ const GET_ALL_USERS = gql`
       items {
         id
         email: username
-        role
+        roles
         lastModifiedTimestamp
         customerId
       }
@@ -22,10 +22,10 @@ const GET_ALL_USERS = gql`
 `;
 
 const CREATE_USER = gql`
-  mutation CreateUser($username: String!, $password: String!, $role: String!, $customerId: ID!) {
-    createUser(username: $username, password: $password, role: $role, customerId: $customerId) {
+  mutation CreateUser($username: String!, $password: String!, $roles: [String], $customerId: ID!) {
+    createUser(username: $username, password: $password, roles: $roles, customerId: $customerId) {
       username
-      role
+      roles
       customerId
     }
   }
@@ -36,7 +36,7 @@ const UPDATE_USER = gql`
     $id: ID!
     $username: String!
     $password: String!
-    $role: String!
+    $roles: [String]
     $customerId: ID!
     $lastModifiedTimestamp: String
   ) {
@@ -44,13 +44,13 @@ const UPDATE_USER = gql`
       id: $id
       username: $username
       password: $password
-      role: $role
+      roles: $roles
       customerId: $customerId
       lastModifiedTimestamp: $lastModifiedTimestamp
     ) {
       id
       username
-      role
+      roles
       customerId
       lastModifiedTimestamp
     }
@@ -95,12 +95,12 @@ const Accounts = () => {
     }
   };
 
-  const handleCreateUser = (email, password, role) => {
+  const handleCreateUser = (email, password, roles) => {
     createUser({
       variables: {
         username: email,
         password,
-        role,
+        roles: [roles],
         customerId,
       },
     })
@@ -119,13 +119,13 @@ const Accounts = () => {
       );
   };
 
-  const handleEditUser = (id, email, password, role, lastModifiedTimestamp) => {
+  const handleEditUser = (id, email, password, roles, lastModifiedTimestamp) => {
     updateUser({
       variables: {
         id,
         username: email,
         password,
-        role,
+        roles: [roles],
         customerId,
         lastModifiedTimestamp,
       },
