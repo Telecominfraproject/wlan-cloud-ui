@@ -98,6 +98,10 @@ const ProfileDetails = () => {
     }
   );
 
+  const { data: rfProfiles, fetchMore: fetchMoreRfProfiles } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'rf' },
+  });
+
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
 
@@ -217,6 +221,24 @@ const ProfileDetails = () => {
     return true;
   };
 
+  const handleFetchRfProfiles = e => {
+    if (rfProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreRfProfiles({
+        variables: { context: { ...rfProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -236,16 +258,17 @@ const ProfileDetails = () => {
       name={data.getProfile.name}
       profileType={data.getProfile.profileType}
       details={data.getProfile.details}
+      childProfiles={data.getProfile.childProfiles}
       childProfileIds={data.getProfile.childProfileIds}
       onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
-      ssidProfiles={
-        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
-      }
+      ssidProfiles={ssidProfiles?.getAllProfiles?.items}
+      rfProfiles={rfProfiles?.getAllProfiles?.items}
       radiusProfiles={radiusProfiles?.getAllProfiles?.items}
       captiveProfiles={captiveProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchProfiles}
+      onFetchMoreRfProfiles={handleFetchRfProfiles}
       onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
       onFetchMoreCaptiveProfiles={handleFetchCaptiveProfiles}
     />
