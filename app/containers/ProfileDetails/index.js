@@ -308,6 +308,7 @@ const ProfileDetails = () => {
       profileType={data.getProfile.profileType}
       details={data.getProfile.details}
       childProfileIds={data.getProfile.childProfileIds}
+      childProfiles={data.getProfile.childProfiles}
       onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
       ssidProfiles={
