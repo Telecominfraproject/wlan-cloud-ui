@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { useMutation, useQuery, gql } from '@apollo/client';
-import { notification, Alert } from 'antd';
-import { EditAccount as EditAccountPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
-import { Redirect } from 'react-router-dom';
+import { useMutation, gql } from '@apollo/client';
+import { notification } from 'antd';
+import { EditAccount as EditAccountPage } from '@tip-wlan/wlan-cloud-ui-library';
+import { withQuery } from 'containers/QueryWrapper';
 
 import UserContext from 'contexts/UserContext';
 
@@ -44,51 +44,45 @@ const UPDATE_USER = gql`
   }
 `;
 
-const EditAccount = () => {
-  const { id, email } = useContext(UserContext);
-  const { loading, error, data } = useQuery(GET_USER, { variables: { id } });
-  const [updateUser] = useMutation(UPDATE_USER);
+const EditAccount = withQuery(
+  ({ data }) => {
+    const { id, email } = useContext(UserContext);
+    const [updateUser] = useMutation(UPDATE_USER);
 
-  const handleSubmit = newPassword => {
-    const { role, customerId, lastModifiedTimestamp } = data.getUser;
+    const handleSubmit = newPassword => {
+      const { role, customerId, lastModifiedTimestamp } = data.getUser;
 
-    updateUser({
-      variables: {
-        id,
-        username: email,
-        password: newPassword,
-        role,
-        customerId,
-        lastModifiedTimestamp,
-      },
-    })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'Password successfully updated.',
-        });
+      updateUser({
+        variables: {
+          id,
+          username: email,
+          password: newPassword,
+          role,
+          customerId,
+          lastModifiedTimestamp,
+        },
       })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Password could not be updated.',
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Password successfully updated.',
+          });
         })
-      );
-  };
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Password could not be updated.',
+          })
+        );
+    };
 
-  if (loading) {
-    return <Loading />;
+    return <EditAccountPage onSubmit={handleSubmit} email={email} />;
+  },
+  GET_USER,
+  () => {
+    const { id } = useContext(UserContext);
+    return { id };
   }
-
-  if (error) {
-    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
-      return <Redirect to="/login" />;
-    }
-
-    return <Alert message="Error" description="Failed to load User." type="error" showIcon />;
-  }
-
-  return <EditAccountPage onSubmit={handleSubmit} email={email} />;
-};
+);
 
 export default EditAccount;

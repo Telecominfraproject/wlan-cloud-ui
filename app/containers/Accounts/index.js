@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
-import { useQuery, useMutation, gql } from '@apollo/client';
-import { Alert, notification } from 'antd';
-import { Redirect } from 'react-router-dom';
+import { useMutation, gql } from '@apollo/client';
+import { notification } from 'antd';
 
-import { Accounts as AccountsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { Accounts as AccountsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
+import { withQuery } from 'containers/QueryWrapper';
 
 const GET_ALL_USERS = gql`
   query GetAllUsers($customerId: ID!, $context: JSONObject) {
@@ -66,124 +66,117 @@ const DELETE_USER = gql`
   }
 `;
 
-const Accounts = () => {
-  const { customerId } = useContext(UserContext);
+const Accounts = withQuery(
+  ({ data, fetchMore, refetch }) => {
+    const { customerId } = useContext(UserContext);
 
-  const { data, loading, error, refetch, fetchMore } = useQuery(GET_ALL_USERS, {
-    variables: { customerId },
-  });
-  const [createUser] = useMutation(CREATE_USER);
-  const [updateUser] = useMutation(UPDATE_USER);
-  const [deleteUser] = useMutation(DELETE_USER);
+    const [createUser] = useMutation(CREATE_USER);
+    const [updateUser] = useMutation(UPDATE_USER);
+    const [deleteUser] = useMutation(DELETE_USER);
 
-  const handleLoadMore = () => {
-    if (!data.getAllUsers.context.lastPage) {
-      fetchMore({
-        variables: { context: data.getAllUsers.context },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllUsers;
-          const newItems = fetchMoreResult.getAllUsers.items;
+    const handleLoadMore = () => {
+      if (!data.getAllUsers.context.lastPage) {
+        fetchMore({
+          variables: { context: data.getAllUsers.context },
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            const previousEntry = previousResult.getAllUsers;
+            const newItems = fetchMoreResult.getAllUsers.items;
 
-          return {
-            getAllUsers: {
-              context: fetchMoreResult.getAllUsers.context,
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
+            return {
+              getAllUsers: {
+                context: fetchMoreResult.getAllUsers.context,
+                items: [...previousEntry.items, ...newItems],
+                __typename: previousEntry.__typename,
+              },
+            };
+          },
+        });
+      }
+    };
+
+    const handleCreateUser = (email, password, role) => {
+      createUser({
+        variables: {
+          username: email,
+          password,
+          role,
+          customerId,
         },
-      });
-    }
-  };
-
-  const handleCreateUser = (email, password, role) => {
-    createUser({
-      variables: {
-        username: email,
-        password,
-        role,
-        customerId,
-      },
-    })
-      .then(() => {
-        refetch();
-        notification.success({
-          message: 'Success',
-          description: 'Account successfully created.',
-        });
       })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Account could not be created.',
+        .then(() => {
+          refetch();
+          notification.success({
+            message: 'Success',
+            description: 'Account successfully created.',
+          });
         })
-      );
-  };
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Account could not be created.',
+          })
+        );
+    };
 
-  const handleEditUser = (id, email, password, role, lastModifiedTimestamp) => {
-    updateUser({
-      variables: {
-        id,
-        username: email,
-        password,
-        role,
-        customerId,
-        lastModifiedTimestamp,
-      },
-    })
-      .then(() => {
-        refetch();
-        notification.success({
-          message: 'Success',
-          description: 'Account successfully updated.',
-        });
+    const handleEditUser = (id, email, password, role, lastModifiedTimestamp) => {
+      updateUser({
+        variables: {
+          id,
+          username: email,
+          password,
+          role,
+          customerId,
+          lastModifiedTimestamp,
+        },
       })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Account could not be updated.',
+        .then(() => {
+          refetch();
+          notification.success({
+            message: 'Success',
+            description: 'Account successfully updated.',
+          });
         })
-      );
-  };
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Account could not be updated.',
+          })
+        );
+    };
 
-  const handleDeleteUser = id => {
-    deleteUser({ variables: { id } })
-      .then(() => {
-        refetch();
-        notification.success({
-          message: 'Success',
-          description: 'Account successfully deleted.',
-        });
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Account could not be deleted.',
+    const handleDeleteUser = id => {
+      deleteUser({ variables: { id } })
+        .then(() => {
+          refetch();
+          notification.success({
+            message: 'Success',
+            description: 'Account successfully deleted.',
+          });
         })
-      );
-  };
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Account could not be deleted.',
+          })
+        );
+    };
 
-  if (loading) {
-    return <Loading />;
+    return (
+      <AccountsPage
+        data={data.getAllUsers.items}
+        onLoadMore={handleLoadMore}
+        onCreateUser={handleCreateUser}
+        onEditUser={handleEditUser}
+        onDeleteUser={handleDeleteUser}
+        isLastPage={data.getAllUsers.context.lastPage}
+      />
+    );
+  },
+  GET_ALL_USERS,
+  () => {
+    const { customerId } = useContext(UserContext);
+    return { customerId };
   }
+);
 
-  if (error) {
-    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
-      return <Redirect to="/login" />;
-    }
-
-    return <Alert message="Error" description="Failed to load Users." type="error" showIcon />;
-  }
-
-  return (
-    <AccountsPage
-      data={data.getAllUsers.items}
-      onLoadMore={handleLoadMore}
-      onCreateUser={handleCreateUser}
-      onEditUser={handleEditUser}
-      onDeleteUser={handleDeleteUser}
-      isLastPage={data.getAllUsers.context.lastPage}
-    />
-  );
-};
 export default Accounts;

@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
-import { useQuery, gql } from '@apollo/client';
-import { Alert, notification } from 'antd';
-import { Alarms as AlarmsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
-import { Redirect } from 'react-router-dom';
+import { gql } from '@apollo/client';
+import { notification } from 'antd';
+import { Alarms as AlarmsPage } from '@tip-wlan/wlan-cloud-ui-library';
+import { withQuery } from 'containers/QueryWrapper';
 
 import UserContext from 'contexts/UserContext';
 
@@ -24,69 +24,58 @@ const GET_ALL_ALARMS = gql`
   }
 `;
 
-const Alarms = () => {
-  const { customerId } = useContext(UserContext);
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ALL_ALARMS, {
-    variables: { customerId },
-    errorPolicy: 'all',
-  });
-
-  const handleOnReload = () => {
-    refetch()
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'Alarms reloaded.',
-        });
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Alarms could not be reloaded.',
+const Alarms = withQuery(
+  ({ data, refetch, fetchMore }) => {
+    const handleOnReload = () => {
+      refetch()
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Alarms reloaded.',
+          });
         })
-      );
-  };
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Alarms could not be reloaded.',
+          })
+        );
+    };
 
-  const handleLoadMore = () => {
-    if (!data.getAllAlarms.context.lastPage) {
-      fetchMore({
-        variables: { context: data.getAllAlarms.context },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          const previousEntry = previousResult.getAllAlarms;
-          const newItems = fetchMoreResult.getAllAlarms.items;
+    const handleLoadMore = () => {
+      if (!data.getAllAlarms.context.lastPage) {
+        fetchMore({
+          variables: { context: data.getAllAlarms.context },
+          updateQuery: (previousResult, { fetchMoreResult }) => {
+            const previousEntry = previousResult.getAllAlarms;
+            const newItems = fetchMoreResult.getAllAlarms.items;
 
-          return {
-            getAllAlarms: {
-              context: fetchMoreResult.getAllAlarms.context,
-              items: [...previousEntry.items, ...newItems],
-              __typename: previousEntry.__typename,
-            },
-          };
-        },
-      });
-    }
-  };
+            return {
+              getAllAlarms: {
+                context: fetchMoreResult.getAllAlarms.context,
+                items: [...previousEntry.items, ...newItems],
+                __typename: previousEntry.__typename,
+              },
+            };
+          },
+        });
+      }
+    };
 
-  if (loading) {
-    return <Loading />;
+    return (
+      <AlarmsPage
+        data={data.getAllAlarms.items}
+        onReload={handleOnReload}
+        onLoadMore={handleLoadMore}
+        isLastPage={data.getAllAlarms.context.lastPage}
+      />
+    );
+  },
+  GET_ALL_ALARMS,
+  () => {
+    const { customerId } = useContext(UserContext);
+    return { customerId, errorPolicy: 'all' };
   }
-
-  if (error && !data?.getAllAlarms?.items) {
-    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
-      return <Redirect to="/login" />;
-    }
-
-    return <Alert message="Error" description="Failed to load alarms." type="error" showIcon />;
-  }
-
-  return (
-    <AlarmsPage
-      data={data.getAllAlarms.items}
-      onReload={handleOnReload}
-      onLoadMore={handleLoadMore}
-      isLastPage={data.getAllAlarms.context.lastPage}
-    />
-  );
-};
+);
 
 export default Alarms;

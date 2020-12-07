@@ -1,13 +1,14 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
-import { Alert, notification } from 'antd';
-import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { notification } from 'antd';
+import { ProfileDetails as ProfileDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
 import { FILE_UPLOAD } from 'graphql/mutations';
 import { updateQueryGetAllProfiles } from 'graphql/functions';
+import { withQuery } from 'containers/QueryWrapper';
 
 const GET_PROFILE = gql`
   query GetProfile($id: ID!) {
@@ -68,191 +69,179 @@ const DELETE_PROFILE = gql`
   }
 `;
 
-const ProfileDetails = () => {
-  const { customerId } = useContext(UserContext);
-  const { id } = useParams();
+const ProfileDetails = withQuery(
+  ({ data }) => {
+    const { customerId } = useContext(UserContext);
+    const { id } = useParams();
 
-  const [redirect, setRedirect] = useState(false);
+    const [redirect, setRedirect] = useState(false);
 
-  const { loading, error, data } = useQuery(GET_PROFILE, {
-    variables: { id },
-    fetchPolicy: 'network-only',
-  });
+    const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
+      variables: { customerId, type: 'ssid' },
+    });
 
-  const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
-    variables: { customerId, type: 'ssid' },
-  });
+    const { data: radiusProfiles, fetchMore: fetchMoreRadiusProfiles } = useQuery(
+      GET_ALL_PROFILES(),
+      {
+        variables: { customerId, type: 'radius' },
+      }
+    );
 
-  const { data: radiusProfiles, fetchMore: fetchMoreRadiusProfiles } = useQuery(
-    GET_ALL_PROFILES(),
-    {
-      variables: { customerId, type: 'radius' },
-    }
-  );
+    const { data: captiveProfiles, fetchMore: fetchMoreCaptiveProfiles } = useQuery(
+      GET_ALL_PROFILES(),
+      {
+        variables: { customerId, type: 'captive_portal' },
+      }
+    );
 
-  const { data: captiveProfiles, fetchMore: fetchMoreCaptiveProfiles } = useQuery(
-    GET_ALL_PROFILES(),
-    {
-      variables: { customerId, type: 'captive_portal' },
-    }
-  );
+    const [updateProfile] = useMutation(UPDATE_PROFILE);
+    const [deleteProfile] = useMutation(DELETE_PROFILE);
 
-  const [updateProfile] = useMutation(UPDATE_PROFILE);
-  const [deleteProfile] = useMutation(DELETE_PROFILE);
+    const [fileUpload] = useMutation(FILE_UPLOAD);
 
-  const [fileUpload] = useMutation(FILE_UPLOAD);
+    const handleDeleteProfile = () => {
+      deleteProfile({ variables: { id } })
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Profile successfully deleted.',
+          });
 
-  const handleDeleteProfile = () => {
-    deleteProfile({ variables: { id } })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'Profile successfully deleted.',
-        });
-
-        setRedirect(true);
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Profile could not be deleted.',
+          setRedirect(true);
         })
-      );
-  };
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Profile could not be deleted.',
+          })
+        );
+    };
 
-  const handleUpdateProfile = (
-    name,
-    details,
-    childProfileIds = data.getProfile.childProfileIds
-  ) => {
-    updateProfile({
-      variables: {
-        ...data.getProfile,
-        name,
-        childProfileIds,
-        details,
-      },
-    })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'Profile successfully updated.',
-        });
+    const handleUpdateProfile = (
+      name,
+      details,
+      childProfileIds = data.getProfile.childProfileIds
+    ) => {
+      updateProfile({
+        variables: {
+          ...data.getProfile,
+          name,
+          childProfileIds,
+          details,
+        },
       })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Profile could not be updated.',
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'Profile successfully updated.',
+          });
         })
-      );
-  };
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Profile could not be updated.',
+          })
+        );
+    };
 
-  const handleFileUpload = (fileName, file) =>
-    fileUpload({ variables: { fileName, file } })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'File successfully uploaded.',
+    const handleFileUpload = (fileName, file) =>
+      fileUpload({ variables: { fileName, file } })
+        .then(() => {
+          notification.success({
+            message: 'Success',
+            description: 'File successfully uploaded.',
+          });
+        })
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'File could not be uploaded.',
+          })
+        );
+
+    const handleFetchProfiles = e => {
+      if (ssidProfiles.getAllProfiles.context.lastPage) {
+        return false;
+      }
+
+      e.persist();
+      const { target } = e;
+
+      if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+        fetchMore({
+          variables: { context: { ...ssidProfiles.getAllProfiles.context } },
+          updateQuery: updateQueryGetAllProfiles,
         });
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'File could not be uploaded.',
-        })
-      );
+      }
 
-  const handleFetchProfiles = e => {
-    if (ssidProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
+      return true;
+    };
 
-    e.persist();
-    const { target } = e;
+    const handleFetchRadiusProfiles = e => {
+      if (radiusProfiles.getAllProfiles.context.lastPage) {
+        return false;
+      }
 
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMore({
-        variables: { context: { ...ssidProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
+      e.persist();
+      const { target } = e;
 
-    return true;
-  };
+      if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+        fetchMoreRadiusProfiles({
+          variables: { context: { ...radiusProfiles.getAllProfiles.context } },
+          updateQuery: updateQueryGetAllProfiles,
+        });
+      }
 
-  const handleFetchRadiusProfiles = e => {
-    if (radiusProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
+      return true;
+    };
 
-    e.persist();
-    const { target } = e;
+    const handleFetchCaptiveProfiles = e => {
+      if (captiveProfiles.getAllProfiles.context.lastPage) {
+        return false;
+      }
 
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreRadiusProfiles({
-        variables: { context: { ...radiusProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
+      e.persist();
+      const { target } = e;
 
-    return true;
-  };
+      if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+        fetchMoreCaptiveProfiles({
+          variables: { context: { ...captiveProfiles.getAllProfiles.context } },
+          updateQuery: updateQueryGetAllProfiles,
+        });
+      }
 
-  const handleFetchCaptiveProfiles = e => {
-    if (captiveProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
+      return true;
+    };
 
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreCaptiveProfiles({
-        variables: { context: { ...captiveProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
-  };
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
-      return <Redirect to="/login" />;
+    if (redirect) {
+      return <Redirect to="/profiles" />;
     }
 
     return (
-      <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
+      <ProfileDetailsPage
+        name={data.getProfile.name}
+        profileType={data.getProfile.profileType}
+        details={data.getProfile.details}
+        childProfileIds={data.getProfile.childProfileIds}
+        onDeleteProfile={handleDeleteProfile}
+        onUpdateProfile={handleUpdateProfile}
+        ssidProfiles={
+          (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
+        }
+        radiusProfiles={radiusProfiles?.getAllProfiles?.items}
+        captiveProfiles={captiveProfiles?.getAllProfiles?.items}
+        fileUpload={handleFileUpload}
+        onFetchMoreProfiles={handleFetchProfiles}
+        onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
+        onFetchMoreCaptiveProfiles={handleFetchCaptiveProfiles}
+      />
     );
+  },
+  GET_PROFILE,
+  () => {
+    const { id } = useParams();
+    return { id, fetchPolicy: 'network-only' };
   }
-
-  if (redirect) {
-    return <Redirect to="/profiles" />;
-  }
-
-  return (
-    <ProfileDetailsPage
-      name={data.getProfile.name}
-      profileType={data.getProfile.profileType}
-      details={data.getProfile.details}
-      childProfileIds={data.getProfile.childProfileIds}
-      onDeleteProfile={handleDeleteProfile}
-      onUpdateProfile={handleUpdateProfile}
-      ssidProfiles={
-        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
-      }
-      radiusProfiles={radiusProfiles?.getAllProfiles?.items}
-      captiveProfiles={captiveProfiles?.getAllProfiles?.items}
-      fileUpload={handleFileUpload}
-      onFetchMoreProfiles={handleFetchProfiles}
-      onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
-      onFetchMoreCaptiveProfiles={handleFetchCaptiveProfiles}
-    />
-  );
-};
+);
 
 export default ProfileDetails;
