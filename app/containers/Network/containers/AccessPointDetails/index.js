@@ -1,13 +1,10 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useParams, Redirect } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
-import { Alert, notification } from 'antd';
+import { notification } from 'antd';
 import moment from 'moment';
-import {
-  AccessPointDetails as AccessPointDetailsPage,
-  Loading,
-} from '@tip-wlan/wlan-cloud-ui-library';
+import { AccessPointDetails as AccessPointDetailsPage } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE, GET_ALL_PROFILES } from 'graphql/queries';
 import {
@@ -17,6 +14,7 @@ import {
 } from 'graphql/mutations';
 import { updateQueryGetAllProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
+import { withQuery } from 'containers/QueryWrapper';
 
 const GET_EQUIPMENT = gql`
   query GetEquipment($id: ID!) {
@@ -126,240 +124,222 @@ const UPDATE_EQUIPMENT = gql`
 const toTime = moment();
 const fromTime = moment().subtract(1, 'hour');
 
-const AccessPointDetails = ({ locations }) => {
-  const { id } = useParams();
-  const { customerId } = useContext(UserContext);
+const AccessPointDetails = withQuery(
+  ({ data, refetch, locations }) => {
+    const { id } = useParams();
+    const { customerId } = useContext(UserContext);
 
-  const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
-    variables: {
-      id,
-    },
-  });
+    const { data: dataFirmware, error: errorFirmware, loading: loadingFirmware } = useQuery(
+      GET_ALL_FIRMWARE,
+      {
+        skip: !data?.getEquipment?.model,
+        variables: { modelId: data?.getEquipment?.model },
+      }
+    );
 
-  const { data: dataFirmware, error: errorFirmware, loading: loadingFirmware } = useQuery(
-    GET_ALL_FIRMWARE,
-    {
-      skip: !data?.getEquipment?.model,
-      variables: { modelId: data?.getEquipment?.model },
-    }
-  );
-
-  const {
-    data: dataProfiles,
-    error: errorProfiles,
-    loading: loadingProfiles,
-    fetchMore,
-  } = useQuery(
-    GET_ALL_PROFILES(`
+    const {
+      data: dataProfiles,
+      error: errorProfiles,
+      loading: loadingProfiles,
+      fetchMore,
+    } = useQuery(
+      GET_ALL_PROFILES(`
     childProfiles {
       id
       name
       details
     }`),
-    {
-      variables: { customerId, type: 'equipment_ap' },
-    }
-  );
+      {
+        variables: { customerId, type: 'equipment_ap' },
+      }
+    );
 
-  const {
-    loading: metricsLoading,
-    error: metricsError,
-    data: metricsData,
-    refetch: metricsRefetch,
-  } = useQuery(FILTER_SERVICE_METRICS, {
-    variables: {
-      customerId,
-      fromTime: fromTime.valueOf().toString(),
-      toTime: toTime.valueOf().toString(),
-      equipmentIds: [id],
-      dataTypes: ['ApNode'],
-      limit: 100,
-    },
-  });
-
-  const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
-  const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
-  const [requestEquipmentSwitchBank] = useMutation(REQUEST_EQUIPMENT_SWITCH_BANK);
-  const [requestEquipmentReboot] = useMutation(REQUEST_EQUIPMENT_REBOOT);
-
-  const refetchData = () => {
-    refetch();
-    metricsRefetch();
-  };
-
-  const handleUpdateEquipment = (
-    equipmentId,
-    equipmentType,
-    inventoryId,
-    custId,
-    profileId,
-    locationId,
-    name,
-    latitude,
-    longitude,
-    serial,
-    lastModifiedTimestamp,
-    details
-  ) => {
-    updateEquipment({
+    const {
+      loading: metricsLoading,
+      error: metricsError,
+      data: metricsData,
+      refetch: metricsRefetch,
+    } = useQuery(FILTER_SERVICE_METRICS, {
       variables: {
-        id: equipmentId,
-        equipmentType,
-        inventoryId,
-        customerId: custId,
-        profileId,
-        locationId,
-        name,
-        latitude,
-        longitude,
-        serial,
-        lastModifiedTimestamp,
-        details,
+        customerId,
+        fromTime: fromTime.valueOf().toString(),
+        toTime: toTime.valueOf().toString(),
+        equipmentIds: [id],
+        dataTypes: ['ApNode'],
+        limit: 100,
       },
-    })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'Equipment settings successfully updated.',
-        });
+    });
+
+    const [updateEquipment] = useMutation(UPDATE_EQUIPMENT);
+    const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
+    const [requestEquipmentSwitchBank] = useMutation(REQUEST_EQUIPMENT_SWITCH_BANK);
+    const [requestEquipmentReboot] = useMutation(REQUEST_EQUIPMENT_REBOOT);
+
+    const refetchData = () => {
+      refetch();
+      metricsRefetch();
+    };
+
+    const handleUpdateEquipment = (
+      equipmentId,
+      equipmentType,
+      inventoryId,
+      custId,
+      profileId,
+      locationId,
+      name,
+      latitude,
+      longitude,
+      serial,
+      lastModifiedTimestamp,
+      details
+    ) => {
+      updateEquipment({
+        variables: {
+          id: equipmentId,
+          equipmentType,
+          inventoryId,
+          customerId: custId,
+          profileId,
+          locationId,
+          name,
+          latitude,
+          longitude,
+          serial,
+          lastModifiedTimestamp,
+          details,
+        },
       })
-
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Equipment settings could not be updated.',
-        })
-      );
-  };
-
-  const handleUpdateEquipmentFirmware = (equipmentId, firmwareVersionId) =>
-    updateEquipmentFirmware({ variables: { equipmentId, firmwareVersionId } })
-      .then(firmwareResp => {
-        if (firmwareResp?.data?.updateEquipmentFirmware?.success === true) {
+        .then(() => {
           notification.success({
             message: 'Success',
-            description: 'Equipment Firmware Upgrade in progress',
+            description: 'Equipment settings successfully updated.',
           });
-        } else {
+        })
+
+        .catch(() =>
+          notification.error({
+            message: 'Error',
+            description: 'Equipment settings could not be updated.',
+          })
+        );
+    };
+
+    const handleUpdateEquipmentFirmware = (equipmentId, firmwareVersionId) =>
+      updateEquipmentFirmware({ variables: { equipmentId, firmwareVersionId } })
+        .then(firmwareResp => {
+          if (firmwareResp?.data?.updateEquipmentFirmware?.success === true) {
+            notification.success({
+              message: 'Success',
+              description: 'Equipment Firmware Upgrade in progress',
+            });
+          } else {
+            notification.error({
+              message: 'Error',
+              description: 'Equipment Firmware Upgrade could not be updated.',
+            });
+          }
+        })
+        .catch(() =>
           notification.error({
             message: 'Error',
             description: 'Equipment Firmware Upgrade could not be updated.',
-          });
-        }
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Equipment Firmware Upgrade could not be updated.',
-        })
-      );
+          })
+        );
 
-  const handleRequestEquipmentSwitchBank = equipmentId =>
-    requestEquipmentSwitchBank({ variables: { equipmentId } })
-      .then(firmwareResp => {
-        if (firmwareResp?.data?.requestEquipmentSwitchBank?.success === true) {
-          notification.success({
-            message: 'Success',
-            description: 'Equipment Firmware in progress',
-          });
-        } else {
+    const handleRequestEquipmentSwitchBank = equipmentId =>
+      requestEquipmentSwitchBank({ variables: { equipmentId } })
+        .then(firmwareResp => {
+          if (firmwareResp?.data?.requestEquipmentSwitchBank?.success === true) {
+            notification.success({
+              message: 'Success',
+              description: 'Equipment Firmware in progress',
+            });
+          } else {
+            notification.error({
+              message: 'Error',
+              description: 'Equipment Firmware could not be updated.',
+            });
+          }
+        })
+        .catch(() =>
           notification.error({
             message: 'Error',
             description: 'Equipment Firmware could not be updated.',
-          });
-        }
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Equipment Firmware could not be updated.',
-        })
-      );
+          })
+        );
 
-  const handleRequestEquipmentReboot = equipmentId =>
-    requestEquipmentReboot({ variables: { equipmentId } })
-      .then(firmwareResp => {
-        if (firmwareResp?.data?.requestEquipmentReboot?.success === true) {
-          notification.success({
-            message: 'Success',
-            description: 'Equipment Firmware in progress',
-          });
-        } else {
+    const handleRequestEquipmentReboot = equipmentId =>
+      requestEquipmentReboot({ variables: { equipmentId } })
+        .then(firmwareResp => {
+          if (firmwareResp?.data?.requestEquipmentReboot?.success === true) {
+            notification.success({
+              message: 'Success',
+              description: 'Equipment Firmware in progress',
+            });
+          } else {
+            notification.error({
+              message: 'Error',
+              description: 'Equipment Firmware could not be updated.',
+            });
+          }
+        })
+        .catch(() =>
           notification.error({
             message: 'Error',
             description: 'Equipment Firmware could not be updated.',
-          });
-        }
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Equipment Firmware could not be updated.',
-        })
-      );
+          })
+        );
 
-  const handleFetchProfiles = e => {
-    if (dataProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
+    const handleFetchProfiles = e => {
+      if (dataProfiles.getAllProfiles.context.lastPage) {
+        return false;
+      }
 
-    e.persist();
-    const { target } = e;
+      e.persist();
+      const { target } = e;
 
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMore({
-        variables: { context: { ...dataProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
+      if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+        fetchMore({
+          variables: { context: { ...dataProfiles.getAllProfiles.context } },
+          updateQuery: updateQueryGetAllProfiles,
+        });
+      }
 
-    return true;
-  };
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (error) {
-    if (error.message === '403: Forbidden' || error.message === '401: Unauthorized') {
-      return <Redirect to="/login" />;
-    }
+      return true;
+    };
 
     return (
-      <Alert
-        message="Error"
-        description="Failed to load Access Point data."
-        type="error"
-        showIcon
+      <AccessPointDetailsPage
+        handleRefresh={refetchData}
+        onUpdateEquipment={handleUpdateEquipment}
+        data={data?.getEquipment}
+        profiles={dataProfiles?.getAllProfiles?.items}
+        osData={{
+          loading: metricsLoading,
+          error: metricsError,
+          data: metricsData && metricsData.filterServiceMetrics.items,
+        }}
+        firmware={dataFirmware?.getAllFirmware}
+        locations={locations}
+        onUpdateEquipmentFirmware={handleUpdateEquipmentFirmware}
+        onRequestEquipmentSwitchBank={handleRequestEquipmentSwitchBank}
+        onRequestEquipmentReboot={handleRequestEquipmentReboot}
+        loadingProfiles={loadingProfiles}
+        errorProfiles={errorProfiles}
+        loadingFirmware={loadingFirmware}
+        errorFirmware={errorFirmware}
+        onFetchMoreProfiles={handleFetchProfiles}
+        isLastProfilesPage={dataProfiles?.getAllProfiles?.context?.lastPage}
       />
     );
+  },
+  GET_EQUIPMENT,
+  () => {
+    const { id } = useParams();
+    return { id };
   }
-
-  return (
-    <AccessPointDetailsPage
-      handleRefresh={refetchData}
-      onUpdateEquipment={handleUpdateEquipment}
-      data={data?.getEquipment}
-      profiles={dataProfiles?.getAllProfiles?.items}
-      osData={{
-        loading: metricsLoading,
-        error: metricsError,
-        data: metricsData && metricsData.filterServiceMetrics.items,
-      }}
-      firmware={dataFirmware?.getAllFirmware}
-      locations={locations}
-      onUpdateEquipmentFirmware={handleUpdateEquipmentFirmware}
-      onRequestEquipmentSwitchBank={handleRequestEquipmentSwitchBank}
-      onRequestEquipmentReboot={handleRequestEquipmentReboot}
-      loadingProfiles={loadingProfiles}
-      errorProfiles={errorProfiles}
-      loadingFirmware={loadingFirmware}
-      errorFirmware={errorFirmware}
-      onFetchMoreProfiles={handleFetchProfiles}
-      isLastProfilesPage={dataProfiles?.getAllProfiles?.context?.lastPage}
-    />
-  );
-};
+);
 
 AccessPointDetails.propTypes = {
   locations: PropTypes.instanceOf(Array).isRequired,
