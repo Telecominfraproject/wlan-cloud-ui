@@ -17,6 +17,7 @@ import {
 } from 'graphql/mutations';
 import { updateQueryGetAllProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
+import history from 'utils/history';
 
 const GET_EQUIPMENT = gql`
   query GetEquipment($id: ID!) {
@@ -123,6 +124,14 @@ const UPDATE_EQUIPMENT = gql`
   }
 `;
 
+const DELETE_EQUIPMENT = gql`
+  mutation DeleteEquipment($id: ID!) {
+    deleteEquipment(id: $id) {
+      id
+    }
+  }
+`;
+
 const toTime = moment();
 const fromTime = moment().subtract(1, 'hour');
 
@@ -181,6 +190,7 @@ const AccessPointDetails = ({ locations }) => {
   const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
   const [requestEquipmentSwitchBank] = useMutation(REQUEST_EQUIPMENT_SWITCH_BANK);
   const [requestEquipmentReboot] = useMutation(REQUEST_EQUIPMENT_REBOOT);
+  const [deleteEquipment] = useMutation(DELETE_EQUIPMENT);
 
   const refetchData = () => {
     refetch();
@@ -228,6 +238,24 @@ const AccessPointDetails = ({ locations }) => {
         notification.error({
           message: 'Error',
           description: 'Equipment settings could not be updated.',
+        })
+      );
+  };
+
+  const handleDeleteEquipment = () => {
+    deleteEquipment({ variables: { id } })
+      .then(() => {
+        refetch();
+        history.replace('/network/access-points');
+        notification.success({
+          message: 'Success',
+          description: 'Equipment successfully deleted',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Equipment could not be deleted.',
         })
       );
   };
@@ -335,6 +363,7 @@ const AccessPointDetails = ({ locations }) => {
     <AccessPointDetailsPage
       handleRefresh={refetchData}
       onUpdateEquipment={handleUpdateEquipment}
+      onDeleteEquipment={handleDeleteEquipment}
       data={data?.getEquipment}
       profiles={dataProfiles?.getAllProfiles?.items}
       osData={{
