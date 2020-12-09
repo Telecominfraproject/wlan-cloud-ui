@@ -38,6 +38,21 @@ const AddProfile = () => {
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
   });
+  const { data: venueProfiles, fetchMore: fetchMoreVenueProfiles } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'passpoint_venue' },
+  });
+  const { data: operatorProfiles, fetchMore: fetchMoreOperatorProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'passpoint_operator' },
+    }
+  );
+  const { data: idProviderProfiles, fetchMore: fetchMoreIdProviderProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'passpoint_osu_id_provider' },
+    }
+  );
   const { data: rfProfiles, fetchMore: fetchMoreRfProfiles } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'rf' },
   });
@@ -87,6 +102,24 @@ const AddProfile = () => {
     return true;
   };
 
+  const handleFetchVenueProfiles = e => {
+    if (venueProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreVenueProfiles({
+        variables: { context: { ...venueProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
   const handleFetchRfProfiles = e => {
     if (rfProfiles.getAllProfiles.context.lastPage) {
       return false;
@@ -105,12 +138,56 @@ const AddProfile = () => {
     return true;
   };
 
+  const handleFetchOperatorProfiles = e => {
+    if (operatorProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreOperatorProfiles({
+        variables: { context: { ...operatorProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
+  const handleFetchIdProviderProfiles = e => {
+    if (idProviderProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreIdProviderProfiles({
+        variables: { context: { ...idProviderProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
   return (
     <AddProfilePage
       onCreateProfile={handleAddProfile}
-      ssidProfiles={ssidProfiles?.getAllProfiles?.items}
+      ssidProfiles={
+        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
+      }
+      venueProfiles={venueProfiles?.getAllProfiles?.items}
+      operatorProfiles={operatorProfiles?.getAllProfiles?.items}
+      idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       rfProfiles={rfProfiles?.getAllProfiles?.items}
       onFetchMoreProfiles={handleFetchProfiles}
+      onFetchMoreVenueProfiles={handleFetchVenueProfiles}
+      onFetchMoreOperatorProfiles={handleFetchOperatorProfiles}
+      onFetchMoreIdProviderProfiles={handleFetchIdProviderProfiles}
       onFetchMoreRfProfiles={handleFetchRfProfiles}
     />
   );
