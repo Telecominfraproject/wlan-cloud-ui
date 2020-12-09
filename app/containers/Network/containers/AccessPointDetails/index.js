@@ -143,6 +143,7 @@ const AccessPointDetails = ({ locations }) => {
     variables: {
       id,
     },
+    fetchPolicy: 'network-only',
   });
 
   const { data: dataFirmware, error: errorFirmware, loading: loadingFirmware } = useQuery(
@@ -245,11 +246,6 @@ const AccessPointDetails = ({ locations }) => {
   const handleDeleteEquipment = () => {
     deleteEquipment({
       variables: { id },
-      update: cache => {
-        Object.keys(cache.data.data).forEach(
-          key => key.match(`Equipment:${id}`) && cache.data.delete(key)
-        );
-      },
     })
       .then(() => {
         history.push('/network/access-points');
