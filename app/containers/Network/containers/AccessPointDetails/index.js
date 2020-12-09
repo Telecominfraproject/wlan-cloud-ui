@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import moment from 'moment';
@@ -17,7 +17,6 @@ import {
 } from 'graphql/mutations';
 import { updateQueryGetAllProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
-import history from 'utils/history';
 
 const GET_EQUIPMENT = gql`
   query GetEquipment($id: ID!) {
@@ -138,6 +137,7 @@ const fromTime = moment().subtract(1, 'hour');
 const AccessPointDetails = ({ locations }) => {
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
+  const history = useHistory();
 
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
     variables: {
@@ -243,10 +243,16 @@ const AccessPointDetails = ({ locations }) => {
   };
 
   const handleDeleteEquipment = () => {
-    deleteEquipment({ variables: { id } })
+    deleteEquipment({
+      variables: { id },
+      update: cache => {
+        Object.keys(cache.data.data).forEach(
+          key => key.match(`Equipment:${id}`) && cache.data.delete(key)
+        );
+      },
+    })
       .then(() => {
-        refetch();
-        history.replace('/network/access-points');
+        history.push('/network/access-points');
         notification.success({
           message: 'Success',
           description: 'Equipment successfully deleted',
