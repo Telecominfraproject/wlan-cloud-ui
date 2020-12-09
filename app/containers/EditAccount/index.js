@@ -10,7 +10,7 @@ const GET_USER = gql`
     getUser(id: $id) {
       id
       username
-      role
+      roles
       customerId
       lastModifiedTimestamp
     }
@@ -22,7 +22,7 @@ const UPDATE_USER = gql`
     $id: ID!
     $username: String!
     $password: String!
-    $role: String!
+    $roles: [String]
     $customerId: ID!
     $lastModifiedTimestamp: String
   ) {
@@ -30,13 +30,13 @@ const UPDATE_USER = gql`
       id: $id
       username: $username
       password: $password
-      role: $role
+      roles: $roles
       customerId: $customerId
       lastModifiedTimestamp: $lastModifiedTimestamp
     ) {
       id
       username
-      role
+      roles
       customerId
       lastModifiedTimestamp
     }
@@ -49,14 +49,14 @@ const EditAccount = () => {
   const [updateUser] = useMutation(UPDATE_USER);
 
   const handleSubmit = newPassword => {
-    const { role, customerId, lastModifiedTimestamp } = data.getUser;
+    const { roles, customerId, lastModifiedTimestamp } = data.getUser;
 
     updateUser({
       variables: {
         id,
         username: email,
         password: newPassword,
-        role,
+        roles,
         customerId,
         lastModifiedTimestamp,
       },

@@ -4,6 +4,7 @@ import { useMutation, useQuery, gql } from '@apollo/client';
 import { notification } from 'antd';
 import { useHistory } from 'react-router-dom';
 
+import { ROUTES } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
 import { updateQueryGetAllProfiles } from 'graphql/functions';
@@ -52,6 +53,9 @@ const AddProfile = () => {
       variables: { customerId, type: 'passpoint_osu_id_provider' },
     }
   );
+  const { data: rfProfiles, fetchMore: fetchMoreRfProfiles } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'rf' },
+  });
   const [createProfile] = useMutation(CREATE_PROFILE);
   const history = useHistory();
 
@@ -70,7 +74,7 @@ const AddProfile = () => {
           message: 'Success',
           description: 'Profile successfully created.',
         });
-        history.push('/profiles', { refetch: true });
+        history.push(ROUTES.profiles, { refetch: true });
       })
       .catch(() =>
         notification.error({
@@ -109,6 +113,24 @@ const AddProfile = () => {
     if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
       fetchMoreVenueProfiles({
         variables: { context: { ...venueProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
+  const handleFetchRfProfiles = e => {
+    if (rfProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreRfProfiles({
+        variables: { context: { ...rfProfiles.getAllProfiles.context } },
         updateQuery: updateQueryGetAllProfiles,
       });
     }
@@ -161,10 +183,12 @@ const AddProfile = () => {
       venueProfiles={venueProfiles?.getAllProfiles?.items}
       operatorProfiles={operatorProfiles?.getAllProfiles?.items}
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
+      rfProfiles={rfProfiles?.getAllProfiles?.items}
       onFetchMoreProfiles={handleFetchProfiles}
       onFetchMoreVenueProfiles={handleFetchVenueProfiles}
       onFetchMoreOperatorProfiles={handleFetchOperatorProfiles}
       onFetchMoreIdProviderProfiles={handleFetchIdProviderProfiles}
+      onFetchMoreRfProfiles={handleFetchRfProfiles}
     />
   );
 };

@@ -6,6 +6,7 @@ import { notification } from 'antd';
 import { floor, padStart } from 'lodash';
 import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';
 
+import { ROUTES } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { FILTER_EQUIPMENT } from 'graphql/queries';
 
@@ -165,7 +166,7 @@ const AccessPoints = ({ checkedLocations }) => {
 
   return (
     <NetworkTableContainer
-      activeTab="/network/access-points"
+      activeTab={ROUTES.accessPoints}
       onRefresh={handleOnRefresh}
       tableColumns={accessPointsTableColumns}
       tableData={equipData && equipData.filterEquipment && equipData.filterEquipment.items}

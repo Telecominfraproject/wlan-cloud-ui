@@ -4,6 +4,7 @@ import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
+import { ROUTES } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
 import { FILE_UPLOAD } from 'graphql/mutations';
@@ -114,6 +115,10 @@ const ProfileDetails = () => {
       variables: { customerId, type: 'passpoint_osu_id_provider' },
     }
   );
+
+  const { data: rfProfiles, fetchMore: fetchMoreRfProfiles } = useQuery(GET_ALL_PROFILES(), {
+    variables: { customerId, type: 'rf' },
+  });
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
@@ -252,6 +257,24 @@ const ProfileDetails = () => {
     return true;
   };
 
+  const handleFetchRfProfiles = e => {
+    if (rfProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreRfProfiles({
+        variables: { context: { ...rfProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
   const handleFetchOperatorProfiles = e => {
     if (operatorProfiles.getAllProfiles.context.lastPage) {
       return false;
@@ -299,7 +322,7 @@ const ProfileDetails = () => {
   }
 
   if (redirect) {
-    return <Redirect to="/profiles" />;
+    return <Redirect to={ROUTES.profiles} />;
   }
 
   return (
@@ -307,13 +330,12 @@ const ProfileDetails = () => {
       name={data.getProfile.name}
       profileType={data.getProfile.profileType}
       details={data.getProfile.details}
-      childProfileIds={data.getProfile.childProfileIds}
       childProfiles={data.getProfile.childProfiles}
+      childProfileIds={data.getProfile.childProfileIds}
       onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
-      ssidProfiles={
-        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
-      }
+      ssidProfiles={ssidProfiles?.getAllProfiles?.items}
+      rfProfiles={rfProfiles?.getAllProfiles?.items}
       radiusProfiles={radiusProfiles?.getAllProfiles?.items}
       captiveProfiles={captiveProfiles?.getAllProfiles?.items}
       venueProfiles={venueProfiles?.getAllProfiles?.items}
@@ -321,6 +343,7 @@ const ProfileDetails = () => {
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchProfiles}
+      onFetchMoreRfProfiles={handleFetchRfProfiles}
       onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
       onFetchMoreCaptiveProfiles={handleFetchCaptiveProfiles}
       onFetchMoreVenueProfiles={handleFetchVenueProfiles}
