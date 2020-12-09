@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import moment from 'moment';
@@ -123,17 +123,27 @@ const UPDATE_EQUIPMENT = gql`
   }
 `;
 
+const DELETE_EQUIPMENT = gql`
+  mutation DeleteEquipment($id: ID!) {
+    deleteEquipment(id: $id) {
+      id
+    }
+  }
+`;
+
 const toTime = moment();
 const fromTime = moment().subtract(1, 'hour');
 
 const AccessPointDetails = ({ locations }) => {
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
+  const history = useHistory();
 
   const { loading, error, data, refetch } = useQuery(GET_EQUIPMENT, {
     variables: {
       id,
     },
+    fetchPolicy: 'network-only',
   });
 
   const { data: dataFirmware, error: errorFirmware, loading: loadingFirmware } = useQuery(
@@ -181,6 +191,7 @@ const AccessPointDetails = ({ locations }) => {
   const [updateEquipmentFirmware] = useMutation(UPDATE_EQUIPMENT_FIRMWARE);
   const [requestEquipmentSwitchBank] = useMutation(REQUEST_EQUIPMENT_SWITCH_BANK);
   const [requestEquipmentReboot] = useMutation(REQUEST_EQUIPMENT_REBOOT);
+  const [deleteEquipment] = useMutation(DELETE_EQUIPMENT);
 
   const refetchData = () => {
     refetch();
@@ -228,6 +239,25 @@ const AccessPointDetails = ({ locations }) => {
         notification.error({
           message: 'Error',
           description: 'Equipment settings could not be updated.',
+        })
+      );
+  };
+
+  const handleDeleteEquipment = () => {
+    deleteEquipment({
+      variables: { id },
+    })
+      .then(() => {
+        history.push('/network/access-points');
+        notification.success({
+          message: 'Success',
+          description: 'Equipment successfully deleted',
+        });
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Equipment could not be deleted.',
         })
       );
   };
@@ -335,6 +365,7 @@ const AccessPointDetails = ({ locations }) => {
     <AccessPointDetailsPage
       handleRefresh={refetchData}
       onUpdateEquipment={handleUpdateEquipment}
+      onDeleteEquipment={handleDeleteEquipment}
       data={data?.getEquipment}
       profiles={dataProfiles?.getAllProfiles?.items}
       osData={{
