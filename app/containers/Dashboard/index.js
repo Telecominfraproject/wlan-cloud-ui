@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client';
 import { Dashboard as DashboardPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 import UserContext from 'contexts/UserContext';
 import { FILTER_SYSTEM_EVENTS, GET_ALL_STATUS } from 'graphql/queries';
+import { USER_FRIENDLY_RADIOS } from 'constants/index';
 
 function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
@@ -28,13 +29,6 @@ function trafficTooltipFormatter() {
     this.y
   )}</b><br/>`;
 }
-
-const USER_FRIENDLY_RADIOS = {
-  is2dot4GHz: '2.4GHz',
-  is5GHzL: '5GHz (L)',
-  is5GHzU: '5GHz (U)',
-  is5GHz: '5GHz',
-};
 
 const lineChartConfig = [
   { key: 'inservicesAPs', title: 'Inservice APs (24 hours)' },

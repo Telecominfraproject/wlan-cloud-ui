@@ -1,7 +1,12 @@
 export const AUTH_TOKEN = 'tip-auth-token';
 export const COMPANY = 'Telecom Infra Project';
-export const IS_RADIO_TYPE_5GHZ = 'is5GHz';
-export const IS_RADIO_TYPE_2DOT4GHZ = 'is2dot4GHz';
+
+export const USER_FRIENDLY_RADIOS = {
+  is2dot4GHz: '2.4GHz',
+  is5GHzL: '5GHz (L)',
+  is5GHzU: '5GHz (U)',
+  is5GHz: '5GHz',
+};
 
 export const ROUTES = {
   root: '/',
