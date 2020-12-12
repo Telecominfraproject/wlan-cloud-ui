@@ -66,7 +66,7 @@ const DELETE_USER = gql`
 `;
 
 const Accounts = () => {
-  const { customerId } = useContext(UserContext);
+  const { customerId, id: currentUserId } = useContext(UserContext);
 
   const { data, loading, error, refetch, fetchMore } = useQuery(GET_ALL_USERS, {
     variables: { customerId },
@@ -173,6 +173,7 @@ const Accounts = () => {
   return (
     <AccountsPage
       data={data.getAllUsers.items}
+      currentUserId={currentUserId}
       onLoadMore={handleLoadMore}
       onCreateUser={handleCreateUser}
       onEditUser={handleEditUser}
