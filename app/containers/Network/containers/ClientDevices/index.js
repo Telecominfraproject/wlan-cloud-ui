@@ -5,7 +5,7 @@ import { notification } from 'antd';
 
 import { NetworkTableContainer } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { ROUTES } from 'constants/index';
+import { ROUTES, USER_FRIENDLY_RADIOS } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { FILTER_CLIENT_SESSIONS } from 'graphql/queries';
 
@@ -23,7 +23,11 @@ const clientDevicesTableColumns = [
   { title: 'HOST NAME', dataIndex: 'hostname' },
   { title: 'ACCESS POINT', dataIndex: ['equipment', 'name'] },
   { title: 'SSID', dataIndex: 'ssid' },
-  { title: 'BAND', dataIndex: 'radioType' },
+  {
+    title: 'BAND',
+    dataIndex: 'radioType',
+    render: band => USER_FRIENDLY_RADIOS[band],
+  },
   { title: 'SIGNAL', dataIndex: 'signal' },
   {
     title: 'STATUS',
