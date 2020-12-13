@@ -22,7 +22,7 @@ const Firmware = () => {
   const [
     getAllFirmware,
     { data: firmwareVersionData, loading: firmwareVersionLoading },
-  ] = useLazyQuery(GET_ALL_FIRMWARE);
+  ] = useLazyQuery(GET_ALL_FIRMWARE, { fetchPolicy: 'network-only' });
 
   const {
     data: trackAssignmentData,
