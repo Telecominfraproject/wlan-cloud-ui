@@ -7,7 +7,7 @@ import { ThemeProvider, GenericNotFound } from '@tip-wlan/wlan-cloud-ui-library'
 import logo from 'images/tip-logo.png';
 import logoMobile from 'images/tip-logo-mobile.png';
 
-import { AUTH_TOKEN, COMPANY, ROUTES } from 'constants/index';
+import { AUTH_TOKEN, COMPANY, ROUTES, USER_FRIENDLY_RADIOS } from 'constants/index';
 import Login from 'containers/Login';
 
 import Network from 'containers/Network';
@@ -65,7 +65,13 @@ const App = () => {
       updateUser={updateUser}
       updateToken={updateToken}
     >
-      <ThemeProvider company={COMPANY} logo={logo} logoMobile={logoMobile} routes={ROUTES}>
+      <ThemeProvider
+        company={COMPANY}
+        logo={logo}
+        logoMobile={logoMobile}
+        routes={ROUTES}
+        radioTypes={USER_FRIENDLY_RADIOS}
+      >
         <Helmet titleTemplate={`%s - ${COMPANY}`} defaultTitle={COMPANY}>
           <meta name="description" content={COMPANY} />
         </Helmet>
