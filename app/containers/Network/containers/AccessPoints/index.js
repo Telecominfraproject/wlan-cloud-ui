@@ -59,7 +59,7 @@ const accessPointsTableColumns = [
   },
   {
     title: 'MAC',
-    dataIndex: ['baseMacAddress'],
+    dataIndex: 'baseMacAddress',
     render: renderTableCell,
   },
   {
