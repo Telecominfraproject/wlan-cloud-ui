@@ -42,16 +42,14 @@ const GET_EQUIPMENT = gql`
           details
         }
       }
+      baseMacAddress
+      manufacturer
       status {
         firmware {
           detailsJSON
         }
         protocol {
           detailsJSON
-          details {
-            reportedMacAddr
-            manufacturer
-          }
         }
         radioUtilization {
           detailsJSON
