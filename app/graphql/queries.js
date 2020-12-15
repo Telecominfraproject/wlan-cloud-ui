@@ -42,12 +42,12 @@ export const FILTER_EQUIPMENT = gql`
         profile {
           name
         }
+        baseMacAddress
+        manufacturer
         status {
           protocol {
             details {
               reportedIpV4Addr
-              reportedMacAddr
-              manufacturer
             }
           }
           osPerformance {
