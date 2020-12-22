@@ -129,11 +129,17 @@ const Dashboard = () => {
             clientDevices2dot4GHz.push([eventTimestamp, radios.is2dot4GHz || 0]);
             clientDevices5GHz.push([eventTimestamp, total5GHz || 0]);
 
-            trafficBytesDownstreamData.push([eventTimestamp, trafficBytesDownstream || 0]);
-            trafficBytesUpstreamData.push([eventTimestamp, trafficBytesUpstream || 0]);
+            trafficBytesDownstreamData.push([
+              eventTimestamp,
+              (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0,
+            ]);
+            trafficBytesUpstreamData.push([
+              eventTimestamp,
+              (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0,
+            ]);
 
-            totalDown += trafficBytesDownstream || 0;
-            totalUp += trafficBytesUpstream || 0;
+            totalDown += (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0;
+            totalUp += (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0;
           }
         );
 
