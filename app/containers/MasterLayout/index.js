@@ -12,8 +12,7 @@ import { removeItem } from 'utils/localStorage';
 
 import UserContext from 'contexts/UserContext';
 
-// eslint-disable-next-line import/named
-import { UsersDropdown } from 'components/UsersDropdown';
+import UsersDropdown from 'components/UsersDropdown';
 
 const MasterLayout = ({ children }) => {
   const { roles, customerId, email } = useContext(UserContext);
@@ -94,7 +93,7 @@ const MasterLayout = ({ children }) => {
       mobileMenuItems={mobileMenuItems}
       totalAlarms={data && data.getAlarmCount}
       currentUserEmail={email}
-      usersDropdown={<UsersDropdown onLogout={handleLogout} />}
+      component={UsersDropdown}
     >
       {children}
     </Layout>
