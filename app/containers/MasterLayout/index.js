@@ -93,7 +93,7 @@ const MasterLayout = ({ children }) => {
       mobileMenuItems={mobileMenuItems}
       totalAlarms={data && data.getAlarmCount}
       currentUserEmail={email}
-      component={UsersDropdown}
+      userDropdown={<UsersDropdown onLogout={handleLogout} />}
     >
       {children}
     </Layout>
