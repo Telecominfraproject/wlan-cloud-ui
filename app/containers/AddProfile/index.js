@@ -38,6 +38,18 @@ const AddProfile = () => {
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
   });
+  const { data: radiusProfiles, fetchMore: fetchMoreRadiusProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'radius' },
+    }
+  );
+  const { data: captiveProfiles, fetchMore: fetchMoreCaptiveProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'captive_portal' },
+    }
+  );
   const { data: venueProfiles, fetchMore: fetchMoreVenueProfiles } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'passpoint_venue' },
   });
@@ -95,6 +107,42 @@ const AddProfile = () => {
     if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
       fetchMore({
         variables: { context: { ...ssidProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
+  const handleFetchRadiusProfiles = e => {
+    if (radiusProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreRadiusProfiles({
+        variables: { context: { ...radiusProfiles.getAllProfiles.context } },
+        updateQuery: updateQueryGetAllProfiles,
+      });
+    }
+
+    return true;
+  };
+
+  const handleFetchCaptiveProfiles = e => {
+    if (captiveProfiles.getAllProfiles.context.lastPage) {
+      return false;
+    }
+
+    e.persist();
+    const { target } = e;
+
+    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
+      fetchMoreCaptiveProfiles({
+        variables: { context: { ...captiveProfiles.getAllProfiles.context } },
         updateQuery: updateQueryGetAllProfiles,
       });
     }
@@ -177,14 +225,16 @@ const AddProfile = () => {
   return (
     <AddProfilePage
       onCreateProfile={handleAddProfile}
-      ssidProfiles={
-        (ssidProfiles && ssidProfiles.getAllProfiles && ssidProfiles.getAllProfiles.items) || []
-      }
+      ssidProfiles={ssidProfiles?.getAllProfiles?.items}
+      radiusProfiles={radiusProfiles?.getAllProfiles?.items}
+      captiveProfiles={captiveProfiles?.getAllProfiles?.items}
       venueProfiles={venueProfiles?.getAllProfiles?.items}
       operatorProfiles={operatorProfiles?.getAllProfiles?.items}
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       rfProfiles={rfProfiles?.getAllProfiles?.items}
       onFetchMoreProfiles={handleFetchProfiles}
+      onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
+      onFetchMoreCaptiveProfiles={handleFetchCaptiveProfiles}
       onFetchMoreVenueProfiles={handleFetchVenueProfiles}
       onFetchMoreOperatorProfiles={handleFetchOperatorProfiles}
       onFetchMoreIdProviderProfiles={handleFetchIdProviderProfiles}
