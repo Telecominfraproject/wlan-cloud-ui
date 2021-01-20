@@ -142,6 +142,7 @@ const AccessPointDetails = ({ locations }) => {
       id,
     },
     fetchPolicy: 'network-only',
+    errorPolicy: 'all',
   });
 
   const { data: dataFirmware, error: errorFirmware, loading: loadingFirmware } = useQuery(
@@ -149,6 +150,7 @@ const AccessPointDetails = ({ locations }) => {
     {
       skip: !data?.getEquipment?.model,
       variables: { modelId: data?.getEquipment?.model },
+      errorPolicy: 'all',
     }
   );
 
@@ -166,6 +168,7 @@ const AccessPointDetails = ({ locations }) => {
     }`),
     {
       variables: { customerId, type: 'equipment_ap' },
+      errorPolicy: 'all',
     }
   );
 
