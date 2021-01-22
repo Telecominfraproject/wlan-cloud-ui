@@ -10,3 +10,21 @@ export const updateQueryGetAllProfiles = (previousResult, { fetchMoreResult }) =
     },
   };
 };
+
+export const fetchMoreProfiles = (e, profile, fetchMore) => {
+  if (profile.getAllProfiles.context.lastPage) {
+    return false;
+  }
+
+  e.persist();
+  const { target } = e;
+
+  if (target.scrollTop + target.offsetHeight + 10 >= target.scrollHeight) {
+    fetchMore({
+      variables: { context: { ...profile.getAllProfiles.context } },
+      updateQuery: updateQueryGetAllProfiles,
+    });
+  }
+
+  return true;
+};
