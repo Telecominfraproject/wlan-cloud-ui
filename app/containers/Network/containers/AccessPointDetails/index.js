@@ -85,6 +85,7 @@ const UPDATE_EQUIPMENT = gql`
     $profileId: ID!
     $locationId: ID!
     $name: String!
+    $baseMacAddress: String
     $latitude: String
     $longitude: String
     $serial: String
@@ -99,6 +100,7 @@ const UPDATE_EQUIPMENT = gql`
       profileId: $profileId
       locationId: $locationId
       name: $name
+      baseMacAddress: $baseMacAddress
       latitude: $latitude
       longitude: $longitude
       serial: $serial
@@ -112,6 +114,7 @@ const UPDATE_EQUIPMENT = gql`
       profileId
       locationId
       name
+      baseMacAddress
       latitude
       longitude
       serial
@@ -199,20 +202,21 @@ const AccessPointDetails = ({ locations }) => {
     metricsRefetch();
   };
 
-  const handleUpdateEquipment = (
-    equipmentId,
+  const handleUpdateEquipment = ({
+    id: equipmentId,
     equipmentType,
     inventoryId,
-    custId,
+    customerId: custId,
     profileId,
     locationId,
     name,
+    baseMacAddress,
     latitude,
     longitude,
     serial,
     lastModifiedTimestamp,
-    details
-  ) => {
+    formattedData,
+  }) => {
     updateEquipment({
       variables: {
         id: equipmentId,
@@ -222,11 +226,12 @@ const AccessPointDetails = ({ locations }) => {
         profileId,
         locationId,
         name,
+        baseMacAddress,
         latitude,
         longitude,
         serial,
         lastModifiedTimestamp,
-        details,
+        details: formattedData,
       },
     })
       .then(() => {
@@ -351,7 +356,7 @@ const AccessPointDetails = ({ locations }) => {
     return <Loading />;
   }
 
-  if (error) {
+  if (error && !data?.getEquipment) {
     return (
       <Alert
         message="Error"
