@@ -8,7 +8,7 @@ import { ROUTES } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES } from 'graphql/queries';
 import { FILE_UPLOAD } from 'graphql/mutations';
-import { updateQueryGetAllProfiles } from 'graphql/functions';
+import { fetchMoreProfiles } from 'graphql/functions';
 
 const GET_PROFILE = gql`
   query GetProfile($id: ID!) {
@@ -185,130 +185,17 @@ const ProfileDetails = () => {
         })
       );
 
-  const handleFetchProfiles = e => {
-    if (ssidProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMore({
-        variables: { context: { ...ssidProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
-  };
-
-  const handleFetchRadiusProfiles = e => {
-    if (radiusProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreRadiusProfiles({
-        variables: { context: { ...radiusProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
-  };
-
-  const handleFetchCaptiveProfiles = e => {
-    if (captiveProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreCaptiveProfiles({
-        variables: { context: { ...captiveProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
-  };
-
-  const handleFetchVenueProfiles = e => {
-    if (venueProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreVenueProfiles({
-        variables: { context: { ...venueProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
-  };
-
-  const handleFetchRfProfiles = e => {
-    if (rfProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreRfProfiles({
-        variables: { context: { ...rfProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
-  };
-
-  const handleFetchOperatorProfiles = e => {
-    if (operatorProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreOperatorProfiles({
-        variables: { context: { ...operatorProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
-  };
-
-  const handleFetchIdProviderProfiles = e => {
-    if (idProviderProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMoreIdProviderProfiles({
-        variables: { context: { ...idProviderProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
+  const handleFetchMoreProfiles = (e, key) => {
+    if (key === 'radius') fetchMoreProfiles(e, radiusProfiles, fetchMoreRadiusProfiles);
+    else if (key === 'captive_portal')
+      fetchMoreProfiles(e, captiveProfiles, fetchMoreCaptiveProfiles);
+    else if (key === 'rf') fetchMoreProfiles(e, rfProfiles, fetchMoreRfProfiles);
+    else if (key === 'passpoint_venue') fetchMoreProfiles(e, venueProfiles, fetchMoreVenueProfiles);
+    else if (key === 'passpoint_operator')
+      fetchMoreProfiles(e, operatorProfiles, fetchMoreOperatorProfiles);
+    else if (key === 'passpoint_osu_id_provider')
+      fetchMoreProfiles(e, idProviderProfiles, fetchMoreIdProviderProfiles);
+    else fetchMoreProfiles(e, ssidProfiles, fetchMore);
   };
 
   if (loading) {
@@ -342,13 +229,7 @@ const ProfileDetails = () => {
       operatorProfiles={operatorProfiles?.getAllProfiles?.items}
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
-      onFetchMoreProfiles={handleFetchProfiles}
-      onFetchMoreRfProfiles={handleFetchRfProfiles}
-      onFetchMoreRadiusProfiles={handleFetchRadiusProfiles}
-      onFetchMoreCaptiveProfiles={handleFetchCaptiveProfiles}
-      onFetchMoreVenueProfiles={handleFetchVenueProfiles}
-      onFetchMoreOperatorProfiles={handleFetchOperatorProfiles}
-      onFetchMoreIdProviderProfiles={handleFetchIdProviderProfiles}
+      onFetchMoreProfiles={handleFetchMoreProfiles}
     />
   );
 };
