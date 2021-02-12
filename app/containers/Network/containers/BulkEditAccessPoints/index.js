@@ -165,7 +165,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     if (type === 'cellSize') {
       const cellSizeValues = [];
       Object.keys(radioDetails?.radioMap || {}).map(i => {
-        return cellSizeValues.push(radioDetails.radioMap[i].rxCellSizeDb.value);
+        return cellSizeValues.push(radioDetails.radioMap[i]?.rxCellSizeDb?.value);
       });
       return cellSizeValues;
     }
@@ -173,7 +173,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
       const probeResponseThresholdValues = [];
       Object.keys(radioDetails?.radioMap || {}).map(i => {
         return probeResponseThresholdValues.push(
-          radioDetails.radioMap[i].probeResponseThresholdDb.value
+          radioDetails.radioMap[i]?.probeResponseThresholdDb?.value
         );
       });
       return probeResponseThresholdValues;
@@ -182,7 +182,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
       const clientDisconnectThresholdValues = [];
       Object.keys(radioDetails?.radioMap || {}).map(i => {
         return clientDisconnectThresholdValues.push(
-          radioDetails.radioMap[i].clientDisconnectThresholdDb.value
+          radioDetails.radioMap[i]?.clientDisconnectThresholdDb?.value
         );
       });
       return clientDisconnectThresholdValues;
@@ -191,7 +191,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
       const snrDropValues = [];
       Object.keys(radioDetails?.radioMap || {}).map(i => {
         return snrDropValues.push(
-          radioDetails.advancedRadioMap[i].bestApSettings.value.dropInSnrPercentage
+          radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.dropInSnrPercentage
         );
       });
       return snrDropValues;
@@ -199,7 +199,9 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
 
     const minLoadValue = [];
     Object.keys(radioDetails?.radioMap || {}).map(i => {
-      return minLoadValue.push(radioDetails.advancedRadioMap[i].bestApSettings.value.minLoadFactor);
+      return minLoadValue.push(
+        radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.minLoadFactor
+      );
     });
     return minLoadValue;
   };
