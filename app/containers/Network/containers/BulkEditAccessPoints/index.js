@@ -11,6 +11,8 @@ import { UPDATE_EQUIPMENT_BULK } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 import styles from './index.module.scss';
 
+const defaultAppliedRadios = { is5GHzL: 'is5GHzL', is2dot4GHz: 'is2dot4GHz', is5GHzU: 'is5GHzU' };
+
 const renderTableCell = tabCell => {
   if (Array.isArray(tabCell)) {
     return (
@@ -162,14 +164,14 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   const getRadioDetails = (radioDetails, type) => {
     if (type === 'cellSize') {
       const cellSizeValues = [];
-      Object.keys(radioDetails.radioMap).map(i => {
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
         return cellSizeValues.push(radioDetails.radioMap[i].rxCellSizeDb.value);
       });
       return cellSizeValues;
     }
     if (type === 'probeResponseThreshold') {
       const probeResponseThresholdValues = [];
-      Object.keys(radioDetails.radioMap).map(i => {
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
         return probeResponseThresholdValues.push(
           radioDetails.radioMap[i].probeResponseThresholdDb.value
         );
@@ -178,7 +180,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     }
     if (type === 'clientDisconnectThreshold') {
       const clientDisconnectThresholdValues = [];
-      Object.keys(radioDetails.radioMap).map(i => {
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
         return clientDisconnectThresholdValues.push(
           radioDetails.radioMap[i].clientDisconnectThresholdDb.value
         );
@@ -187,17 +189,17 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     }
     if (type === 'snrDrop') {
       const snrDropValues = [];
-      Object.keys(radioDetails.advancedRadioMap).map(i => {
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
         return snrDropValues.push(
-          radioDetails.advancedRadioMap[i].bestApSettings.dropInSnrPercentage
+          radioDetails.advancedRadioMap[i].bestApSettings.value.dropInSnrPercentage
         );
       });
       return snrDropValues;
     }
 
     const minLoadValue = [];
-    Object.keys(radioDetails.advancedRadioMap).map(i => {
-      return minLoadValue.push(radioDetails.advancedRadioMap[i].bestApSettings.minLoadFactor);
+    Object.keys(radioDetails?.radioMap || {}).map(i => {
+      return minLoadValue.push(radioDetails.advancedRadioMap[i].bestApSettings.value.minLoadFactor);
     });
     return minLoadValue;
   };
@@ -234,7 +236,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     let minLoadFactor;
     dataSource.items.forEach(({ id: itemId, details }) => {
       if (equipmentId === itemId) {
-        Object.keys(details.radioMap).forEach((i, dataIndex) => {
+        Object.keys(details?.radioMap || defaultAppliedRadios).forEach((i, dataIndex) => {
           const frequencies = {};
           dropInSnrPercentage = snrDrop[dataIndex];
           minLoadFactor = minLoad[dataIndex];
