@@ -27,47 +27,54 @@ const renderTableCell = tabCell => {
   return <span>{tabCell}</span>;
 };
 const accessPointsChannelTableColumns = [
-  { title: 'NAME', dataIndex: 'name', key: 'name', render: renderTableCell },
+  { title: 'Name', dataIndex: 'name', key: 'name', width: 150, render: renderTableCell },
   {
-    title: 'CHANNEL',
+    title: 'Channel',
     dataIndex: 'channel',
     key: 'channel',
     editable: true,
+    width: 150,
     render: renderTableCell,
   },
   {
-    title: 'CELL SIZE',
+    title: 'Cell Size',
     dataIndex: 'cellSize',
     key: 'cellSize',
     editable: true,
+    width: 150,
     render: renderTableCell,
   },
   {
-    title: 'PROB RESPONSE THRESHOLD',
+    title: 'Probe Response Threshold',
     dataIndex: 'probeResponseThreshold',
     key: 'probeResponseThreshold',
     editable: true,
+    width: 200,
     render: renderTableCell,
   },
   {
-    title: 'CLIENT DISCONNECT THRESHOLD',
+    title: 'Client Disconnect Threshold',
     dataIndex: 'clientDisconnectThreshold',
     key: 'clientDisconnectThreshold',
     editable: true,
+    width: 200,
+
     render: renderTableCell,
   },
   {
-    title: 'SNR (% DROP)',
+    title: 'SNR (% Drop)',
     dataIndex: 'snrDrop',
     key: 'snrDrop',
     editable: true,
+    width: 175,
     render: renderTableCell,
   },
   {
-    title: 'MIN LOAD',
+    title: 'Min Load',
     dataIndex: 'minLoad',
     key: 'minLoad',
     editable: true,
+    width: 150,
     render: renderTableCell,
   },
 ];
