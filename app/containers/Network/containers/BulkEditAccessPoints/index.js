@@ -11,6 +11,8 @@ import { UPDATE_EQUIPMENT_BULK } from 'graphql/mutations';
 import UserContext from 'contexts/UserContext';
 import styles from './index.module.scss';
 
+const defaultAppliedRadios = { is5GHzL: 'is5GHzL', is2dot4GHz: 'is2dot4GHz', is5GHzU: 'is5GHzU' };
+
 const renderTableCell = tabCell => {
   if (Array.isArray(tabCell)) {
     return (
@@ -25,47 +27,54 @@ const renderTableCell = tabCell => {
   return <span>{tabCell}</span>;
 };
 const accessPointsChannelTableColumns = [
-  { title: 'NAME', dataIndex: 'name', key: 'name', render: renderTableCell },
+  { title: 'Name', dataIndex: 'name', key: 'name', width: 150, render: renderTableCell },
   {
-    title: 'CHANNEL',
+    title: 'Channel',
     dataIndex: 'channel',
     key: 'channel',
     editable: true,
+    width: 150,
     render: renderTableCell,
   },
   {
-    title: 'CELL SIZE',
+    title: 'Cell Size',
     dataIndex: 'cellSize',
     key: 'cellSize',
     editable: true,
+    width: 150,
     render: renderTableCell,
   },
   {
-    title: 'PROB RESPONSE THRESHOLD',
+    title: 'Probe Response Threshold',
     dataIndex: 'probeResponseThreshold',
     key: 'probeResponseThreshold',
     editable: true,
+    width: 200,
     render: renderTableCell,
   },
   {
-    title: 'CLIENT DISCONNECT THRESHOLD',
+    title: 'Client Disconnect Threshold',
     dataIndex: 'clientDisconnectThreshold',
     key: 'clientDisconnectThreshold',
     editable: true,
+    width: 200,
+
     render: renderTableCell,
   },
   {
-    title: 'SNR (% DROP)',
+    title: 'SNR (% Drop)',
     dataIndex: 'snrDrop',
     key: 'snrDrop',
     editable: true,
+    width: 175,
     render: renderTableCell,
   },
   {
-    title: 'MIN LOAD',
+    title: 'Min Load',
     dataIndex: 'minLoad',
     key: 'minLoad',
     editable: true,
+    width: 150,
     render: renderTableCell,
   },
 ];
@@ -162,42 +171,44 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   const getRadioDetails = (radioDetails, type) => {
     if (type === 'cellSize') {
       const cellSizeValues = [];
-      Object.keys(radioDetails.radioMap).map(i => {
-        return cellSizeValues.push(radioDetails.radioMap[i].rxCellSizeDb.value);
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
+        return cellSizeValues.push(radioDetails.radioMap[i]?.rxCellSizeDb?.value);
       });
       return cellSizeValues;
     }
     if (type === 'probeResponseThreshold') {
       const probeResponseThresholdValues = [];
-      Object.keys(radioDetails.radioMap).map(i => {
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
         return probeResponseThresholdValues.push(
-          radioDetails.radioMap[i].probeResponseThresholdDb.value
+          radioDetails.radioMap[i]?.probeResponseThresholdDb?.value
         );
       });
       return probeResponseThresholdValues;
     }
     if (type === 'clientDisconnectThreshold') {
       const clientDisconnectThresholdValues = [];
-      Object.keys(radioDetails.radioMap).map(i => {
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
         return clientDisconnectThresholdValues.push(
-          radioDetails.radioMap[i].clientDisconnectThresholdDb.value
+          radioDetails.radioMap[i]?.clientDisconnectThresholdDb?.value
         );
       });
       return clientDisconnectThresholdValues;
     }
     if (type === 'snrDrop') {
       const snrDropValues = [];
-      Object.keys(radioDetails.advancedRadioMap).map(i => {
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
         return snrDropValues.push(
-          radioDetails.advancedRadioMap[i].bestApSettings.dropInSnrPercentage
+          radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.dropInSnrPercentage
         );
       });
       return snrDropValues;
     }
 
     const minLoadValue = [];
-    Object.keys(radioDetails.advancedRadioMap).map(i => {
-      return minLoadValue.push(radioDetails.advancedRadioMap[i].bestApSettings.minLoadFactor);
+    Object.keys(radioDetails?.radioMap || {}).map(i => {
+      return minLoadValue.push(
+        radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.minLoadFactor
+      );
     });
     return minLoadValue;
   };
@@ -234,7 +245,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     let minLoadFactor;
     dataSource.items.forEach(({ id: itemId, details }) => {
       if (equipmentId === itemId) {
-        Object.keys(details.radioMap).forEach((i, dataIndex) => {
+        Object.keys(details?.radioMap || defaultAppliedRadios).forEach((i, dataIndex) => {
           const frequencies = {};
           dropInSnrPercentage = snrDrop[dataIndex];
           minLoadFactor = minLoad[dataIndex];
@@ -286,42 +297,39 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
 
   const handleSaveChanges = updatedRows => {
     const editedRowsArr = [];
-    if (updatedRows.length > 0) {
-      updatedRows.map(
-        ({
-          id: equipmentId,
-          channel,
-          cellSize,
-          probeResponseThreshold,
-          clientDisconnectThreshold,
-          snrDrop,
-          minLoad,
-        }) => {
-          const updatedEuips = setUpdatedBulkEditTableData(
-            equipmentId,
-            channel,
-            cellSize,
-            probeResponseThreshold,
-            clientDisconnectThreshold,
-            snrDrop,
-            minLoad,
-            equipData && equipData.filterEquipment
-          );
-          const tempObj = {
-            equipmentId,
-            perRadioDetails: {},
-          };
-          updatedEuips.map(item => {
-            Object.keys(item).forEach(i => {
-              tempObj.perRadioDetails[i] = item[i];
-            });
-            return tempObj;
-          });
-          return editedRowsArr.push(tempObj);
-        }
+    Object.keys(updatedRows).forEach(key => {
+      const {
+        id: equipmentId,
+        channel,
+        cellSize,
+        probeResponseThreshold,
+        clientDisconnectThreshold,
+        snrDrop,
+        minLoad,
+      } = updatedRows[key];
+      const updatedEuips = setUpdatedBulkEditTableData(
+        equipmentId,
+        channel,
+        cellSize,
+        probeResponseThreshold,
+        clientDisconnectThreshold,
+        snrDrop,
+        minLoad,
+        equipData && equipData.filterEquipment
       );
-      updateEquipments(editedRowsArr);
-    }
+      const tempObj = {
+        equipmentId,
+        perRadioDetails: {},
+      };
+      updatedEuips.map(item => {
+        Object.keys(item).forEach(i => {
+          tempObj.perRadioDetails[i] = item[i];
+        });
+        return tempObj;
+      });
+      return editedRowsArr.push(tempObj);
+    });
+    updateEquipments(editedRowsArr);
   };
 
   const handleLoadMore = () => {
