@@ -297,42 +297,39 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
 
   const handleSaveChanges = updatedRows => {
     const editedRowsArr = [];
-    if (updatedRows.length > 0) {
-      updatedRows.map(
-        ({
-          id: equipmentId,
-          channel,
-          cellSize,
-          probeResponseThreshold,
-          clientDisconnectThreshold,
-          snrDrop,
-          minLoad,
-        }) => {
-          const updatedEuips = setUpdatedBulkEditTableData(
-            equipmentId,
-            channel,
-            cellSize,
-            probeResponseThreshold,
-            clientDisconnectThreshold,
-            snrDrop,
-            minLoad,
-            equipData && equipData.filterEquipment
-          );
-          const tempObj = {
-            equipmentId,
-            perRadioDetails: {},
-          };
-          updatedEuips.map(item => {
-            Object.keys(item).forEach(i => {
-              tempObj.perRadioDetails[i] = item[i];
-            });
-            return tempObj;
-          });
-          return editedRowsArr.push(tempObj);
-        }
+    Object.keys(updatedRows).forEach(key => {
+      const {
+        id: equipmentId,
+        channel,
+        cellSize,
+        probeResponseThreshold,
+        clientDisconnectThreshold,
+        snrDrop,
+        minLoad,
+      } = updatedRows[key];
+      const updatedEuips = setUpdatedBulkEditTableData(
+        equipmentId,
+        channel,
+        cellSize,
+        probeResponseThreshold,
+        clientDisconnectThreshold,
+        snrDrop,
+        minLoad,
+        equipData && equipData.filterEquipment
       );
-      updateEquipments(editedRowsArr);
-    }
+      const tempObj = {
+        equipmentId,
+        perRadioDetails: {},
+      };
+      updatedEuips.map(item => {
+        Object.keys(item).forEach(i => {
+          tempObj.perRadioDetails[i] = item[i];
+        });
+        return tempObj;
+      });
+      return editedRowsArr.push(tempObj);
+    });
+    updateEquipments(editedRowsArr);
   };
 
   const handleLoadMore = () => {
