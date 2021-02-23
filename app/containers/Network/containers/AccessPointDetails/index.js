@@ -15,7 +15,7 @@ import {
   REQUEST_EQUIPMENT_SWITCH_BANK,
   REQUEST_EQUIPMENT_REBOOT,
 } from 'graphql/mutations';
-import { updateQueryGetAllProfiles } from 'graphql/functions';
+import { fetchMoreProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
 
 const GET_EQUIPMENT = gql`
@@ -156,7 +156,6 @@ const AccessPointDetails = ({ locations }) => {
       errorPolicy: 'all',
     }
   );
-
   const {
     data: dataProfiles,
     error: errorProfiles,
@@ -171,7 +170,6 @@ const AccessPointDetails = ({ locations }) => {
     }`),
     {
       variables: { customerId, type: 'equipment_ap' },
-      errorPolicy: 'all',
     }
   );
 
@@ -335,21 +333,7 @@ const AccessPointDetails = ({ locations }) => {
       );
 
   const handleFetchProfiles = e => {
-    if (dataProfiles.getAllProfiles.context.lastPage) {
-      return false;
-    }
-
-    e.persist();
-    const { target } = e;
-
-    if (target.scrollTop + target.offsetHeight === target.scrollHeight) {
-      fetchMore({
-        variables: { context: { ...dataProfiles.getAllProfiles.context } },
-        updateQuery: updateQueryGetAllProfiles,
-      });
-    }
-
-    return true;
+    fetchMoreProfiles(e, dataProfiles, fetchMore);
   };
 
   if (loading) {
