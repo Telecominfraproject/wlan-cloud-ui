@@ -37,36 +37,43 @@ const AddProfile = () => {
   const { customerId } = useContext(UserContext);
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
+    fetchPolicy: 'network-only',
   });
   const { data: radiusProfiles, fetchMore: fetchMoreRadiusProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'radius' },
+      fetchPolicy: 'network-only',
     }
   );
   const { data: captiveProfiles, fetchMore: fetchMoreCaptiveProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'captive_portal' },
+      fetchPolicy: 'network-only',
     }
   );
   const { data: venueProfiles, fetchMore: fetchMoreVenueProfiles } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'passpoint_venue' },
+    fetchPolicy: 'network-only',
   });
   const { data: operatorProfiles, fetchMore: fetchMoreOperatorProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'passpoint_operator' },
+      fetchPolicy: 'network-only',
     }
   );
   const { data: idProviderProfiles, fetchMore: fetchMoreIdProviderProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'passpoint_osu_id_provider' },
+      fetchPolicy: 'network-only',
     }
   );
   const { data: rfProfiles, fetchMore: fetchMoreRfProfiles } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'rf' },
+    fetchPolicy: 'network-only',
   });
   const [createProfile] = useMutation(CREATE_PROFILE);
   const history = useHistory();
