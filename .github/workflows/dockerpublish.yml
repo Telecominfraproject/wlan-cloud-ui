@@ -57,7 +57,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=0.0.1-SNAPSHOT
+          [ "$VERSION" == "master" ] && VERSION=1.0.0-SNAPSHOT
 
           TIMESTAMP=$(date +'%Y-%m-%d')
 
@@ -89,7 +89,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=0.0.1-SNAPSHOT
+          [ "$VERSION" == "master" ] && VERSION=1.0.0-SNAPSHOT
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
