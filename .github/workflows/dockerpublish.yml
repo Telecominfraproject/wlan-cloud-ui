@@ -100,7 +100,7 @@ jobs:
           echo TIMESTAMP=$TIMESTAMP
 
           docker tag image $IMAGE_ID:$VERSION
-          #docker push $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
           
           docker tag image $IMAGE_ID:$VERSION-$TIMESTAMP
-          #docker push $IMAGE_ID:$VERSION-$TIMESTAMP          
+          docker push $IMAGE_ID:$VERSION-$TIMESTAMP          
