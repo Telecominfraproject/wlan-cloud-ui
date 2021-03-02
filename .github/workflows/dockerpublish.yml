@@ -5,6 +5,7 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
+      - 'release/**'
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -56,6 +57,9 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
+          # Create a release snapshot if we are on release branch
+          [[ "${{ github.ref }}" == "refs/heads/release/v"* ]] && VERSION=$(echo $VERSION | sed -e 's/refs\/heads\/release\/[v]*//' | awk '{print $1"-SNAPSHOT"}')
+
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=1.0.0-SNAPSHOT
 
@@ -85,8 +89,8 @@ jobs:
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Create a release snapshot if we are on release branch
+          [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo $VERSION | sed -e 's/refs\/heads\/release\/[v]*//' | awk '{print $1"-SNAPSHOT"}')
 
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=1.0.0-SNAPSHOT
@@ -96,7 +100,7 @@ jobs:
           echo TIMESTAMP=$TIMESTAMP
 
           docker tag image $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          #docker push $IMAGE_ID:$VERSION
           
           docker tag image $IMAGE_ID:$VERSION-$TIMESTAMP
-          docker push $IMAGE_ID:$VERSION-$TIMESTAMP          
+          #docker push $IMAGE_ID:$VERSION-$TIMESTAMP          
