@@ -89,6 +89,9 @@ jobs:
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
           # Create a release snapshot if we are on release branch
           [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
 
