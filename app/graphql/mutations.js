@@ -255,6 +255,62 @@ export const CREATE_EQUIPMENT = gql`
   }
 `;
 
+export const UPDATE_EQUIPMENT = gql`
+  mutation UpdateEquipment(
+    $id: ID!
+    $equipmentType: String!
+    $inventoryId: String!
+    $customerId: ID!
+    $profileId: ID!
+    $locationId: ID!
+    $name: String!
+    $baseMacAddress: String
+    $latitude: String
+    $longitude: String
+    $serial: String
+    $lastModifiedTimestamp: String
+    $details: JSONObject
+  ) {
+    updateEquipment(
+      id: $id
+      equipmentType: $equipmentType
+      inventoryId: $inventoryId
+      customerId: $customerId
+      profileId: $profileId
+      locationId: $locationId
+      name: $name
+      baseMacAddress: $baseMacAddress
+      latitude: $latitude
+      longitude: $longitude
+      serial: $serial
+      lastModifiedTimestamp: $lastModifiedTimestamp
+      details: $details
+    ) {
+      id
+      equipmentType
+      inventoryId
+      customerId
+      profileId
+      locationId
+      name
+      baseMacAddress
+      latitude
+      longitude
+      serial
+      lastModifiedTimestamp
+      details
+    }
+  }
+`;
+
+export const DELETE_EQUIPMENT = gql`
+  mutation DeleteEquipment($id: ID!) {
+    deleteEquipment(id: $id) {
+      id
+    }
+  }
+`;
+
 export const UPDATE_CUSTOMER = gql`
   mutation UpdateCustomer(
     $id: ID!

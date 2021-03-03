@@ -27,13 +27,22 @@ const renderTableCell = tabCell => {
   return <span>{tabCell}</span>;
 };
 const accessPointsChannelTableColumns = [
-  { title: 'Name', dataIndex: 'name', key: 'name', width: 150, render: renderTableCell },
+  { title: 'Name', dataIndex: 'name', key: 'name', width: 250, render: renderTableCell },
   {
-    title: 'Channel',
-    dataIndex: 'channel',
-    key: 'channel',
+    title: 'Manual Active Channel',
+    dataIndex: 'manualChannelNumber',
+    key: 'manualChannelNumber',
     editable: true,
-    width: 150,
+    width: 200,
+    render: renderTableCell,
+  },
+
+  {
+    title: 'Manual Backup Channel',
+    dataIndex: 'manualBackupChannelNumber',
+    key: 'manualBackupChannelNumber',
+    editable: true,
+    width: 210,
     render: renderTableCell,
   },
   {
@@ -49,7 +58,7 @@ const accessPointsChannelTableColumns = [
     dataIndex: 'probeResponseThreshold',
     key: 'probeResponseThreshold',
     editable: true,
-    width: 200,
+    width: 210,
     render: renderTableCell,
   },
   {
@@ -57,7 +66,7 @@ const accessPointsChannelTableColumns = [
     dataIndex: 'clientDisconnectThreshold',
     key: 'clientDisconnectThreshold',
     editable: true,
-    width: 200,
+    width: 210,
 
     render: renderTableCell,
   },
@@ -66,7 +75,7 @@ const accessPointsChannelTableColumns = [
     dataIndex: 'snrDrop',
     key: 'snrDrop',
     editable: true,
-    width: 175,
+    width: 150,
     render: renderTableCell,
   },
   {
@@ -169,6 +178,21 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   const [updateEquipmentBulk] = useMutation(UPDATE_EQUIPMENT_BULK);
 
   const getRadioDetails = (radioDetails, type) => {
+    if (type === 'manualChannelNumber') {
+      const manualChannelNumbers = [];
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
+        return manualChannelNumbers.push(radioDetails.radioMap[i]?.manualChannelNumber);
+      });
+      return manualChannelNumbers;
+    }
+
+    if (type === 'manualBackupChannelNumber') {
+      const manualBackupChannelNumbers = [];
+      Object.keys(radioDetails?.radioMap || {}).map(i => {
+        return manualBackupChannelNumbers.push(radioDetails.radioMap[i]?.manualBackupChannelNumber);
+      });
+      return manualBackupChannelNumbers;
+    }
     if (type === 'cellSize') {
       const cellSizeValues = [];
       Object.keys(radioDetails?.radioMap || {}).map(i => {
@@ -214,12 +238,13 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   };
 
   const setAccessPointsBulkEditTableData = (dataSource = []) => {
-    const tableData = dataSource.items.map(({ id: key, name, channel, details }) => {
+    const tableData = dataSource.items.map(({ id: key, name, details }) => {
       return {
         key,
         id: key,
         name,
-        channel,
+        manualChannelNumber: getRadioDetails(details, 'manualChannelNumber'),
+        manualBackupChannelNumber: getRadioDetails(details, 'manualBackupChannelNumber'),
         cellSize: getRadioDetails(details, 'cellSize'),
         probeResponseThreshold: getRadioDetails(details, 'probeResponseThreshold'),
         clientDisconnectThreshold: getRadioDetails(details, 'clientDisconnectThreshold'),
@@ -232,7 +257,8 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
 
   const setUpdatedBulkEditTableData = (
     equipmentId,
-    channel,
+    manualChannelNumber,
+    manualBackupChannelNumber,
     cellSize,
     probeResponseThreshold,
     clientDisconnectThreshold,
@@ -251,7 +277,8 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
           minLoadFactor = minLoad[dataIndex];
 
           frequencies[`${i}`] = {
-            channelNumber: channel[dataIndex],
+            channelNumber: manualChannelNumber[dataIndex],
+            backupChannelNumber: manualBackupChannelNumber[dataIndex],
             rxCellSizeDb: {
               auto: true,
               value: cellSize[dataIndex],
@@ -300,7 +327,8 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     Object.keys(updatedRows).forEach(key => {
       const {
         id: equipmentId,
-        channel,
+        manualChannelNumber,
+        manualBackupChannelNumber,
         cellSize,
         probeResponseThreshold,
         clientDisconnectThreshold,
@@ -309,7 +337,8 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
       } = updatedRows[key];
       const updatedEuips = setUpdatedBulkEditTableData(
         equipmentId,
-        channel,
+        manualChannelNumber,
+        manualBackupChannelNumber,
         cellSize,
         probeResponseThreshold,
         clientDisconnectThreshold,
@@ -364,18 +393,9 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   return (
     <BulkEditAccessPoints
       tableColumns={accessPointsChannelTableColumns}
-      tableData={
-        equipData &&
-        equipData.filterEquipment &&
-        setAccessPointsBulkEditTableData(equipData && equipData.filterEquipment)
-      }
+      tableData={setAccessPointsBulkEditTableData(equipData && equipData?.filterEquipment)}
       onLoadMore={handleLoadMore}
-      isLastPage={
-        equipData &&
-        equipData.filterEquipment &&
-        equipData.filterEquipment.context &&
-        equipData.filterEquipment.context.lastPage
-      }
+      isLastPage={equipData?.filterEquipment?.context?.lastPage}
       onSaveChanges={handleSaveChanges}
       breadcrumbPath={getBreadcrumbPath(id, locations)}
     />
