@@ -5,8 +5,7 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
-      # Publish `v1.2.3` release branches as releases.
-      - release/*
+      - 'release/**'
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -58,7 +57,10 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Use Docker `latest` tag convention for master branch
+          # Create a release snapshot if we are on release branch
+          [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
+
+          # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
 
           TIMESTAMP=$(date +'%Y-%m-%d')
@@ -90,7 +92,10 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Use Docker `latest` tag convention for master branch
+          # Create a release snapshot if we are on release branch
+          [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
+
+          # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
 
           echo IMAGE_ID=$IMAGE_ID
