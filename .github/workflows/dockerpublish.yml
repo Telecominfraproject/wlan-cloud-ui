@@ -61,7 +61,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=master
+          [ "$VERSION" == "master" ] && VERSION=latest
 
           TIMESTAMP=$(date +'%Y-%m-%d')
 
