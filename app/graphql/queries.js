@@ -77,6 +77,64 @@ export const FILTER_EQUIPMENT = gql`
   }
 `;
 
+export const GET_EQUIPMENT = gql`
+  query GetEquipment($id: ID!) {
+    getEquipment(id: $id) {
+      id
+      equipmentType
+      inventoryId
+      customerId
+      profileId
+      locationId
+      name
+      latitude
+      longitude
+      serial
+      lastModifiedTimestamp
+      details
+      profile {
+        id
+        name
+        childProfiles {
+          id
+          name
+          details
+        }
+      }
+      baseMacAddress
+      manufacturer
+      status {
+        firmware {
+          detailsJSON
+        }
+        protocol {
+          detailsJSON
+        }
+        radioUtilization {
+          detailsJSON
+        }
+        clientDetails {
+          detailsJSON
+          details {
+            numClientsPerRadio
+          }
+        }
+        osPerformance {
+          detailsJSON
+        }
+      }
+      model
+      alarmsCount
+      alarms {
+        severity
+        alarmCode
+        details
+        createdTimestamp
+      }
+    }
+  }
+`;
+
 export const FILTER_EQUIPMENT_BULK_EDIT_APS = gql`
   query FilterEquipment(
     $locationIds: [ID]
