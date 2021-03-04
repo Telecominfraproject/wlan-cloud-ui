@@ -5,6 +5,8 @@ on:
     # Publish `master` as Docker `latest` image.
     branches:
       - master
+      # Publish `v1.2.3` release branches as releases.
+      - release/*
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -14,8 +16,8 @@ on:
   pull_request:
 
   schedule:
-      # runs nightly build at 5AM
-      - cron:  '00 09 * * *'
+    # runs nightly build at 5AM
+    - cron: '00 09 * * *'
 
 env:
   IMAGE_NAME: wlan-cloud-ui
@@ -48,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Adding property file with component version and commit hash 
+      - name: Adding property file with component version and commit hash
         run: |
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
@@ -56,8 +58,8 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=0.0.1-SNAPSHOT
+          # Use Docker `latest` tag convention for master branch
+          [ "$VERSION" == "master" ] && VERSION=latest
 
           TIMESTAMP=$(date +'%Y-%m-%d')
 
@@ -88,8 +90,8 @@ jobs:
           # Strip "v" prefix from tag name
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=0.0.1-SNAPSHOT
+          # Use Docker `latest` tag convention for master branch
+          [ "$VERSION" == "master" ] && VERSION=latest
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
@@ -97,6 +99,6 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-          
+
           docker tag image $IMAGE_ID:$VERSION-$TIMESTAMP
-          docker push $IMAGE_ID:$VERSION-$TIMESTAMP          
+          docker push $IMAGE_ID:$VERSION-$TIMESTAMP
