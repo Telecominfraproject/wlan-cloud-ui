@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useParams, useHistory } from 'react-router-dom';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import moment from 'moment';
 import {
@@ -9,128 +9,21 @@ import {
   Loading,
 } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { FILTER_SERVICE_METRICS, GET_ALL_FIRMWARE, GET_ALL_PROFILES } from 'graphql/queries';
 import {
+  GET_EQUIPMENT,
+  FILTER_SERVICE_METRICS,
+  GET_ALL_FIRMWARE,
+  GET_ALL_PROFILES,
+} from 'graphql/queries';
+import {
+  UPDATE_EQUIPMENT,
+  DELETE_EQUIPMENT,
   UPDATE_EQUIPMENT_FIRMWARE,
   REQUEST_EQUIPMENT_SWITCH_BANK,
   REQUEST_EQUIPMENT_REBOOT,
 } from 'graphql/mutations';
 import { fetchMoreProfiles } from 'graphql/functions';
 import UserContext from 'contexts/UserContext';
-
-const GET_EQUIPMENT = gql`
-  query GetEquipment($id: ID!) {
-    getEquipment(id: $id) {
-      id
-      equipmentType
-      inventoryId
-      customerId
-      profileId
-      locationId
-      name
-      latitude
-      longitude
-      serial
-      lastModifiedTimestamp
-      details
-      profile {
-        id
-        name
-        childProfiles {
-          id
-          name
-          details
-        }
-      }
-      baseMacAddress
-      manufacturer
-      status {
-        firmware {
-          detailsJSON
-        }
-        protocol {
-          detailsJSON
-        }
-        radioUtilization {
-          detailsJSON
-        }
-        clientDetails {
-          detailsJSON
-          details {
-            numClientsPerRadio
-          }
-        }
-        osPerformance {
-          detailsJSON
-        }
-      }
-      model
-      alarmsCount
-      alarms {
-        severity
-        alarmCode
-        details
-        createdTimestamp
-      }
-    }
-  }
-`;
-
-const UPDATE_EQUIPMENT = gql`
-  mutation UpdateEquipment(
-    $id: ID!
-    $equipmentType: String!
-    $inventoryId: String!
-    $customerId: ID!
-    $profileId: ID!
-    $locationId: ID!
-    $name: String!
-    $baseMacAddress: String
-    $latitude: String
-    $longitude: String
-    $serial: String
-    $lastModifiedTimestamp: String
-    $details: JSONObject
-  ) {
-    updateEquipment(
-      id: $id
-      equipmentType: $equipmentType
-      inventoryId: $inventoryId
-      customerId: $customerId
-      profileId: $profileId
-      locationId: $locationId
-      name: $name
-      baseMacAddress: $baseMacAddress
-      latitude: $latitude
-      longitude: $longitude
-      serial: $serial
-      lastModifiedTimestamp: $lastModifiedTimestamp
-      details: $details
-    ) {
-      id
-      equipmentType
-      inventoryId
-      customerId
-      profileId
-      locationId
-      name
-      baseMacAddress
-      latitude
-      longitude
-      serial
-      lastModifiedTimestamp
-      details
-    }
-  }
-`;
-
-const DELETE_EQUIPMENT = gql`
-  mutation DeleteEquipment($id: ID!) {
-    deleteEquipment(id: $id) {
-      id
-    }
-  }
-`;
 
 const toTime = moment();
 const fromTime = moment().subtract(1, 'hour');

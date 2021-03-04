@@ -15,8 +15,8 @@ on:
   pull_request:
 
   schedule:
-      # runs nightly build at 5AM
-      - cron:  '00 09 * * *'
+    # runs nightly build at 5AM
+    - cron: '00 09 * * *'
 
 env:
   IMAGE_NAME: wlan-cloud-ui
@@ -49,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Adding property file with component version and commit hash 
+      - name: Adding property file with component version and commit hash
         run: |
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
@@ -61,7 +61,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=1.0.0-SNAPSHOT
+          [ "$VERSION" == "master" ] && VERSION=master
 
           TIMESTAMP=$(date +'%Y-%m-%d')
 
@@ -96,7 +96,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=1.0.0-SNAPSHOT
+          [ "$VERSION" == "master" ] && VERSION=latest
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
@@ -104,6 +104,6 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-          
+
           docker tag image $IMAGE_ID:$VERSION-$TIMESTAMP
-          docker push $IMAGE_ID:$VERSION-$TIMESTAMP          
+          docker push $IMAGE_ID:$VERSION-$TIMESTAMP
