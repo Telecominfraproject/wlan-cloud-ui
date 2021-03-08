@@ -4,11 +4,12 @@ import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { ROUTES } from 'constants/index';
+import { ROUTES, AUTH_TOKEN } from 'constants/index';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_PROFILES } from 'graphql/queries';
+import { GET_ALL_PROFILES, GET_API_URL } from 'graphql/queries';
 import { FILE_UPLOAD } from 'graphql/mutations';
 import { fetchMoreProfiles } from 'graphql/functions';
+import { getItem } from 'utils/localStorage';
 
 const GET_PROFILE = gql`
   query GetProfile($id: ID!) {
@@ -74,6 +75,8 @@ const ProfileDetails = () => {
   const { id } = useParams();
 
   const [redirect, setRedirect] = useState(false);
+
+  const { data: apiUrl } = useQuery(GET_API_URL);
 
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id },
@@ -192,6 +195,29 @@ const ProfileDetails = () => {
         })
       );
 
+  const handleDownloadFile = async name => {
+    const token = getItem(AUTH_TOKEN);
+    if (apiUrl?.getApiUrl) {
+      return fetch(`${apiUrl?.getApiUrl}filestore/${encodeURIComponent(name)}`, {
+        method: 'GET',
+        headers: {
+          Authorization: token ? `Bearer ${token.access_token}` : '',
+        },
+      })
+        .then(res => res.text())
+        .catch(() => {
+          notification.error({
+            message: 'Error',
+            description: 'File could not be retrieved.',
+          });
+        });
+    }
+    return notification.error({
+      message: 'Error',
+      description: 'File could not be retrieved.',
+    });
+  };
+
   const handleFetchMoreProfiles = (e, key) => {
     if (key === 'radius') fetchMoreProfiles(e, radiusProfiles, fetchMoreRadiusProfiles);
     else if (key === 'captive_portal')
@@ -237,6 +263,7 @@ const ProfileDetails = () => {
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchMoreProfiles}
+      onDownloadFile={handleDownloadFile}
     />
   );
 };
