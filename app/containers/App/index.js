@@ -92,7 +92,9 @@ const App = () => {
           <ProtectedRouteWithLayout exact path={ROUTES.addprofile} component={AddProfile} />
 
           <ProtectedRouteWithLayout exact path={ROUTES.alarms} component={Alarms} />
-          <ProtectedRouteWithLayout exact path={ROUTES.account} component={EditAccount} />
+          {user?.roles?.[0] === 'SuperUser' && user?.id !== 0 && (
+            <ProtectedRouteWithLayout exact path={ROUTES.account} component={EditAccount} />
+          )}
           {user?.roles?.[0] === 'SuperUser' && (
             <ProtectedRouteWithLayout exact path={ROUTES.users} component={Accounts} />
           )}

@@ -13,7 +13,7 @@ import { removeItem } from 'utils/localStorage';
 import UserContext from 'contexts/UserContext';
 
 const MasterLayout = ({ children }) => {
-  const { roles, customerId } = useContext(UserContext);
+  const { roles, customerId, id: currentUserId } = useContext(UserContext);
 
   const client = useApolloClient();
   const location = useLocation();
@@ -56,11 +56,15 @@ const MasterLayout = ({ children }) => {
       key: 'settings',
       text: 'Settings',
       children: [
-        {
-          key: 'editAccount',
-          path: ROUTES.account,
-          text: 'Edit Account',
-        },
+        ...(roles?.[0] === 'SuperUser' && currentUserId !== 0
+          ? [
+              {
+                key: 'editAccount',
+                path: ROUTES.account,
+                text: 'Edit Account',
+              },
+            ]
+          : []),
         {
           key: 'logout',
           path: ROUTES.root,
@@ -90,6 +94,7 @@ const MasterLayout = ({ children }) => {
       menuItems={menuItems}
       mobileMenuItems={mobileMenuItems}
       totalAlarms={data && data.getAlarmCount}
+      currentUserId={currentUserId}
     >
       {children}
     </Layout>
