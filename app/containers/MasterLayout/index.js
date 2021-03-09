@@ -56,7 +56,7 @@ const MasterLayout = ({ children }) => {
       key: 'settings',
       text: 'Settings',
       children: [
-        ...(roles?.[0] === 'SuperUser' && currentUserId !== 0
+        ...(currentUserId !== 0
           ? [
               {
                 key: 'editAccount',
