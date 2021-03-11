@@ -7,7 +7,6 @@ import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cl
 import { ROUTES, AUTH_TOKEN } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES, GET_API_URL } from 'graphql/queries';
-import { FILE_UPLOAD } from 'graphql/mutations';
 import { fetchMoreProfiles } from 'graphql/functions';
 import { getItem } from 'utils/localStorage';
 
@@ -133,8 +132,6 @@ const ProfileDetails = () => {
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
 
-  const [fileUpload] = useMutation(FILE_UPLOAD);
-
   const handleDeleteProfile = () => {
     deleteProfile({ variables: { id } })
       .then(() => {
@@ -180,20 +177,45 @@ const ProfileDetails = () => {
       );
   };
 
-  const handleFileUpload = (fileName, file) =>
-    fileUpload({ variables: { fileName, file } })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'File successfully uploaded.',
-        });
+  const handleFileUpload = async (fileName, file) => {
+    const token = getItem(AUTH_TOKEN);
+
+    if (apiUrl?.getApiUrl) {
+      fetch(`${apiUrl?.getApiUrl}filestore/${fileName}`, {
+        method: 'POST',
+        headers: {
+          Authorization: token ? `Bearer ${token.access_token}` : '',
+          'Content-Type': 'application/octet-stream',
+        },
+        body: file,
       })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'File could not be uploaded.',
+        .then(response => response.json())
+        .then(resp => {
+          if (resp?.success) {
+            notification.success({
+              message: 'Success',
+              description: 'File successfully uploaded.',
+            });
+          } else {
+            notification.error({
+              message: 'Error',
+              description: 'File could not be uploaded.',
+            });
+          }
         })
-      );
+        .catch(() => {
+          notification.error({
+            message: 'Error',
+            description: 'File could not be uploaded.',
+          });
+        });
+    } else {
+      notification.error({
+        message: 'Error',
+        description: 'File could not be uploaded.',
+      });
+    }
+  };
 
   const handleDownloadFile = async name => {
     const token = getItem(AUTH_TOKEN);
@@ -201,10 +223,19 @@ const ProfileDetails = () => {
       return fetch(`${apiUrl?.getApiUrl}filestore/${encodeURIComponent(name)}`, {
         method: 'GET',
         headers: {
+          'Content-Type': 'application/octet-stream',
           Authorization: token ? `Bearer ${token.access_token}` : '',
         },
       })
-        .then(res => res.text())
+        .then(response => response.blob())
+        .then(blob => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        })
         .catch(() => {
           notification.error({
             message: 'Error',
