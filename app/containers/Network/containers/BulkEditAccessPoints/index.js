@@ -237,23 +237,20 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     return minLoadValue;
   };
 
-  const setAccessPointsBulkEditTableData = (dataSource = []) => {
-    const tableData = dataSource.items.map(({ id: key, name, details }) => {
-      return {
-        key,
-        id: key,
-        name,
-        manualChannelNumber: getRadioDetails(details, 'manualChannelNumber'),
-        manualBackupChannelNumber: getRadioDetails(details, 'manualBackupChannelNumber'),
-        cellSize: getRadioDetails(details, 'cellSize'),
-        probeResponseThreshold: getRadioDetails(details, 'probeResponseThreshold'),
-        clientDisconnectThreshold: getRadioDetails(details, 'clientDisconnectThreshold'),
-        snrDrop: getRadioDetails(details, 'snrDrop'),
-        minLoad: getRadioDetails(details, 'minLoad'),
-      };
-    });
-    return tableData;
-  };
+  const setAccessPointsBulkEditTableData = (dataSource = []) =>
+    dataSource.items.map(({ id: key, name, details }) => ({
+      key,
+      id: key,
+      name,
+      manualChannelNumber: getRadioDetails(details, 'manualChannelNumber'),
+      manualBackupChannelNumber: getRadioDetails(details, 'manualBackupChannelNumber'),
+      cellSize: getRadioDetails(details, 'cellSize'),
+      probeResponseThreshold: getRadioDetails(details, 'probeResponseThreshold'),
+      clientDisconnectThreshold: getRadioDetails(details, 'clientDisconnectThreshold'),
+      snrDrop: getRadioDetails(details, 'snrDrop'),
+      minLoad: getRadioDetails(details, 'minLoad'),
+      radioMap: Object.keys(details?.radioMap || {}),
+    }));
 
   const setUpdatedBulkEditTableData = (
     equipmentId,
@@ -393,7 +390,7 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   return (
     <BulkEditAccessPoints
       tableColumns={accessPointsChannelTableColumns}
-      tableData={setAccessPointsBulkEditTableData(equipData && equipData?.filterEquipment)}
+      tableData={setAccessPointsBulkEditTableData(equipData?.filterEquipment)}
       onLoadMore={handleLoadMore}
       isLastPage={equipData?.filterEquipment?.context?.lastPage}
       onSaveChanges={handleSaveChanges}
