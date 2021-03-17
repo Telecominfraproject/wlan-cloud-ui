@@ -70,6 +70,9 @@ export const FILTER_EQUIPMENT = gql`
           firmware {
             detailsJSON
           }
+          channel {
+            detailsJSON
+          }
         }
       }
       context
@@ -120,6 +123,9 @@ export const GET_EQUIPMENT = gql`
           }
         }
         osPerformance {
+          detailsJSON
+        }
+        channel {
           detailsJSON
         }
       }
