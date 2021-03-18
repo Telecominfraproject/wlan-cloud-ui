@@ -4,11 +4,11 @@ import { useQuery, useMutation, gql } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { ROUTES } from 'constants/index';
+import { ROUTES, AUTH_TOKEN } from 'constants/index';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_PROFILES } from 'graphql/queries';
-import { FILE_UPLOAD } from 'graphql/mutations';
+import { GET_ALL_PROFILES, GET_API_URL } from 'graphql/queries';
 import { fetchMoreProfiles } from 'graphql/functions';
+import { getItem } from 'utils/localStorage';
 
 const GET_PROFILE = gql`
   query GetProfile($id: ID!) {
@@ -75,6 +75,8 @@ const ProfileDetails = () => {
 
   const [redirect, setRedirect] = useState(false);
 
+  const { data: apiUrl } = useQuery(GET_API_URL);
+
   const { loading, error, data } = useQuery(GET_PROFILE, {
     variables: { id },
     fetchPolicy: 'network-only',
@@ -130,8 +132,6 @@ const ProfileDetails = () => {
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
 
-  const [fileUpload] = useMutation(FILE_UPLOAD);
-
   const handleDeleteProfile = () => {
     deleteProfile({ variables: { id } })
       .then(() => {
@@ -177,20 +177,77 @@ const ProfileDetails = () => {
       );
   };
 
-  const handleFileUpload = (fileName, file) =>
-    fileUpload({ variables: { fileName, file } })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'File successfully uploaded.',
-        });
+  const handleFileUpload = async (fileName, file) => {
+    const token = getItem(AUTH_TOKEN);
+
+    if (apiUrl?.getApiUrl) {
+      fetch(`${apiUrl?.getApiUrl}filestore/${fileName}`, {
+        method: 'POST',
+        headers: {
+          Authorization: token ? `Bearer ${token.access_token}` : '',
+          'Content-Type': 'application/octet-stream',
+        },
+        body: file,
       })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'File could not be uploaded.',
+        .then(response => response.json())
+        .then(resp => {
+          if (resp?.success) {
+            notification.success({
+              message: 'Success',
+              description: 'File successfully uploaded.',
+            });
+          } else {
+            notification.error({
+              message: 'Error',
+              description: 'File could not be uploaded.',
+            });
+          }
         })
-      );
+        .catch(() => {
+          notification.error({
+            message: 'Error',
+            description: 'File could not be uploaded.',
+          });
+        });
+    } else {
+      notification.error({
+        message: 'Error',
+        description: 'File could not be uploaded.',
+      });
+    }
+  };
+
+  const handleDownloadFile = async name => {
+    const token = getItem(AUTH_TOKEN);
+    if (apiUrl?.getApiUrl) {
+      return fetch(`${apiUrl?.getApiUrl}filestore/${encodeURIComponent(name)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/octet-stream',
+          Authorization: token ? `Bearer ${token.access_token}` : '',
+        },
+      })
+        .then(response => response.blob())
+        .then(blob => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+        })
+        .catch(() => {
+          notification.error({
+            message: 'Error',
+            description: 'File could not be retrieved.',
+          });
+        });
+    }
+    return notification.error({
+      message: 'Error',
+      description: 'File could not be retrieved.',
+    });
+  };
 
   const handleFetchMoreProfiles = (e, key) => {
     if (key === 'radius') fetchMoreProfiles(e, radiusProfiles, fetchMoreRadiusProfiles);
@@ -237,6 +294,7 @@ const ProfileDetails = () => {
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchMoreProfiles}
+      onDownloadFile={handleDownloadFile}
     />
   );
 };

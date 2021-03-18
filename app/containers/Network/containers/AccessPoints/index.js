@@ -89,8 +89,8 @@ const accessPointsTableColumns = [
   },
   {
     title: 'CHANNEL',
-    dataIndex: 'channel',
-    render: renderTableCell,
+    dataIndex: ['status', 'channel', 'detailsJSON', 'channelNumberStatusDataMap'],
+    render: text => renderTableCell(Object.values(text ?? [])),
   },
   {
     title: 'OCCUPANCY',
