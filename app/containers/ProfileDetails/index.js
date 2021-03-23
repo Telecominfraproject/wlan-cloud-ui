@@ -23,6 +23,16 @@ const GET_PROFILE = gql`
         profileType
         details
       }
+      associatedSsidProfiles {
+        id
+        name
+        profileType
+        details
+      }
+      osuSsidProfile {
+        id
+        name
+      }
       childProfileIds
       createdTimestamp
       lastModifiedTimestamp
@@ -292,6 +302,8 @@ const ProfileDetails = () => {
       venueProfiles={venueProfiles?.getAllProfiles?.items}
       operatorProfiles={operatorProfiles?.getAllProfiles?.items}
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
+      associatedSsidProfiles={data.getProfile?.associatedSsidProfiles}
+      osuSsidProfile={data.getProfile?.osuSsidProfile}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchMoreProfiles}
       onDownloadFile={handleDownloadFile}
