@@ -70,7 +70,7 @@ const AccessPointDetails = ({ locations }) => {
     loading: metricsLoading,
     error: metricsError,
     data: metricsData,
-    refetch: metricsRefetch,
+    fetchMore: fetchMoreServiceMetrics,
   } = useQuery(FILTER_SERVICE_METRICS, {
     variables: {
       customerId,
@@ -90,7 +90,29 @@ const AccessPointDetails = ({ locations }) => {
 
   const refetchData = () => {
     refetch();
-    metricsRefetch();
+    fetchMoreServiceMetrics({
+      variables: {
+        fromTime: moment()
+          .subtract(2, 'minutes')
+          .valueOf()
+          .toString(),
+        toTime: moment()
+          .valueOf()
+          .toString(),
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const previousEntry = previousResult.filterServiceMetrics;
+        const newItems = fetchMoreResult.filterServiceMetrics.items;
+
+        return {
+          filterServiceMetrics: {
+            context: fetchMoreResult.filterServiceMetrics.context,
+            items: [...previousEntry.items, ...newItems],
+            __typename: previousEntry.__typename,
+          },
+        };
+      },
+    });
   };
 
   const handleUpdateEquipment = ({
