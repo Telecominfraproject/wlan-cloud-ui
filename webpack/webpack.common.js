@@ -1,4 +1,3 @@
-const HtmlWebPackPlugin = require('html-webpack-plugin');
 /* eslint-disable import/no-extraneous-dependencies */
 const webpack = require('webpack');
 
@@ -25,10 +24,6 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebPackPlugin({
-      template: commonPaths.templatePath,
-      favicon: './app/images/favicon.ico',
-    }),
     new webpack.DefinePlugin({
       'process.env.API': JSON.stringify(process.env.API || 'http://localhost:4000'),
     }),

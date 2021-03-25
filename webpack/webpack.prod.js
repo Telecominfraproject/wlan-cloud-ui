@@ -1,6 +1,8 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+/* eslint-disable import/no-extraneous-dependencies */
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 
@@ -8,45 +10,50 @@ const commonPaths = require('./paths');
 
 module.exports = {
   output: {
-    filename: `${commonPaths.jsFolder}/[name].[hash].js`,
     path: commonPaths.outputPath,
     publicPath: '/',
-    chunkFilename: `${commonPaths.jsFolder}/[name].[chunkhash].js`,
+    filename: `${commonPaths.jsFolder}/[name].[chunkhash].js`,
+    chunkFilename: `${commonPaths.jsFolder}/[id].[chunkhash].js`,
   },
+
   optimization: {
     minimize: true,
     minimizer: [
       new TerserPlugin({
-        // Use multi-process parallel running to improve the build speed
-        // Default number of concurrent runs: os.cpus().length - 1
-        parallel: true,
-        // Enable file caching
-        cache: true,
-        sourceMap: true,
-      }),
-      new OptimizeCSSAssetsPlugin(),
-    ],
-    // Automatically split vendor and commons
-    // https://twitter.com/wSokra/status/969633336732905474
-    // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
-    splitChunks: {
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'initial',
+        terserOptions: {
+          warnings: false,
+          compress: {
+            comparisons: false,
+          },
+          parse: {},
+          mangle: true,
+          output: {
+            comments: false,
+            ascii_only: true,
+          },
         },
-        async: {
+        parallel: true,
+      }),
+      new CssMinimizerPlugin(),
+    ],
+    nodeEnv: 'production',
+    sideEffects: true,
+    concatenateModules: true,
+    runtimeChunk: 'single',
+    splitChunks: {
+      chunks: 'all',
+      maxInitialRequests: 10,
+      minSize: 0,
+      cacheGroups: {
+        vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name: 'async',
-          chunks: 'async',
-          minChunks: 4,
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `npm.${packageName.replace('@', '')}`;
+          },
         },
       },
     },
-    // Keep the runtime chunk seperated to enable long term caching
-    // https://twitter.com/wSokra/status/969679223278505985
-    runtimeChunk: true,
   },
 
   module: {
@@ -93,10 +100,29 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
+
+    // Minify and optimize the index.html
+    new HtmlWebpackPlugin({
+      template: commonPaths.templatePath,
+      favicon: './app/images/favicon.ico',
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+      inject: true,
+    }),
+
     new MiniCssExtractPlugin({
       filename: `${commonPaths.cssFolder}/[name].css`,
-      chunkFilename: `${commonPaths.cssFolder}/[name].css`,
+      chunkFilename: `${commonPaths.cssFolder}/[id].css`,
     }),
   ],
-  devtool: 'source-map',
 };
