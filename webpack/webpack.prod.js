@@ -85,19 +85,23 @@ module.exports = {
           {
             loader: 'less-loader', // compiles Less to CSS
             options: {
-              javascriptEnabled: true,
+              lessOptions: {
+                javascriptEnabled: true,
+              },
             },
           },
         ],
       },
     ],
   },
+
   resolve: {
     modules: ['node_modules', 'app'],
     alias: {
       app: path.resolve(__dirname, '../', 'app'),
     },
   },
+
   plugins: [
     new CleanWebpackPlugin(),
 
