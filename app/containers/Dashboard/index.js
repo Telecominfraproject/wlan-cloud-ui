@@ -20,8 +20,11 @@ function formatBytes(bytes, decimals = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i] || ''}`;
 }
 
-function trafficLabelFormatter() {
-  return formatBytes(this.value);
+function trafficLabelFormatter(bytes) {
+  if (this?.value) {
+    return formatBytes(this.value);
+  }
+  return formatBytes(bytes);
 }
 
 function trafficTooltipFormatter() {
@@ -31,7 +34,7 @@ function trafficTooltipFormatter() {
 }
 
 const lineChartConfig = [
-  { key: 'inservicesAPs', title: 'Inservice APs (24 hours)' },
+  { key: 'service', title: 'Inservice APs (24 hours)' },
   { key: 'clientDevices', title: 'Client Devices (24 hours)' },
   {
     key: 'traffic',
@@ -56,9 +59,11 @@ const Dashboard = () => {
   });
 
   const [lineChartData, setLineChartData] = useState({
-    inservicesAPs: {
-      key: 'Inservice APs',
-      value: [],
+    service: {
+      inservicesAPs: {
+        key: 'Inservice APs',
+        value: [],
+      },
     },
     clientDevices: {
       is2dot4GHz: {
@@ -121,22 +126,23 @@ const Dashboard = () => {
               },
             },
           }) => {
-            inservicesAPs.push([eventTimestamp, equipmentInServiceCount]);
+            const timestamp = parseInt(eventTimestamp, 10);
+            inservicesAPs.push({ timestamp, value: equipmentInServiceCount });
 
             let total5GHz = 0;
             total5GHz += (radios?.is5GHz || 0) + (radios?.is5GHzL || 0) + (radios?.is5GHzU || 0); // combine all 5GHz radios
 
-            clientDevices2dot4GHz.push([eventTimestamp, radios.is2dot4GHz || 0]);
-            clientDevices5GHz.push([eventTimestamp, total5GHz || 0]);
+            clientDevices2dot4GHz.push({ timestamp, value: radios.is2dot4GHz || 0 });
+            clientDevices5GHz.push({ timestamp, value: total5GHz || 0 });
 
-            trafficBytesDownstreamData.push([
-              eventTimestamp,
-              (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0,
-            ]);
-            trafficBytesUpstreamData.push([
-              eventTimestamp,
-              (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0,
-            ]);
+            trafficBytesDownstreamData.push({
+              timestamp,
+              value: (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0,
+            });
+            trafficBytesUpstreamData.push({
+              timestamp,
+              value: (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0,
+            });
 
             totalDown += (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0;
             totalUp += (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0;
@@ -144,9 +150,11 @@ const Dashboard = () => {
         );
 
         return {
-          inservicesAPs: {
-            ...prev.inservicesAPs,
-            value: [...prev.inservicesAPs.value, ...inservicesAPs],
+          service: {
+            inservicesAPs: {
+              ...prev.service.inservicesAPs,
+              value: [...prev.service.inservicesAPs.value, ...inservicesAPs],
+            },
           },
           clientDevices: {
             is2dot4GHz: {
