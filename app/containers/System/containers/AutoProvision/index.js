@@ -6,6 +6,7 @@ import { AutoProvision as AutoProvisionPage, Loading } from '@tip-wlan/wlan-clou
 import UserContext from 'contexts/UserContext';
 import { GET_CUSTOMER, GET_ALL_LOCATIONS, GET_ALL_PROFILES } from 'graphql/queries';
 import { UPDATE_CUSTOMER } from 'graphql/mutations';
+import { fetchMoreProfiles } from 'graphql/functions';
 
 const AutoProvision = () => {
   const { customerId } = useContext(UserContext);
@@ -14,13 +15,13 @@ const AutoProvision = () => {
   });
   const [updateCustomer] = useMutation(UPDATE_CUSTOMER);
 
-  const { data: dataLocation, loading: loadingLoaction, error: errorLocation } = useQuery(
+  const { data: dataLocation, loading: loadingLocation, error: errorLocation } = useQuery(
     GET_ALL_LOCATIONS,
     {
       variables: { customerId },
     }
   );
-  const { data: dataProfile, loading: loadingProfile, error: errorProfile } = useQuery(
+  const { data: dataProfile, loading: loadingProfile, error: errorProfile, fetchMore } = useQuery(
     GET_ALL_PROFILES(),
     {
       variables: { customerId, type: 'equipment_ap', limit: 100 },
@@ -60,6 +61,10 @@ const AutoProvision = () => {
       );
   };
 
+  const handleFetchMoreProfiles = e => {
+    fetchMoreProfiles(e, dataProfile, fetchMore);
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -75,11 +80,12 @@ const AutoProvision = () => {
       data={data && data.getCustomer}
       dataLocation={dataLocation && dataLocation.getAllLocations}
       dataProfile={dataProfile && dataProfile.getAllProfiles.items}
-      loadingLoaction={loadingLoaction}
+      loadingLocation={loadingLocation}
       loadingProfile={loadingProfile}
       errorLocation={errorLocation}
       errorProfile={errorProfile}
       onUpdateCustomer={handleUpdateCustomer}
+      onFetchMoreProfiles={handleFetchMoreProfiles}
     />
   );
 };
