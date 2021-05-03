@@ -9,9 +9,9 @@
   },
   "scripts": {
     "test": "jest --passWithNoTests --coverage",
-    "start": "cross-env NODE_ENV=development webpack serve",
-    "start:bare": "cross-env API=https://wlan-graphql.tip-sdk.lab.netexperience.com NODE_ENV=bare webpack serve",
-    "start:dev": "cross-env API=https://wlan-graphql.tip-sdk.lab.netexperience.com NODE_ENV=development webpack serve",
+    "start": "cross-env NODE_ENV=development webpack serve --mode development",
+    "start:bare": "cross-env API=https://wlan-ui.tip-sdk.lab.netexperience.com NODE_ENV=bare webpack serve --mode development",
+    "start:dev": "cross-env API=https://wlan-ui.tip-sdk.lab.netexperience.com NODE_ENV=development webpack serve --mode development",
     "build": "webpack --mode=production",
     "format": "prettier --write 'app/**/*{.js,.scss}'",
     "eslint-fix": "eslint --fix 'app/**/*.js'",
