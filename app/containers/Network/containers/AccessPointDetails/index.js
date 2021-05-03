@@ -63,6 +63,7 @@ const AccessPointDetails = ({ locations }) => {
     }`),
     {
       variables: { customerId, type: 'equipment_ap' },
+      fetchPolicy: 'network-only',
     }
   );
 
