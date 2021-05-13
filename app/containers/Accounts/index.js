@@ -95,7 +95,7 @@ const Accounts = () => {
     }
   };
 
-  const handleCreateUser = (email, password, roles) => {
+  const handleCreateUser = ({ email, password, roles }) => {
     createUser({
       variables: {
         username: email,
@@ -119,7 +119,7 @@ const Accounts = () => {
       );
   };
 
-  const handleEditUser = (id, email, password, roles, lastModifiedTimestamp) => {
+  const handleEditUser = ({ id, email, password, roles, lastModifiedTimestamp }) => {
     updateUser({
       variables: {
         id,

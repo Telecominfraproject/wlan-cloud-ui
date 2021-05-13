@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { RolesProvider } from '@tip-wlan/wlan-cloud-ui-library';
 
 import UserContext from 'contexts/UserContext';
 
 const UserProvider = ({ children, id, email, roles, customerId, updateUser, updateToken }) => (
   <UserContext.Provider value={{ id, email, roles, customerId, updateUser, updateToken }}>
-    {children}
+    <RolesProvider role={roles}>{children}</RolesProvider>
   </UserContext.Provider>
 );
 
