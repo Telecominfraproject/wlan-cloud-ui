@@ -4,10 +4,11 @@ import { useMutation, useQuery, gql } from '@apollo/client';
 import { notification } from 'antd';
 import { useHistory } from 'react-router-dom';
 
-import { ROUTES } from 'constants/index';
+import { ROUTES, AUTH_TOKEN } from 'constants/index';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_PROFILES } from 'graphql/queries';
+import { GET_ALL_PROFILES, GET_API_URL } from 'graphql/queries';
 import { fetchMoreProfiles } from 'graphql/functions';
+import { getItem } from 'utils/localStorage';
 
 const CREATE_PROFILE = gql`
   mutation CreateProfile(
@@ -35,6 +36,9 @@ const CREATE_PROFILE = gql`
 
 const AddProfile = () => {
   const { customerId } = useContext(UserContext);
+
+  const { data: apiUrl } = useQuery(GET_API_URL);
+
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
     variables: { customerId, type: 'ssid' },
     fetchPolicy: 'network-only',
@@ -116,6 +120,46 @@ const AddProfile = () => {
     else fetchMoreProfiles(e, ssidProfiles, fetchMore);
   };
 
+  const handleFileUpload = async (fileName, file) => {
+    const token = getItem(AUTH_TOKEN);
+
+    if (apiUrl?.getApiUrl) {
+      fetch(`${apiUrl?.getApiUrl}filestore/${fileName}`, {
+        method: 'POST',
+        headers: {
+          Authorization: token ? `Bearer ${token.access_token}` : '',
+          'Content-Type': 'application/octet-stream',
+        },
+        body: file,
+      })
+        .then(response => response.json())
+        .then(resp => {
+          if (resp?.success) {
+            notification.success({
+              message: 'Success',
+              description: 'File successfully uploaded.',
+            });
+          } else {
+            notification.error({
+              message: 'Error',
+              description: 'File could not be uploaded.',
+            });
+          }
+        })
+        .catch(() => {
+          notification.error({
+            message: 'Error',
+            description: 'File could not be uploaded.',
+          });
+        });
+    } else {
+      notification.error({
+        message: 'Error',
+        description: 'File could not be uploaded.',
+      });
+    }
+  };
+
   return (
     <AddProfilePage
       onCreateProfile={handleAddProfile}
@@ -127,6 +171,7 @@ const AddProfile = () => {
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       rfProfiles={rfProfiles?.getAllProfiles?.items}
       onFetchMoreProfiles={handleFetchMoreProfiles}
+      fileUpload={handleFileUpload}
     />
   );
 };
