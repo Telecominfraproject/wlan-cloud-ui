@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Switch, Redirect } from 'react-router-dom';
 
-import { ThemeProvider, GenericNotFound } from '@tip-wlan/wlan-cloud-ui-library';
+import { ThemeProvider, GenericNotFound, ScrollToTop } from '@tip-wlan/wlan-cloud-ui-library';
 
 import logo from 'images/tip-logo.png';
 import logoMobile from 'images/tip-logo-mobile.png';
@@ -75,7 +75,7 @@ const App = () => {
         <Helmet titleTemplate={`%s - ${COMPANY}`} defaultTitle={COMPANY}>
           <meta name="description" content={COMPANY} />
         </Helmet>
-
+        <ScrollToTop />
         <Switch>
           <UnauthenticatedRoute exact path={ROUTES.login} component={Login} />
           <ProtectedRouteWithLayout exact path={ROUTES.root} component={RedirectToDashboard} />
