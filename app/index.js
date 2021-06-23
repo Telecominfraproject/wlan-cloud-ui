@@ -14,6 +14,7 @@ import { AUTH_TOKEN } from 'constants/index';
 import { REFRESH_TOKEN } from 'graphql/mutations';
 import { getItem, setItem, removeItem } from 'utils/localStorage';
 import history from 'utils/history';
+import { ScrollToTop } from '@tip-wlan/wlan-cloud-ui-library';
 
 const API_URI = process.env.NODE_ENV === 'production' ? window.REACT_APP_API : process.env.API;
 const MOUNT_NODE = document.getElementById('root');
@@ -102,6 +103,7 @@ const render = () => {
   ReactDOM.render(
     <Router history={history}>
       <ApolloProvider client={client}>
+        <ScrollToTop />
         <App />
       </ApolloProvider>
     </Router>,

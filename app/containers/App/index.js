@@ -75,7 +75,6 @@ const App = () => {
         <Helmet titleTemplate={`%s - ${COMPANY}`} defaultTitle={COMPANY}>
           <meta name="description" content={COMPANY} />
         </Helmet>
-
         <Switch>
           <UnauthenticatedRoute exact path={ROUTES.login} component={Login} />
           <ProtectedRouteWithLayout exact path={ROUTES.root} component={RedirectToDashboard} />
