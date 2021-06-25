@@ -3,9 +3,9 @@ export const COMPANY = 'Telecom Infra Project';
 
 export const USER_FRIENDLY_RADIOS = {
   is2dot4GHz: '2.4GHz',
+  is5GHz: '5GHz',
   is5GHzL: '5GHz (L)',
   is5GHzU: '5GHz (U)',
-  is5GHz: '5GHz',
 };
 
 export const ROUTES = {
