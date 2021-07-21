@@ -34,12 +34,27 @@ function trafficTooltipFormatter() {
 }
 
 const lineChartConfig = [
-  { key: 'service', title: 'Inservice APs (24 hours)' },
-  { key: 'clientDevices', title: 'Client Devices (24 hours)' },
+  {
+    key: 'service',
+    title: 'Inservice APs (24 hours)',
+    lines: [{ key: 'inServiceAps', name: 'Inservice APs' }],
+  },
+  {
+    key: 'clientDevices',
+    title: 'Client Devices (24 hours)',
+    lines: [
+      { key: 'clientDevices2dot4GHz', name: '2.4GHz' },
+      { key: 'clientDevices5GHz', name: '5GHz' },
+    ],
+  },
   {
     key: 'traffic',
-    title: 'Traffic (24 hours)',
-    options: { formatter: trafficLabelFormatter, tooltipFormatter: trafficTooltipFormatter },
+    title: 'Traffic - 5 min intervals (24 hours)',
+    lines: [
+      { key: 'trafficBytesDownstreamData', name: 'Downstream' },
+      { key: 'trafficBytesUpstreamData', name: 'Upstream' },
+    ],
+    options: { formatter: trafficLabelFormatter, trafficTooltipFormatter },
   },
 ];
 
@@ -58,34 +73,8 @@ const Dashboard = () => {
     variables: { customerId, statusDataTypes: ['CUSTOMER_DASHBOARD'] },
   });
 
-  const [lineChartData, setLineChartData] = useState({
-    service: {
-      inservicesAPs: {
-        key: 'Inservice APs',
-        value: [],
-      },
-    },
-    clientDevices: {
-      is2dot4GHz: {
-        key: USER_FRIENDLY_RADIOS.is2dot4GHz,
-        value: [],
-      },
-      is5GHz: {
-        key: USER_FRIENDLY_RADIOS.is5GHz,
-        value: [],
-      },
-    },
-    traffic: {
-      trafficBytesDownstream: {
-        key: 'Down Stream',
-        value: [],
-      },
-      trafficBytesUpstream: {
-        key: 'Up Stream',
-        value: [],
-      },
-    },
-  });
+  const [lineChartData, setLineChartData] = useState([]);
+  const [trafficBytesData, setTrafficBytesData] = useState();
 
   const { loading: metricsLoading, error: metricsError, data: metricsData, fetchMore } = useQuery(
     FILTER_SYSTEM_EVENTS,
@@ -103,82 +92,64 @@ const Dashboard = () => {
 
   const formatLineChartData = (list = []) => {
     if (list.length) {
-      setLineChartData(prev => {
-        const inservicesAPs = [];
-        const clientDevices2dot4GHz = [];
-        const clientDevices5GHz = [];
-        const trafficBytesDownstreamData = [];
-        const trafficBytesUpstreamData = [];
-        let totalDown = 0;
-        let totalUp = 0;
+      const chartData = [];
 
-        list.forEach(
-          ({
-            eventTimestamp,
-            details: {
-              payload: {
-                details: {
-                  equipmentInServiceCount,
-                  associatedClientsCountPerRadio: radios,
-                  trafficBytesDownstream,
-                  trafficBytesUpstream,
-                },
+      let inServiceAps = 0;
+      let clientDevices2dot4GHz = 0;
+      let clientDevices5GHz = 0;
+      let trafficBytesDownstreamData = 0;
+      let trafficBytesUpstreamData = 0;
+      let totalDown = 0;
+      let totalUp = 0;
+
+      list.forEach(
+        ({
+          eventTimestamp,
+          details: {
+            payload: {
+              details: {
+                equipmentInServiceCount,
+                associatedClientsCountPerRadio: radios,
+                trafficBytesDownstream,
+                trafficBytesUpstream,
               },
             },
-          }) => {
-            const timestamp = parseInt(eventTimestamp, 10);
-            inservicesAPs.push({ timestamp, value: equipmentInServiceCount });
+          },
+        }) => {
+          const timestamp = parseInt(eventTimestamp, 10);
+          inServiceAps = equipmentInServiceCount;
 
-            let total5GHz = 0;
-            total5GHz += (radios?.is5GHz || 0) + (radios?.is5GHzL || 0) + (radios?.is5GHzU || 0); // combine all 5GHz radios
+          let total5GHz = 0;
+          total5GHz += (radios?.is5GHz || 0) + (radios?.is5GHzL || 0) + (radios?.is5GHzU || 0); // combine all 5GHz radios
 
-            clientDevices2dot4GHz.push({ timestamp, value: radios.is2dot4GHz || 0 });
-            clientDevices5GHz.push({ timestamp, value: total5GHz || 0 });
+          clientDevices2dot4GHz = radios.is2dot4GHz || 0;
+          clientDevices5GHz = total5GHz || 0;
 
-            trafficBytesDownstreamData.push({
-              timestamp,
-              value: (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0,
-            });
-            trafficBytesUpstreamData.push({
-              timestamp,
-              value: (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0,
-            });
+          trafficBytesDownstreamData = (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0;
+          trafficBytesUpstreamData = (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0;
 
-            totalDown += (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0;
-            totalUp += (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0;
-          }
-        );
+          totalDown += (trafficBytesDownstream > 0 && trafficBytesDownstream) || 0;
+          totalUp += (trafficBytesUpstream > 0 && trafficBytesUpstream) || 0;
+          chartData.push({
+            timestamp,
+            inServiceAps,
+            clientDevices2dot4GHz,
+            clientDevices5GHz,
+            trafficBytesDownstreamData,
+            trafficBytesUpstreamData,
+          });
+        }
+      );
 
+      setTrafficBytesData(prev => {
         return {
-          service: {
-            inservicesAPs: {
-              ...prev.service.inservicesAPs,
-              value: [...prev.service.inservicesAPs.value, ...inservicesAPs],
-            },
-          },
-          clientDevices: {
-            is2dot4GHz: {
-              ...prev.clientDevices.is2dot4GHz,
-              value: [...prev.clientDevices.is2dot4GHz.value, ...clientDevices2dot4GHz],
-            },
-            is5GHz: {
-              ...prev.clientDevices.is5GHz,
-              value: [...prev.clientDevices.is5GHz.value, ...clientDevices5GHz],
-            },
-          },
-          traffic: {
-            trafficBytesDownstream: {
-              ...prev.traffic.trafficBytesDownstream,
-              value: [...prev.traffic.trafficBytesDownstream.value, ...trafficBytesDownstreamData],
-            },
-            trafficBytesUpstream: {
-              ...prev.traffic.trafficBytesUpstream,
-              value: [...prev.traffic.trafficBytesUpstream.value, ...trafficBytesUpstreamData],
-            },
-          },
-          totalDownstreamTraffic: totalDown,
-          totalUpstreamTraffic: totalUp,
+          totalUpstreamTraffic: (prev?.totalUpstreamTraffic || 0) + totalUp,
+          totalDownstreamTraffic: (prev?.totalDownstreamTraffic || 0) + totalDown,
         };
+      });
+
+      setLineChartData(prev => {
+        return [...prev, ...chartData];
       });
     }
   };
@@ -279,8 +250,8 @@ const Dashboard = () => {
         },
         {
           title: 'Usage Information (24 hours)',
-          'Total Traffic (US)': formatBytes(lineChartData?.totalUpstreamTraffic),
-          'Total Traffic (DS)': formatBytes(lineChartData?.totalDownstreamTraffic),
+          'Total Traffic (Downstream)': formatBytes(trafficBytesData?.totalDownstreamTraffic),
+          'Total Traffic (Upstream)': formatBytes(trafficBytesData?.totalUpstreamTraffic),
         },
       ]}
       pieChartDetails={pieChartsData}
