@@ -1,17 +1,16 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Alert, notification } from 'antd';
 import { useParams } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/client';
-import { BulkEditAccessPoints, Loading } from '@tip-wlan/wlan-cloud-ui-library';
+import { useLazyQuery, useMutation } from '@apollo/client';
+import { BulkEditAccessPoints, sortRadioTypes } from '@tip-wlan/wlan-cloud-ui-library';
+import { USER_FRIENDLY_RADIOS } from 'constants/index';
 
 import { FILTER_EQUIPMENT_BULK_EDIT_APS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_BULK } from 'graphql/mutations';
 
 import UserContext from 'contexts/UserContext';
 import styles from './index.module.scss';
-
-const defaultAppliedRadios = { is5GHzL: 'is5GHzL', is2dot4GHz: 'is2dot4GHz', is5GHzU: 'is5GHzU' };
 
 const renderTableCell = tabCell => {
   if (Array.isArray(tabCell)) {
@@ -28,6 +27,13 @@ const renderTableCell = tabCell => {
 };
 const accessPointsChannelTableColumns = [
   { title: 'Name', dataIndex: 'name', key: 'name', width: 250, render: renderTableCell },
+
+  {
+    title: 'Radios',
+    dataIndex: 'radioMap',
+    width: 150,
+    render: text => renderTableCell(text.map(i => USER_FRIENDLY_RADIOS[i])),
+  },
   {
     title: 'Manual Active Channel',
     dataIndex: 'manualChannelNumber',
@@ -87,6 +93,80 @@ const accessPointsChannelTableColumns = [
     render: renderTableCell,
   },
 ];
+
+const getRadioDetails = (radioDetails, type) => {
+  const sortedRadios = sortRadioTypes(Object.keys(radioDetails?.radioMap || {}));
+
+  if (type === 'manualChannelNumber') {
+    return sortedRadios.map(i => radioDetails.radioMap[i]?.manualChannelNumber);
+  }
+
+  if (type === 'manualBackupChannelNumber') {
+    return sortedRadios.map(i => radioDetails.radioMap[i]?.manualBackupChannelNumber);
+  }
+  if (type === 'snrDrop') {
+    return sortedRadios.map(
+      i => radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.dropInSnrPercentage
+    );
+  }
+  if (type === 'allowedChannels') {
+    return sortedRadios.map(i => radioDetails.radioMap[i]?.allowedChannelsPowerLevels);
+  }
+
+  if (type === 'minLoad') {
+    return sortedRadios.map(
+      i => radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.minLoadFactor
+    );
+  }
+
+  if (type === 'cellSize') {
+    return sortedRadios.map(i => radioDetails.radioMap[i]?.rxCellSizeDb?.value);
+  }
+
+  if (type === 'probeResponseThreshold') {
+    return sortedRadios.map(i => radioDetails.radioMap[i]?.probeResponseThresholdDb?.value);
+  }
+
+  if (type === 'clientDisconnectThreshold') {
+    return sortedRadios.map(i => radioDetails.radioMap[i]?.clientDisconnectThresholdDb?.value);
+  }
+
+  return sortedRadios;
+};
+
+const formatRadioFrequencies = ({
+  manualChannelNumber,
+  manualBackupChannelNumber,
+  snrDrop,
+  minLoad,
+  cellSize,
+  probeResponseThreshold,
+  clientDisconnectThreshold,
+  radioMap = [],
+}) => {
+  const frequencies = {};
+  radioMap.forEach((i, index) => {
+    frequencies[i] = {
+      channelNumber: manualChannelNumber[index],
+      backupChannelNumber: manualBackupChannelNumber[index],
+      dropInSnrPercentage: snrDrop[index],
+      minLoadFactor: minLoad[index],
+      rxCellSizeDb: {
+        auto: true,
+        value: cellSize[index],
+      },
+      probeResponseThresholdDb: {
+        auto: true,
+        value: probeResponseThreshold[index],
+      },
+      clientDisconnectThresholdDb: {
+        auto: true,
+        value: clientDisconnectThreshold[index],
+      },
+    };
+  });
+  return frequencies;
+};
 
 const getBreadcrumbPath = (id, locations) => {
   const locationsPath = [];
@@ -160,143 +240,55 @@ const getLocationPath = (selectedId, locations) => {
 const BulkEditAPs = ({ locations, checkedLocations }) => {
   const { id } = useParams();
   const { customerId } = useContext(UserContext);
+
   const locationIds = useMemo(() => {
     const locationPath = getLocationPath(id, locations);
     return locationPath.filter(f => checkedLocations.includes(f));
   }, [id, locations, checkedLocations]);
 
-  const {
-    loading: filterEquipmentLoading,
-    error: filterEquipmentError,
-    refetch,
-    data: equipData,
-    fetchMore,
-  } = useQuery(FILTER_EQUIPMENT_BULK_EDIT_APS, {
-    variables: { customerId, locationIds, equipmentType: 'AP' },
+  const [
+    filterEquipment,
+    {
+      loading: filterEquipmentLoading,
+      error: filterEquipmentError,
+      refetch,
+      data: equipData,
+      fetchMore,
+    },
+  ] = useLazyQuery(FILTER_EQUIPMENT_BULK_EDIT_APS, {
+    errorPolicy: 'all',
+    fetchPolicy: 'cache-first',
   });
 
+  const fetchFilterEquipment = async () => {
+    filterEquipment({
+      variables: {
+        customerId,
+        locationIds,
+        equipmentType: 'AP',
+      },
+    });
+  };
   const [updateEquipmentBulk] = useMutation(UPDATE_EQUIPMENT_BULK);
 
-  const getRadioDetails = (radioDetails, type) => {
-    if (type === 'manualChannelNumber') {
-      const manualChannelNumbers = [];
-      Object.keys(radioDetails?.radioMap || {}).map(i => {
-        return manualChannelNumbers.push(radioDetails.radioMap[i]?.manualChannelNumber);
-      });
-      return manualChannelNumbers;
-    }
-
-    if (type === 'manualBackupChannelNumber') {
-      const manualBackupChannelNumbers = [];
-      Object.keys(radioDetails?.radioMap || {}).map(i => {
-        return manualBackupChannelNumbers.push(radioDetails.radioMap[i]?.manualBackupChannelNumber);
-      });
-      return manualBackupChannelNumbers;
-    }
-    if (type === 'cellSize') {
-      const cellSizeValues = [];
-      Object.keys(radioDetails?.radioMap || {}).map(i => {
-        return cellSizeValues.push(radioDetails.radioMap[i]?.rxCellSizeDb?.value);
-      });
-      return cellSizeValues;
-    }
-    if (type === 'probeResponseThreshold') {
-      const probeResponseThresholdValues = [];
-      Object.keys(radioDetails?.radioMap || {}).map(i => {
-        return probeResponseThresholdValues.push(
-          radioDetails.radioMap[i]?.probeResponseThresholdDb?.value
-        );
-      });
-      return probeResponseThresholdValues;
-    }
-    if (type === 'clientDisconnectThreshold') {
-      const clientDisconnectThresholdValues = [];
-      Object.keys(radioDetails?.radioMap || {}).map(i => {
-        return clientDisconnectThresholdValues.push(
-          radioDetails.radioMap[i]?.clientDisconnectThresholdDb?.value
-        );
-      });
-      return clientDisconnectThresholdValues;
-    }
-    if (type === 'snrDrop') {
-      const snrDropValues = [];
-      Object.keys(radioDetails?.radioMap || {}).map(i => {
-        return snrDropValues.push(
-          radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.dropInSnrPercentage
-        );
-      });
-      return snrDropValues;
-    }
-
-    const minLoadValue = [];
-    Object.keys(radioDetails?.radioMap || {}).map(i => {
-      return minLoadValue.push(
-        radioDetails.advancedRadioMap[i]?.bestApSettings?.value?.minLoadFactor
-      );
-    });
-    return minLoadValue;
-  };
-
-  const setAccessPointsBulkEditTableData = (dataSource = []) =>
-    dataSource.items.map(({ id: key, name, details }) => ({
-      key,
-      id: key,
-      name,
-      manualChannelNumber: getRadioDetails(details, 'manualChannelNumber'),
-      manualBackupChannelNumber: getRadioDetails(details, 'manualBackupChannelNumber'),
-      cellSize: getRadioDetails(details, 'cellSize'),
-      probeResponseThreshold: getRadioDetails(details, 'probeResponseThreshold'),
-      clientDisconnectThreshold: getRadioDetails(details, 'clientDisconnectThreshold'),
-      snrDrop: getRadioDetails(details, 'snrDrop'),
-      minLoad: getRadioDetails(details, 'minLoad'),
-      radioMap: Object.keys(details?.radioMap || {}),
-    }));
-
-  const setUpdatedBulkEditTableData = (
-    equipmentId,
-    manualChannelNumber,
-    manualBackupChannelNumber,
-    cellSize,
-    probeResponseThreshold,
-    clientDisconnectThreshold,
-    snrDrop,
-    minLoad,
-    dataSource = []
-  ) => {
-    const updatedItems = [];
-    let dropInSnrPercentage;
-    let minLoadFactor;
-    dataSource.items.forEach(({ id: itemId, details }) => {
-      if (equipmentId === itemId) {
-        Object.keys(details?.radioMap || defaultAppliedRadios).forEach((i, dataIndex) => {
-          const frequencies = {};
-          dropInSnrPercentage = snrDrop[dataIndex];
-          minLoadFactor = minLoad[dataIndex];
-
-          frequencies[`${i}`] = {
-            channelNumber: manualChannelNumber[dataIndex],
-            backupChannelNumber: manualBackupChannelNumber[dataIndex],
-            rxCellSizeDb: {
-              auto: true,
-              value: cellSize[dataIndex],
-            },
-            probeResponseThresholdDb: {
-              auto: true,
-              value: probeResponseThreshold[dataIndex],
-            },
-            clientDisconnectThresholdDb: {
-              auto: true,
-              value: clientDisconnectThreshold[dataIndex],
-            },
-            dropInSnrPercentage,
-            minLoadFactor,
-          };
-          updatedItems.push(frequencies);
-        });
-      }
-    });
-    return updatedItems;
-  };
+  const formattedTableData = useMemo(
+    () =>
+      equipData?.filterEquipment?.items?.map(({ id: key, name, details = {} }) => ({
+        key,
+        id: key,
+        name,
+        manualChannelNumber: getRadioDetails(details, 'manualChannelNumber'),
+        manualBackupChannelNumber: getRadioDetails(details, 'manualBackupChannelNumber'),
+        cellSize: getRadioDetails(details, 'cellSize'),
+        probeResponseThreshold: getRadioDetails(details, 'probeResponseThreshold'),
+        clientDisconnectThreshold: getRadioDetails(details, 'clientDisconnectThreshold'),
+        snrDrop: getRadioDetails(details, 'snrDrop'),
+        minLoad: getRadioDetails(details, 'minLoad'),
+        radioMap: getRadioDetails(details, 'radioMap'),
+        allowedChannels: getRadioDetails(details, 'allowedChannels'),
+      })),
+    [equipData?.filterEquipment?.items]
+  );
 
   const updateEquipments = editedRowsArr => {
     updateEquipmentBulk({
@@ -322,38 +314,10 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
   const handleSaveChanges = updatedRows => {
     const editedRowsArr = [];
     Object.keys(updatedRows).forEach(key => {
-      const {
-        id: equipmentId,
-        manualChannelNumber,
-        manualBackupChannelNumber,
-        cellSize,
-        probeResponseThreshold,
-        clientDisconnectThreshold,
-        snrDrop,
-        minLoad,
-      } = updatedRows[key];
-      const updatedEuips = setUpdatedBulkEditTableData(
-        equipmentId,
-        manualChannelNumber,
-        manualBackupChannelNumber,
-        cellSize,
-        probeResponseThreshold,
-        clientDisconnectThreshold,
-        snrDrop,
-        minLoad,
-        equipData && equipData.filterEquipment
-      );
-      const tempObj = {
-        equipmentId,
-        perRadioDetails: {},
-      };
-      updatedEuips.map(item => {
-        Object.keys(item).forEach(i => {
-          tempObj.perRadioDetails[i] = item[i];
-        });
-        return tempObj;
+      return editedRowsArr.push({
+        equipmentId: updatedRows[key].id,
+        perRadioDetails: formatRadioFrequencies(updatedRows[key]),
       });
-      return editedRowsArr.push(tempObj);
     });
     updateEquipments(editedRowsArr);
   };
@@ -377,24 +341,30 @@ const BulkEditAPs = ({ locations, checkedLocations }) => {
     }
   };
 
-  if (filterEquipmentLoading) {
-    return <Loading />;
-  }
+  useEffect(() => {
+    fetchFilterEquipment();
+  }, [locationIds]);
 
   if (filterEquipmentError) {
     return (
-      <Alert message="Error" description="Failed to load equipments data." type="error" showIcon />
+      <Alert
+        message="Error"
+        description="Failed to load equipment(s) data."
+        type="error"
+        showIcon
+      />
     );
   }
 
   return (
     <BulkEditAccessPoints
       tableColumns={accessPointsChannelTableColumns}
-      tableData={setAccessPointsBulkEditTableData(equipData?.filterEquipment)}
+      tableData={formattedTableData}
       onLoadMore={handleLoadMore}
       isLastPage={equipData?.filterEquipment?.context?.lastPage}
       onSaveChanges={handleSaveChanges}
       breadcrumbPath={getBreadcrumbPath(id, locations)}
+      loading={filterEquipmentLoading}
     />
   );
 };
