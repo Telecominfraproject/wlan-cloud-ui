@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { Alert, notification } from 'antd';
 import { AutoProvision as AutoProvisionPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
@@ -7,6 +7,7 @@ import UserContext from 'contexts/UserContext';
 import { GET_CUSTOMER, GET_ALL_LOCATIONS, GET_ALL_PROFILES } from 'graphql/queries';
 import { UPDATE_CUSTOMER } from 'graphql/mutations';
 import { fetchMoreProfiles } from 'graphql/functions';
+import { formatLocations } from 'utils/locations';
 
 const AutoProvision = () => {
   const { customerId } = useContext(UserContext);
@@ -65,6 +66,10 @@ const AutoProvision = () => {
     fetchMoreProfiles(e, dataProfile, fetchMore);
   };
 
+  const locationsTree = useMemo(() => {
+    return formatLocations(dataLocation?.getAllLocations, true);
+  }, [dataLocation?.getAllLocations]);
+
   if (loading) {
     return <Loading />;
   }
@@ -77,9 +82,9 @@ const AutoProvision = () => {
 
   return (
     <AutoProvisionPage
-      data={data && data.getCustomer}
-      dataLocation={dataLocation && dataLocation.getAllLocations}
-      dataProfile={dataProfile && dataProfile.getAllProfiles.items}
+      data={data?.getCustomer}
+      locationsTree={locationsTree}
+      dataProfile={dataProfile?.getAllProfiles?.items}
       loadingLocation={loadingLocation}
       loadingProfile={loadingProfile}
       errorLocation={errorLocation}

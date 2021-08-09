@@ -6,6 +6,8 @@ import { useLazyQuery, useMutation } from '@apollo/client';
 import { BulkEditAccessPoints, sortRadioTypes } from '@tip-wlan/wlan-cloud-ui-library';
 import { USER_FRIENDLY_RADIOS } from 'constants/index';
 
+import { getBreadcrumbPath, getLocationPath } from 'utils/locations';
+
 import { FILTER_EQUIPMENT_BULK_EDIT_APS } from 'graphql/queries';
 import { UPDATE_EQUIPMENT_BULK } from 'graphql/mutations';
 
@@ -166,75 +168,6 @@ const formatRadioFrequencies = ({
     };
   });
   return frequencies;
-};
-
-const getBreadcrumbPath = (id, locations) => {
-  const locationsPath = [];
-  const treeRecurse = (parentNodeId, node) => {
-    if (node.id === parentNodeId) {
-      locationsPath.unshift(node);
-      return node;
-    }
-    if (node.children) {
-      let parent;
-      node.children.some(i => {
-        parent = treeRecurse(parentNodeId, i);
-        return parent;
-      });
-      if (parent) {
-        locationsPath.unshift(node);
-      }
-      return parent;
-    }
-    return null;
-  };
-
-  treeRecurse(id, {
-    id: 0,
-    children: locations,
-  });
-
-  return locationsPath;
-};
-
-const getLocationPath = (selectedId, locations) => {
-  const locationsPath = [];
-
-  const treeRecurse = (parentNodeId, node) => {
-    if (node.id === parentNodeId) {
-      locationsPath.unshift(node.id);
-
-      if (node.children) {
-        const flatten = children => {
-          children.forEach(i => {
-            locationsPath.unshift(i.id);
-            if (i.children) {
-              flatten(i.children);
-            }
-          });
-        };
-
-        flatten(node.children);
-      }
-      return node;
-    }
-    if (node.children) {
-      let parent;
-      node.children.some(i => {
-        parent = treeRecurse(parentNodeId, i);
-        return parent;
-      });
-      return parent;
-    }
-
-    return null;
-  };
-
-  if (selectedId) {
-    treeRecurse(selectedId, { id: 0, children: locations });
-  }
-
-  return locationsPath;
 };
 
 const BulkEditAPs = ({ locations, checkedLocations }) => {
