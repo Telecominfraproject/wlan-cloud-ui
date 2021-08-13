@@ -61,7 +61,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=1.2.0-SNAPSHOT
+          [ "$VERSION" == "master" ] && VERSION=1.3.0-SNAPSHOT
 
           TIMESTAMP=$(date +'%Y-%m-%d')
 
@@ -96,7 +96,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/heads/release/"* ]] && VERSION=$(echo "${{ github.ref }}" | sed -e 's/refs\/heads\/release\/[v]//' | awk '{print $1"-SNAPSHOT"}')
 
           # Use Docker `latest` tag convention
-          [ "$VERSION" == "master" ] && VERSION=1.2.0-SNAPSHOT
+          [ "$VERSION" == "master" ] && VERSION=1.3.0-SNAPSHOT
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
