@@ -32,6 +32,8 @@ const GET_PROFILE = gql`
       osuSsidProfile {
         id
         name
+        profileType
+        details
       }
       childProfileIds
       createdTimestamp
@@ -138,6 +140,14 @@ const ProfileDetails = () => {
     variables: { customerId, type: 'rf' },
     fetchPolicy: 'network-only',
   });
+
+  const { data: passpointProfiles, fetchMore: fetchMorePasspointProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'rf' },
+      fetchPolicy: 'network-only',
+    }
+  );
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
@@ -269,6 +279,8 @@ const ProfileDetails = () => {
       fetchMoreProfiles(e, operatorProfiles, fetchMoreOperatorProfiles);
     else if (key === 'passpoint_osu_id_provider')
       fetchMoreProfiles(e, idProviderProfiles, fetchMoreIdProviderProfiles);
+    else if (key === 'passpoint')
+      fetchMoreProfiles(e, passpointProfiles, fetchMorePasspointProfiles);
     else fetchMoreProfiles(e, ssidProfiles, fetchMore);
   };
 
@@ -289,6 +301,7 @@ const ProfileDetails = () => {
   return (
     <ProfileDetailsPage
       name={data.getProfile.name}
+      profileId={data?.getProfile?.id}
       profileType={data.getProfile.profileType}
       details={data.getProfile.details}
       childProfiles={data.getProfile.childProfiles}
@@ -304,6 +317,7 @@ const ProfileDetails = () => {
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       associatedSsidProfiles={data.getProfile?.associatedSsidProfiles}
       osuSsidProfile={data.getProfile?.osuSsidProfile}
+      passpointProfiles={passpointProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchMoreProfiles}
       onDownloadFile={handleDownloadFile}

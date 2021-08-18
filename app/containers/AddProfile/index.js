@@ -79,6 +79,15 @@ const AddProfile = () => {
     variables: { customerId, type: 'rf' },
     fetchPolicy: 'network-only',
   });
+
+  const { data: passpointProfiles, fetchMore: fetchMorePasspointProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'rf' },
+      fetchPolicy: 'network-only',
+    }
+  );
+
   const [createProfile] = useMutation(CREATE_PROFILE);
   const history = useHistory();
 
@@ -117,6 +126,8 @@ const AddProfile = () => {
       fetchMoreProfiles(e, operatorProfiles, fetchMoreOperatorProfiles);
     else if (key === 'passpoint_osu_id_provider')
       fetchMoreProfiles(e, idProviderProfiles, fetchMoreIdProviderProfiles);
+    else if (key === 'passpoint')
+      fetchMoreProfiles(e, passpointProfiles, fetchMorePasspointProfiles);
     else fetchMoreProfiles(e, ssidProfiles, fetchMore);
   };
 
@@ -170,6 +181,7 @@ const AddProfile = () => {
       operatorProfiles={operatorProfiles?.getAllProfiles?.items}
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       rfProfiles={rfProfiles?.getAllProfiles?.items}
+      passpointProfiles={passpointProfiles?.getAllProfiles?.items}
       onFetchMoreProfiles={handleFetchMoreProfiles}
       fileUpload={handleFileUpload}
     />
