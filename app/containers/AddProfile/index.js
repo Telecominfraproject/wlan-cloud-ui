@@ -83,7 +83,7 @@ const AddProfile = () => {
   const { data: passpointProfiles, fetchMore: fetchMorePasspointProfiles } = useQuery(
     GET_ALL_PROFILES(),
     {
-      variables: { customerId, type: 'rf' },
+      variables: { customerId, type: 'passpoint' },
       fetchPolicy: 'network-only',
     }
   );
