@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
-import { Alert, notification } from 'antd';
+import { notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { ROUTES, AUTH_TOKEN } from 'constants/index';
@@ -89,9 +89,10 @@ const ProfileDetails = () => {
 
   const { data: apiUrl } = useQuery(GET_API_URL);
 
-  const { loading, error, data } = useQuery(GET_PROFILE, {
+  const { loading, data } = useQuery(GET_PROFILE, {
     variables: { id },
     fetchPolicy: 'network-only',
+    errorPolicy: 'all',
   });
 
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
@@ -285,13 +286,8 @@ const ProfileDetails = () => {
   };
 
   if (loading) {
+    s;
     return <Loading />;
-  }
-
-  if (error) {
-    return (
-      <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
-    );
   }
 
   if (redirect) {
