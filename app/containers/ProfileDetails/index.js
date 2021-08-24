@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
-import { Alert, notification } from 'antd';
+import { notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
 import { ROUTES, AUTH_TOKEN } from 'constants/index';
@@ -32,6 +32,8 @@ const GET_PROFILE = gql`
       osuSsidProfile {
         id
         name
+        profileType
+        details
       }
       childProfileIds
       createdTimestamp
@@ -87,9 +89,10 @@ const ProfileDetails = () => {
 
   const { data: apiUrl } = useQuery(GET_API_URL);
 
-  const { loading, error, data } = useQuery(GET_PROFILE, {
+  const { loading, data } = useQuery(GET_PROFILE, {
     variables: { id },
     fetchPolicy: 'network-only',
+    errorPolicy: 'all',
   });
 
   const { data: ssidProfiles, fetchMore } = useQuery(GET_ALL_PROFILES(), {
@@ -138,6 +141,14 @@ const ProfileDetails = () => {
     variables: { customerId, type: 'rf' },
     fetchPolicy: 'network-only',
   });
+
+  const { data: passpointProfiles, fetchMore: fetchMorePasspointProfiles } = useQuery(
+    GET_ALL_PROFILES(),
+    {
+      variables: { customerId, type: 'passpoint' },
+      fetchPolicy: 'network-only',
+    }
+  );
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [deleteProfile] = useMutation(DELETE_PROFILE);
@@ -269,17 +280,13 @@ const ProfileDetails = () => {
       fetchMoreProfiles(e, operatorProfiles, fetchMoreOperatorProfiles);
     else if (key === 'passpoint_osu_id_provider')
       fetchMoreProfiles(e, idProviderProfiles, fetchMoreIdProviderProfiles);
+    else if (key === 'passpoint')
+      fetchMoreProfiles(e, passpointProfiles, fetchMorePasspointProfiles);
     else fetchMoreProfiles(e, ssidProfiles, fetchMore);
   };
 
   if (loading) {
     return <Loading />;
-  }
-
-  if (error) {
-    return (
-      <Alert message="Error" description="Failed to load profile data." type="error" showIcon />
-    );
   }
 
   if (redirect) {
@@ -289,6 +296,7 @@ const ProfileDetails = () => {
   return (
     <ProfileDetailsPage
       name={data.getProfile.name}
+      profileId={data?.getProfile?.id}
       profileType={data.getProfile.profileType}
       details={data.getProfile.details}
       childProfiles={data.getProfile.childProfiles}
@@ -304,6 +312,7 @@ const ProfileDetails = () => {
       idProviderProfiles={idProviderProfiles?.getAllProfiles?.items}
       associatedSsidProfiles={data.getProfile?.associatedSsidProfiles}
       osuSsidProfile={data.getProfile?.osuSsidProfile}
+      passpointProfiles={passpointProfiles?.getAllProfiles?.items}
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchMoreProfiles}
       onDownloadFile={handleDownloadFile}
