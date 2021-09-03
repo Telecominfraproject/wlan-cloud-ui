@@ -1,38 +1,15 @@
 import React, { useContext } from 'react';
 import { AddProfile as AddProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
-import { useMutation, useQuery, gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { notification } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import { ROUTES, AUTH_TOKEN } from 'constants/index';
 import UserContext from 'contexts/UserContext';
 import { GET_ALL_PROFILES, GET_API_URL } from 'graphql/queries';
+import { CREATE_PROFILE, UPDATE_PROFILE } from 'graphql/mutations';
 import { fetchMoreProfiles } from 'graphql/functions';
 import { getItem } from 'utils/localStorage';
-
-const CREATE_PROFILE = gql`
-  mutation CreateProfile(
-    $profileType: String!
-    $customerId: ID!
-    $name: String!
-    $childProfileIds: [ID]
-    $details: JSONObject
-  ) {
-    createProfile(
-      profileType: $profileType
-      customerId: $customerId
-      name: $name
-      childProfileIds: $childProfileIds
-      details: $details
-    ) {
-      profileType
-      customerId
-      name
-      childProfileIds
-      details
-    }
-  }
-`;
 
 const AddProfile = () => {
   const { customerId } = useContext(UserContext);
@@ -89,6 +66,8 @@ const AddProfile = () => {
   );
 
   const [createProfile] = useMutation(CREATE_PROFILE);
+  const [updateProfile] = useMutation(UPDATE_PROFILE);
+
   const history = useHistory();
 
   const handleAddProfile = (profileType, name, details, childProfileIds = []) => {
@@ -171,6 +150,92 @@ const AddProfile = () => {
     }
   };
 
+  const handleCreateChildProfile = (profileType, name, details, childProfileIds = []) => {
+    return createProfile({
+      variables: {
+        profileType,
+        customerId,
+        name,
+        childProfileIds,
+        details,
+      },
+      update(cache, { data: { createProfile: newProfile } = {} }) {
+        const { getAllProfiles } = cache.readQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: profileType },
+        });
+
+        cache.writeQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: profileType },
+          data: {
+            getAllProfiles: {
+              ...getAllProfiles,
+              items: [...getAllProfiles.items, newProfile],
+            },
+          },
+        });
+      },
+    })
+      .then(({ data: { createProfile: newProfile } = {} }) => {
+        notification.success({
+          message: 'Success',
+          description: 'Profile successfully created.',
+        });
+        return newProfile;
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Profile could not be created.',
+        })
+      );
+  };
+
+  const handleOnUpdateChildProfile = (name, details, childProfileIds = [], fullProfile = {}) => {
+    return updateProfile({
+      variables: {
+        ...fullProfile,
+        customerId,
+        name,
+        childProfileIds,
+        details,
+      },
+      update(cache, { data: { updateProfile: updatedProfile } = {} }) {
+        const { getAllProfiles } = cache.readQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: fullProfile.profileType },
+        });
+
+        cache.writeQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: fullProfile.profileType },
+          data: {
+            getAllProfiles: {
+              ...getAllProfiles,
+              items: getAllProfiles.items.map(profile =>
+                profile.id === updatedProfile.id ? updatedProfile : profile
+              ),
+            },
+          },
+        });
+      },
+    })
+      .then(({ data: { updateProfile: updatedProfile } = {} }) => {
+        notification.success({
+          message: 'Success',
+          description: 'Profile successfully updated.',
+        });
+        return updatedProfile;
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Profile could not be updated.',
+        })
+      );
+  };
+
   return (
     <AddProfilePage
       onCreateProfile={handleAddProfile}
@@ -184,6 +249,8 @@ const AddProfile = () => {
       passpointProfiles={passpointProfiles?.getAllProfiles?.items}
       onFetchMoreProfiles={handleFetchMoreProfiles}
       fileUpload={handleFileUpload}
+      onCreateChildProfile={handleCreateChildProfile}
+      onUpdateChildProfile={handleOnUpdateChildProfile}
     />
   );
 };

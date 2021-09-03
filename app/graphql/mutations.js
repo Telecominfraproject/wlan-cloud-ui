@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { FULL_PROFILE } from './fragments';
 
 export const REFRESH_TOKEN = gql`
   mutation UpdateToken($refreshToken: String!) {
@@ -306,6 +307,60 @@ export const UPDATE_EQUIPMENT = gql`
 export const DELETE_EQUIPMENT = gql`
   mutation DeleteEquipment($id: ID!) {
     deleteEquipment(id: $id) {
+      id
+    }
+  }
+`;
+
+export const CREATE_PROFILE = gql`
+  mutation CreateProfile(
+    $profileType: String!
+    $customerId: ID!
+    $name: String!
+    $childProfileIds: [ID]
+    $details: JSONObject
+  ) {
+    createProfile(
+      profileType: $profileType
+      customerId: $customerId
+      name: $name
+      childProfileIds: $childProfileIds
+      details: $details
+    ) {
+      ...FullProfile
+    }
+  }
+  ${FULL_PROFILE}
+`;
+
+export const UPDATE_PROFILE = gql`
+  mutation UpdateProfile(
+    $id: ID!
+    $profileType: String!
+    $customerId: ID!
+    $name: String!
+    $childProfileIds: [ID]
+    $lastModifiedTimestamp: String
+    $details: JSONObject
+  ) {
+    updateProfile(
+      id: $id
+      profileType: $profileType
+      customerId: $customerId
+      name: $name
+      childProfileIds: $childProfileIds
+      lastModifiedTimestamp: $lastModifiedTimestamp
+      details: $details
+    ) {
+      ...FullProfile
+    }
+  }
+  ${FULL_PROFILE}
+`;
+
+export const DELETE_PROFILE = gql`
+  mutation DeleteProfile($id: ID!) {
+    deleteProfile(id: $id) {
       id
     }
   }

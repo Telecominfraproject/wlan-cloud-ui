@@ -1,91 +1,20 @@
-import React, { useState, useContext } from 'react';
-import { useParams, Redirect } from 'react-router-dom';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import React, { useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuery, useMutation } from '@apollo/client';
 import { notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
-import { ROUTES, AUTH_TOKEN } from 'constants/index';
+import { AUTH_TOKEN } from 'constants/index';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_PROFILES, GET_API_URL } from 'graphql/queries';
+import { GET_ALL_PROFILES, GET_API_URL, GET_PROFILE } from 'graphql/queries';
+import { UPDATE_PROFILE, CREATE_PROFILE } from 'graphql/mutations';
+
 import { fetchMoreProfiles } from 'graphql/functions';
 import { getItem } from 'utils/localStorage';
-
-const GET_PROFILE = gql`
-  query GetProfile($id: ID!) {
-    getProfile(id: $id) {
-      id
-      profileType
-      customerId
-      name
-      childProfiles {
-        id
-        name
-        profileType
-        details
-      }
-      associatedSsidProfiles {
-        id
-        name
-        profileType
-        details
-      }
-      osuSsidProfile {
-        id
-        name
-        profileType
-        details
-      }
-      childProfileIds
-      createdTimestamp
-      lastModifiedTimestamp
-      details
-    }
-  }
-`;
-
-const UPDATE_PROFILE = gql`
-  mutation UpdateProfile(
-    $id: ID!
-    $profileType: String!
-    $customerId: ID!
-    $name: String!
-    $childProfileIds: [ID]
-    $lastModifiedTimestamp: String
-    $details: JSONObject
-  ) {
-    updateProfile(
-      id: $id
-      profileType: $profileType
-      customerId: $customerId
-      name: $name
-      childProfileIds: $childProfileIds
-      lastModifiedTimestamp: $lastModifiedTimestamp
-      details: $details
-    ) {
-      id
-      profileType
-      customerId
-      name
-      childProfileIds
-      lastModifiedTimestamp
-      details
-    }
-  }
-`;
-
-const DELETE_PROFILE = gql`
-  mutation DeleteProfile($id: ID!) {
-    deleteProfile(id: $id) {
-      id
-    }
-  }
-`;
 
 const ProfileDetails = () => {
   const { customerId } = useContext(UserContext);
   const { id } = useParams();
-
-  const [redirect, setRedirect] = useState(false);
 
   const { data: apiUrl } = useQuery(GET_API_URL);
 
@@ -151,25 +80,7 @@ const ProfileDetails = () => {
   );
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
-  const [deleteProfile] = useMutation(DELETE_PROFILE);
-
-  const handleDeleteProfile = () => {
-    deleteProfile({ variables: { id } })
-      .then(() => {
-        notification.success({
-          message: 'Success',
-          description: 'Profile successfully deleted.',
-        });
-
-        setRedirect(true);
-      })
-      .catch(() =>
-        notification.error({
-          message: 'Error',
-          description: 'Profile could not be deleted.',
-        })
-      );
-  };
+  const [createProfile] = useMutation(CREATE_PROFILE);
 
   const handleUpdateProfile = (
     name,
@@ -285,12 +196,94 @@ const ProfileDetails = () => {
     else fetchMoreProfiles(e, ssidProfiles, fetchMore);
   };
 
+  const handleCreateChildProfile = (profileType, name, details, childProfileIds = []) => {
+    return createProfile({
+      variables: {
+        profileType,
+        customerId,
+        name,
+        childProfileIds,
+        details,
+      },
+      update(cache, { data: { createProfile: newProfile } = {} }) {
+        const { getAllProfiles } = cache.readQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: profileType },
+        });
+
+        cache.writeQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: profileType },
+          data: {
+            getAllProfiles: {
+              ...getAllProfiles,
+              items: [...getAllProfiles.items, newProfile],
+            },
+          },
+        });
+      },
+    })
+      .then(({ data: { createProfile: newProfile } = {} }) => {
+        notification.success({
+          message: 'Success',
+          description: 'Profile successfully created.',
+        });
+        return newProfile;
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Profile could not be created.',
+        })
+      );
+  };
+
+  const handleOnUpdateChildProfile = (name, details, childProfileIds = [], fullProfile = {}) => {
+    return updateProfile({
+      variables: {
+        ...fullProfile,
+        customerId,
+        name,
+        childProfileIds,
+        details,
+      },
+      update(cache, { data: { updateProfile: updatedProfile } = {} }) {
+        const { getAllProfiles } = cache.readQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: fullProfile.profileType },
+        });
+
+        cache.writeQuery({
+          query: GET_ALL_PROFILES(),
+          variables: { customerId, type: fullProfile.profileType },
+          data: {
+            getAllProfiles: {
+              ...getAllProfiles,
+              items: getAllProfiles.items.map(profile =>
+                profile.id === updatedProfile.id ? updatedProfile : profile
+              ),
+            },
+          },
+        });
+      },
+    })
+      .then(({ data: { updateProfile: updatedProfile } = {} }) => {
+        notification.success({
+          message: 'Success',
+          description: 'Profile successfully updated.',
+        });
+        return updatedProfile;
+      })
+      .catch(() =>
+        notification.error({
+          message: 'Error',
+          description: 'Profile could not be updated.',
+        })
+      );
+  };
+
   if (loading) {
     return <Loading />;
-  }
-
-  if (redirect) {
-    return <Redirect to={ROUTES.profiles} />;
   }
 
   return (
@@ -301,7 +294,6 @@ const ProfileDetails = () => {
       details={data.getProfile.details}
       childProfiles={data.getProfile.childProfiles}
       childProfileIds={data.getProfile.childProfileIds}
-      onDeleteProfile={handleDeleteProfile}
       onUpdateProfile={handleUpdateProfile}
       ssidProfiles={ssidProfiles?.getAllProfiles?.items}
       rfProfiles={rfProfiles?.getAllProfiles?.items}
@@ -316,6 +308,8 @@ const ProfileDetails = () => {
       fileUpload={handleFileUpload}
       onFetchMoreProfiles={handleFetchMoreProfiles}
       onDownloadFile={handleDownloadFile}
+      onCreateChildProfile={handleCreateChildProfile}
+      onUpdateChildProfile={handleOnUpdateChildProfile}
     />
   );
 };
