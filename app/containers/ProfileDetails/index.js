@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { notification } from 'antd';
 import { ProfileDetails as ProfileDetailsPage, Loading } from '@tip-wlan/wlan-cloud-ui-library';
 
@@ -78,6 +78,13 @@ const ProfileDetails = () => {
       fetchPolicy: 'network-only',
     }
   );
+
+  const [
+    fetchChildProfile,
+    { data: { getProfile: childProfile } = {}, loading: loadingChildProfile },
+  ] = useLazyQuery(GET_PROFILE, {
+    errorPolicy: 'all',
+  });
 
   const [updateProfile] = useMutation(UPDATE_PROFILE);
   const [createProfile] = useMutation(CREATE_PROFILE);
@@ -196,6 +203,10 @@ const ProfileDetails = () => {
     else fetchMoreProfiles(e, ssidProfiles, fetchMore);
   };
 
+  const handleFetchChildProfile = profileId => {
+    fetchChildProfile({ variables: { id: profileId } });
+  };
+
   const handleCreateChildProfile = (profileType, name, details, childProfileIds = []) => {
     return createProfile({
       variables: {
@@ -238,10 +249,10 @@ const ProfileDetails = () => {
       );
   };
 
-  const handleOnUpdateChildProfile = (name, details, childProfileIds = [], fullProfile = {}) => {
+  const handleOnUpdateChildProfile = (name, details, childProfileIds = []) => {
     return updateProfile({
       variables: {
-        ...fullProfile,
+        ...childProfile,
         customerId,
         name,
         childProfileIds,
@@ -250,12 +261,12 @@ const ProfileDetails = () => {
       update(cache, { data: { updateProfile: updatedProfile } = {} }) {
         const { getAllProfiles } = cache.readQuery({
           query: GET_ALL_PROFILES(),
-          variables: { customerId, type: fullProfile.profileType },
+          variables: { customerId, type: childProfile.profileType },
         });
 
         cache.writeQuery({
           query: GET_ALL_PROFILES(),
-          variables: { customerId, type: fullProfile.profileType },
+          variables: { customerId, type: childProfile.profileType },
           data: {
             getAllProfiles: {
               ...getAllProfiles,
@@ -310,6 +321,9 @@ const ProfileDetails = () => {
       onDownloadFile={handleDownloadFile}
       onCreateChildProfile={handleCreateChildProfile}
       onUpdateChildProfile={handleOnUpdateChildProfile}
+      handleFetchChildProfile={handleFetchChildProfile}
+      childProfile={childProfile}
+      loadingChildProfile={loadingChildProfile}
     />
   );
 };

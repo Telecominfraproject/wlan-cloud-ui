@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-import { FULL_PROFILE } from './fragments';
 
 export const REFRESH_TOKEN = gql`
   mutation UpdateToken($refreshToken: String!) {
@@ -327,10 +326,15 @@ export const CREATE_PROFILE = gql`
       childProfileIds: $childProfileIds
       details: $details
     ) {
-      ...FullProfile
+      id
+      profileType
+      customerId
+      name
+      childProfileIds
+      lastModifiedTimestamp
+      details
     }
   }
-  ${FULL_PROFILE}
 `;
 
 export const UPDATE_PROFILE = gql`
@@ -352,10 +356,15 @@ export const UPDATE_PROFILE = gql`
       lastModifiedTimestamp: $lastModifiedTimestamp
       details: $details
     ) {
-      ...FullProfile
+      id
+      profileType
+      customerId
+      name
+      childProfileIds
+      lastModifiedTimestamp
+      details
     }
   }
-  ${FULL_PROFILE}
 `;
 
 export const DELETE_PROFILE = gql`

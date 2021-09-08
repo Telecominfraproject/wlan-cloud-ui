@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-import { FULL_PROFILE } from './fragments';
 
 export const GET_API_URL = gql`
   query GetApiUrl {
@@ -257,10 +256,34 @@ export const FILTER_SERVICE_METRICS = gql`
 export const GET_PROFILE = gql`
   query GetProfile($id: ID!) {
     getProfile(id: $id) {
-      ...FullProfile
+      id
+      profileType
+      customerId
+      name
+      childProfiles {
+        id
+        name
+        profileType
+        details
+      }
+      associatedSsidProfiles {
+        id
+        name
+        profileType
+        details
+      }
+      osuSsidProfile {
+        id
+        name
+        profileType
+        details
+      }
+      childProfileIds
+      createdTimestamp
+      lastModifiedTimestamp
+      details
     }
   }
-  ${FULL_PROFILE}
 `;
 
 export const GET_ALL_PROFILES = (fields = '') => gql`
@@ -279,14 +302,15 @@ export const GET_ALL_PROFILES = (fields = '') => gql`
       context: $context
     ) {
       items {
-        ...FullProfile
-
+        id
+        name
+        profileType
+        details
         ${fields}
       }
       context
     }
   }
-  ${FULL_PROFILE}
 `;
 
 export const GET_ALL_STATUS = gql`

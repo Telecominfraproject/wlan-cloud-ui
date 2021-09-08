@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { AddProfile as AddProfilePage } from '@tip-wlan/wlan-cloud-ui-library';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery, useLazyQuery } from '@apollo/client';
 import { notification } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import { ROUTES, AUTH_TOKEN } from 'constants/index';
 import UserContext from 'contexts/UserContext';
-import { GET_ALL_PROFILES, GET_API_URL } from 'graphql/queries';
+import { GET_ALL_PROFILES, GET_API_URL, GET_PROFILE } from 'graphql/queries';
 import { CREATE_PROFILE, UPDATE_PROFILE } from 'graphql/mutations';
 import { fetchMoreProfiles } from 'graphql/functions';
 import { getItem } from 'utils/localStorage';
@@ -64,6 +64,13 @@ const AddProfile = () => {
       fetchPolicy: 'network-only',
     }
   );
+
+  const [
+    fetchChildProfile,
+    { data: { getProfile: childProfile } = {}, loading: loadingChildProfile },
+  ] = useLazyQuery(GET_PROFILE, {
+    errorPolicy: 'all',
+  });
 
   const [createProfile] = useMutation(CREATE_PROFILE);
   const [updateProfile] = useMutation(UPDATE_PROFILE);
@@ -150,6 +157,10 @@ const AddProfile = () => {
     }
   };
 
+  const handleFetchChildProfile = profileId => {
+    fetchChildProfile({ variables: { id: profileId } });
+  };
+
   const handleCreateChildProfile = (profileType, name, details, childProfileIds = []) => {
     return createProfile({
       variables: {
@@ -192,10 +203,10 @@ const AddProfile = () => {
       );
   };
 
-  const handleOnUpdateChildProfile = (name, details, childProfileIds = [], fullProfile = {}) => {
+  const handleOnUpdateChildProfile = (name, details, childProfileIds = []) => {
     return updateProfile({
       variables: {
-        ...fullProfile,
+        ...childProfile,
         customerId,
         name,
         childProfileIds,
@@ -204,12 +215,12 @@ const AddProfile = () => {
       update(cache, { data: { updateProfile: updatedProfile } = {} }) {
         const { getAllProfiles } = cache.readQuery({
           query: GET_ALL_PROFILES(),
-          variables: { customerId, type: fullProfile.profileType },
+          variables: { customerId, type: childProfile.profileType },
         });
 
         cache.writeQuery({
           query: GET_ALL_PROFILES(),
-          variables: { customerId, type: fullProfile.profileType },
+          variables: { customerId, type: childProfile.profileType },
           data: {
             getAllProfiles: {
               ...getAllProfiles,
@@ -251,6 +262,9 @@ const AddProfile = () => {
       fileUpload={handleFileUpload}
       onCreateChildProfile={handleCreateChildProfile}
       onUpdateChildProfile={handleOnUpdateChildProfile}
+      handleFetchChildProfile={handleFetchChildProfile}
+      childProfile={childProfile}
+      loadingChildProfile={loadingChildProfile}
     />
   );
 };
